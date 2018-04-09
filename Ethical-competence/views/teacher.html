@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TAXI CUSTOMER</title>
+  <title>TEACHER</title>
   <link rel="stylesheet" href="leaflet/leaflet.css">
   <link rel="stylesheet" href="/esri-leaflet-geocoder/esri-leaflet-geocoder.css">
   <link rel="stylesheet" href="css/taxi.css">
@@ -18,10 +18,12 @@
   <h1>
     Teacher 
   </h1>
-  <p>Select destination first, then your location</p>
+  <p>Something here</p>
   <div id="page">
-    <div id="my-map"></div>
-    <button v-on:click="orderTaxi">ORDER TAXI</button>
+  
+    <button id="teacher-button" v-on:click="orderTaxi">Start Workshop</button>
+    <button id="teacher-button" v-on:click="orderTaxi">Edit Workshop</button>
+  
     Your order number is {{ orderId }}
   </div>
 </body>

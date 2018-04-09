@@ -14,3 +14,30 @@ body {
 .popup-list {
 	padding-left: 0;
 }
+
+#teacher-button {
+
+  border-radius: 4px;
+  width: 40%;
+  height: 200px;
+  margin-left: 30%;
+  margin-right: 30%;
+  background: #5b97f0;
+  background-image: linear-gradient(to bottom, #5b97f0, #2980b9);
+  border-radius: 15px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 50px;
+  padding: 9px 25px 10px 25px;
+  text-decoration: none;
+
+}
+
+
+#teacher-button:hover {
+
+  background: #3cb0fd;
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+
+}
