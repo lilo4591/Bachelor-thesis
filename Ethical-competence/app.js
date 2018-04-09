@@ -23,17 +23,18 @@ app.use('/leaflet', express.static(path.join(__dirname, '/node_modules/leaflet/d
 app.use('/esri-leaflet', express.static(path.join(__dirname, '/node_modules/esri-leaflet/dist/')));
 // Serve esri leaflet geocoder from node_modules as esri-leaflet-geocoder/
 app.use('/esri-leaflet-geocoder', express.static(path.join(__dirname, '/node_modules/esri-leaflet-geocoder/dist/')));
+
 // Serve index.html directly as root page
 app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/customer.html'));
+  res.sendFile(path.join(__dirname, 'views/teacher.html'));
 });
-// Serve driver.html as /driver
-app.get('/driver', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/driver.html'));
+// Serve student.html as /student
+app.get('/student', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views/student.html'));
 });
-// Serve dispatcher.html as /dispatcher
-app.get('/dispatcher', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/dispatcher.html'));
+// Serve admin.html as /admin
+app.get('/admin', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views/admin.html'));
 });
 
 // Store data in an object to keep the global namespace clean and 
