@@ -12,7 +12,7 @@ var vm = new Vue({
     customerMarkers: {},
     taxiMarkers: {}
   },
-
+/*
   created: function () {
     socket.on('initialize', function (data) {
       this.orders = data.orders;
@@ -119,5 +119,5 @@ var vm = new Vue({
     assignTaxi: function (order) {
       socket.emit("taxiAssigned", order);
     }
-  }
+  }*/
 });

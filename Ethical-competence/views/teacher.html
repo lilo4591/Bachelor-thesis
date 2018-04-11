@@ -6,8 +6,9 @@
   <title>TEACHER</title>
   <link rel="stylesheet" href="leaflet/leaflet.css">
   <link rel="stylesheet" href="/esri-leaflet-geocoder/esri-leaflet-geocoder.css">
-  <link rel="stylesheet" href="css/taxi.css">
+  <link rel="stylesheet" href="css/style.css">
   <script src="/vue/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/leaflet/leaflet.js"></script>
   <script src="/esri-leaflet/esri-leaflet.js"></script> 
@@ -21,10 +22,23 @@
   <p>Something here</p>
   <div id="page">
   
-    <button id="teacher-button" v-on:click="orderTaxi">Start Workshop</button>
-    <button id="teacher-button" v-on:click="orderTaxi">Edit Workshop</button>
-  
-    Your order number is {{ orderId }}
+  <nav>
+    <ul>
+      <li><router-link to="/">Home</router-link></li>
+      <li><router-link to="/about">About</router-link></li>
+      <li><router-link to="/about">About</router-link></li>
+    </ul>
+    </nav>
+
+    <button id="teacher-button" >Start Workshop</button>
+    <nav>
+      <router-link to="/admin">
+    <button id="teacher-button" >Edit Workshop</button>
+    </router-link>
+    <nav>
+    <router-view></router-view>
+    <p v-if = "sessiontoken !== null">Log in with this sessiontoken {{ vm.sessiontoken }} </p>
+
   </div>
 </body>
 </html>
