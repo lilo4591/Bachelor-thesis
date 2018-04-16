@@ -4,9 +4,11 @@
     <!-- {{btnState ? 'The Button is disabled' : 'The button is active' }}
       <button v-on:click="changeName" v-bind:disabled="btnState">Change Name</button> 
     -->
-    <div class="button">
-      <button v-for="(data, index) in options" :key='index'> {{data.option}}</button>
-    </div> 
+    <router-link to="/heteronmyautonomy">
+      <div class="button">
+        <button v-for="(data, index) in options" :key='index'> {{data.option}}</button>
+      </div> 
+    </router-link>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ export default {
       options: [
         {"option": "Exercise 1"},
         {"option": "Exercise 2"},
+        {"option": "Exercise 3"},
         {"option": "Exercise 3"}
       ],
     }
@@ -35,7 +38,7 @@ export default {
 
 button {
   border-radius: 4px;
-  width: 100%;
+  width: 50%;
   height: 200px;
   margin-left: 0;
   margin-right: 0;

@@ -1,44 +1,48 @@
-<template>
-  <div>
-    {{name}}
-    <!-- {{btnState ? 'The Button is disabled' : 'The button is active' }}
-      <button v-on:click="changeName" v-bind:disabled="btnState">Change Name</button> 
-    -->
-    <div class="button">
-      <!-- want to loop the buttons, but then how to route to 2 different paths?-->
-        <router-link to="/workshop">
-        <button> 
-          {{ this.options[0].option }}
-        </button>
-        </router-link>
-        <router-link to="/workshop">
-        <button> 
-          {{ this.options[1].option }}
-        </button>
-        </router-link>
- </div> 
+<template> 
+  <div><!-- TODO Show first dilemma here-->
+  <!-- prevent: prevents from page reloading -->
+    <div class="holder">
+    <form @submit.prevent="addThought">
+    <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
+    </form> 
+      <p>These are your thoughts</p>
+      <ul>
+        <li v-for="(data, index) in thoughts" :key='index'> 
+          {{data.thought}}
+          <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+      </ul>
+    </div>  
   </div>
 </template>
 
 <script>
-//import Router from '../router.js'
 
 export default {
-  name: 'Teacher',
-  data () {
+  name: 'HeteronomyAutonomy',
+  
+  data() {
     return {
-      name: 'Teacher Page',
-      btnState: true,
-      options: [
-        {"option": "Start Workshop"},
-        {"option": "Edit Workshop"}
+      thought: '',
+      thoughts: [
+        {"thought": "Example: I think this is wrong because of current laws.." }
       ]
     }
+  },
+  methods: {
+    addThought() { 
+      this.thoughts.push({thought: this.thought});
+      this.thought = '';
+    },
+    removeThought(id) {
+      this.thoughts.splice(id,1);
+    } 
   }
 }
+
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 @import "https://www.w3schools.com/w3css/4/w3.css";
@@ -113,4 +117,5 @@ i {
 .container {
   box-shadow: 0px 0px 40px lightgray;
 }
+
 </style>
