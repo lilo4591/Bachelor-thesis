@@ -2,7 +2,7 @@
   <div id="app">
     <nav>
       <router-link to="/">Home</router-link>
-      <router-link to="/About">About</router-link>
+      <router-link to="/teacher/About">About</router-link>
     </nav>
     <router-view/>
     <div>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Teacher from './components/Teacher.vue'
+import Teacher from './components/teacherpage/Teacher.vue'
 
 export default {
   name: 'app',

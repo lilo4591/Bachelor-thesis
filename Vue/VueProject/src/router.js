@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Teacher from './components/Teacher.vue'
-import About from './components/About.vue'
-import Workshop from './components/Workshop.vue'
-import Heteronomyautonomy from './components/Heteronomyautonomy.vue'
+import Teacher from './components/teacherpage/Teacher.vue'
+import About from './components/teacherpage/About.vue'
+import Workshop from './components/teacherpage/Workshop.vue'
+import HeteronomyAutonomy1 from './components/teacherpage/HeteronomyAutonomy1.vue'
 
 Vue.use(Router)
 
@@ -15,21 +15,22 @@ export default new Router({
       component: Teacher
     },
     {
-      path: '/about',
+      path: '/teacher/about',
       name: 'about',
       component: About
     },
     {
-      path: '/workshop',
+      path: '/teacher/workshop',
       name: 'Workshop',
       component: Workshop
     },
     {
-      path: '/heteronmyautonomy',
-      name: 'Heteronomyautonomy',
-      component: Heteronomyautonomy
+      path: '/teacher/heteronmyautonomy1',
+      name: 'HeteronomyAutonomy1',
+      component: HeteronomyAutonomy1
     }
    ],
+  /*
   methods: {
     navigateTo(nav) {
         this.$route.push({
@@ -39,6 +40,6 @@ export default new Router({
           path: './workshop'
         }) 
     }
-  }
+  }*/
 })
 
