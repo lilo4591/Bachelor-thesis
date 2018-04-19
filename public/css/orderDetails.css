@@ -1,0 +1,22 @@
+#detailsPage {
+	flex: 1 1 auto;
+	grid-column: 1;
+	grid-row: 2;
+}
+#detailsPage p {
+	line-height: 80%;
+}
+
+#detailsBox {
+	display: grid;
+	grid-template-columns: 50% 50%;
+}
+
+#detailsInfo {
+	grid-column: 1;
+}
+
+
+#driverInfo {
+	grid-column: 2;
+}

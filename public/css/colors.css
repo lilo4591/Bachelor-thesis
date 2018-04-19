@@ -1,0 +1,54 @@
+:root {
+    --bg-color:#e4f9f5;
+    --accent-color:#30e3ca;
+    --accent2-color:#11999e;
+    --dark-color:#40514e;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Kavivanar|Roboto');
+body {
+	font-family: 'Roboto', sans-serif;
+	background-color: var(--bg-color);
+	margin: 2px;
+}
+
+@media screen and (max-width: 800px) {
+  #headertitle {
+    font-size: 2em;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #headertitle {
+    font-size: 4em;
+  }
+}
+
+button {
+  background-color: var(--dark-color);
+  color: var(--bg-color);
+  padding: 1em;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: var(--accent2-color);
+}
+
+#headertitle {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    width: 100%;
+    margin: 0 auto;
+    color: var(--dark-color);
+    text-align: center;
+    vertical-align: center;
+    border-radius: 5px;
+}
+
+
+.smallerText {
+	display: inline-block;
+	font-size: 0.7em;
+}

@@ -1,0 +1,51 @@
+
+.orderRequest {
+	display: grid;
+	grid-gap: 0 30px;
+	grid-template-columns: 20% 80%;
+	background-color: #fff;
+	border-radius: 5px;
+	color: #444;
+	margin: 10px;
+	padding: 0 10px;
+	font-size: 0.7em;
+}
+
+.orderRequest .orderImg {
+	height: 80px;
+	margin-top: 10px;
+
+	grid-column: 1;
+	grid-row: 1 / span 2;
+}
+
+.orderRequest:hover {
+      background-color: #d4e9e5;
+      
+    }
+
+.orderRequest .orderNr {
+	margin-top: -20px;
+	padding-left: 10px;
+	grid-column: 1;
+	grid-row: 3;
+}
+.orderRequest .orderFrom {
+	grid-column: 2;
+	grid-row: 2;
+}
+.orderRequest .orderTo {
+	grid-column: 2;
+	grid-row: 3;
+}
+.orderRequest .mobility {
+
+  border-radius: 5px;
+	margin-right: 20px;
+	margin-left: 20px;
+  text-align: center;
+ 
+  grid-column: 2;
+  grid-row: 1;
+  background-color: var(--accent-color);
+}

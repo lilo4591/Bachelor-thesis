@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/vue/vue.js"></script> 
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
+    <!--    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/teacher.js" defer></script>
+  </head>
+  <body>
+    <div>
+    <div id="page">
+    <div id="app">
+    <nav>
+      <router-link to="/home">Home</router-link>
+      <router-link to="/help">Help</router-link>
+    </nav>
+    <router-view></router-view>
+      </div>
+      
+        {{ this.name }}
+        <!-- {{btnState ? 'The Button is disabled' : 'The button is active' }}
+          <button v-on:click="changeName" v-bind:disabled="btnState">Change Name</button> 
+        -->
+        <div class="button">
+          <!-- want to loop the buttons, but then how to route to 2 different paths?-->
+          <button v-on:click="goTo('http://localhost:3000/teacher-start-workshop')"> 
+            {{ this.options[0].option }}
+          </button>
+          <button> 
+            {{ this.options[1].option }}
+          </button>
+        </div> 
+
+        <div id = "mall">
+          <button id="smallbutton" v-on:click=goBack()>Go back</button>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>
