@@ -1,14 +1,31 @@
 @import "https://www.w3schools.com/w3css/4/w3.css";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import "https://fonts.googleapis.com/css?family=Montserrat:400,700";
 
 body {
-	margin: 0;
-	padding: 0;
+  background-color: #EEEEEE;
+  font-family: 'Montserrat', sans-serif;
+  display: grid;
+  grid-template-rows: auto;
+  justify-items: center;
+  padding-top: 50px;
 }
 
+nav {
+  padding: 20px 20px 20px 0;
+}
 
+nav a {
+  padding: 10px;
+  text-decoration: none;
+  background: #fff;
+  border-radius: 3px;
+  color: rgb(0, 110, 255);
+  font-weight: bold;
+  margin-right: 15px;
+}
 
-button {
+.button {
   border-radius: 4px;
   width: 100%;
   height: 200px;
@@ -22,14 +39,12 @@ button {
   font-size: 50px;
   padding: 9px 25px 10px 25px;
   text-decoration: none;
-
 }
 
-button:hover {
+.button:hover {
   background: #3cb0fd;
   background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
   text-decoration: none;
-
 }
 
 input {
@@ -80,39 +95,6 @@ i {
 
 /* for header and footer*/
 
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700');
-
-body {
-  background-color: #EEEEEE;
-  font-family: 'Montserrat', sans-serif;
-  display: grid;
-  grid-template-rows: auto;
-  justify-items: center;
-  padding-top: 50px;
-}
-
-body, html {
-  margin: 0;
-  height: 100%;
-}
-
-
-nav {
-  padding: 20px 20px 20px 0;
-}
-
-nav a {
-  padding: 10px;
-  text-decoration: none;
-  background: #fff;
-  border-radius: 3px;
-  color: rgb(0, 110, 255);
-  font-weight: bold;
-  margin-right: 15px;
-}
-
-
-
 #smallbutton {
   border-radius: 4px;
   width: 20%;
@@ -126,14 +108,35 @@ nav a {
   font-size: 50px;
   padding: 9px 25px 10px 25px;
   text-decoration: none;
-
 }
 
 #smallbutton:hover {
   background: #3cb0fd;
   background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
   text-decoration: none;
-
 }
 
+/* for workshop.html page */
+
+.workshopbutton {
+  border-radius: 4px;
+  width: 40%;
+  height: 200px;
+  margin-left: 0;
+  margin-right: 0;
+  background: #5b97f0;
+  background-image: linear-gradient(to bottom, #5b97f0, #2980b9);
+  border-radius: 15px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 50px;
+  padding: 9px 25px 10px 25px;
+  text-decoration: none;
+}
+
+.workshopbutton:hover {
+  background: #3cb0fd;
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+}
 

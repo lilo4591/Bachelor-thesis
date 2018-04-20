@@ -28,6 +28,16 @@ app.get('/teacher-start-workshop', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/teacher-start-workshop.html'));
 });
 
+// Serve workshop.html as /workshop
+app.get('/workshop', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views/workshop.html'));
+});
+
+// Serve heteronomy-autonomy.html as /heteronomy-autonomy
+app.get('/heteronomy-autonomy1', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views/heteronomy-autonomy1.html'));
+});
+
 
 
 // Serve student.html as /student

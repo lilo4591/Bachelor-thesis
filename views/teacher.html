@@ -28,12 +28,12 @@
         <!-- {{btnState ? 'The Button is disabled' : 'The button is active' }}
           <button v-on:click="changeName" v-bind:disabled="btnState">Change Name</button> 
         -->
-        <div class="button">
+        <div>
           <!-- want to loop the buttons, but then how to route to 2 different paths?-->
-          <button v-on:click="goTo('http://localhost:3000/teacher-start-workshop')"> 
+          <button class="button" v-on:click="goTo('http://localhost:3000/teacher-start-workshop')"> 
             {{ this.options[0].option }}
           </button>
-          <button> 
+          <button class= "button"> 
             {{ this.options[1].option }}
           </button>
         </div> 

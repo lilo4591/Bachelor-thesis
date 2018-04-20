@@ -26,9 +26,8 @@
         <li v-for="(data, index) in students" :key='index'>
           Student number {{students[index]}} has connected</li>
       </ul>
-      <div class="button">
-        <!-- want to loop the buttons, but then how to route to 2 different paths?-->
-        <button> Start Workshop  </button>
+      <div>
+        <button class="button" v-on:click="goTo('http://localhost:3000/workshop')" > Start Workshop  </button>
       </div> 
     </div>
   </body>

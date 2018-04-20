@@ -8,6 +8,7 @@ var vm = new Vue ({
     return {
       name: 'StartWorkshop',
       btnState: true,
+      token: null,
       options: [
         {"option": "Start Workshop"},
         {"option": "Edit Workshop"}
@@ -18,12 +19,17 @@ var vm = new Vue ({
   },
   created: function () {
       socket.emit('initToken', function (data) {
-      getRandomnteger(1111,9999)
+      t = getRandomnteger(1111,9999);
+      this.token = t;
     }.bind(this));
 
   },
   methods: {
-     getRandomnteger(min, max) {
+    goTo: function(url) {
+      window.location.href = url;
+      console.log("Hello")
+    },
+    getRandomnteger: function(min, max) {
           return Math.floor(Math.random() * (max - min) ) + min;
     }
   }
