@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
     <!--    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
+    <!--    <script src="js/teacher-start-workshop.js" defer></script>-->
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/workshop.js" defer></script>
   </head>
@@ -21,7 +22,7 @@
     -->
     <!--all buttons now go to the same exercise -->
       <div>
-        <button class="workshopbutton" v-on:click="goTo('http://localhost:3000/heteronomy-autonomy1')" v-for="(data, index) in options" :key='index'> {{data.option}}</button>
+        <button class="workshopbutton" v-on:click="goTo('http://localhost:3000/heteronomy-autonomy1')" v-for="(data, index) in exerciseOptions" :key='index'> {{data.exerciseOption}}</button>
       </div> 
 
     </div>

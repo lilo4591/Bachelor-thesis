@@ -2,7 +2,7 @@
 /*global Vue, io */
 /* exported vm */
 'use strict';
-var socket = io();
+//var socket = io();
 
 var vm = new Vue({
   el: '#page',

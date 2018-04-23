@@ -22,7 +22,6 @@ var vm = new Vue ({
       t = getRandomnteger(1111,9999);
       this.token = t;
     }.bind(this));
-
   },
   methods: {
     goTo: function(url) {

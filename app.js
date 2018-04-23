@@ -6,8 +6,9 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+//var io = require('socket.io')(http);
 var path = require('path');
+var socket = require('socket.io');
 
 // Pick arbitrary port for server
 var port = 3000;
@@ -17,6 +18,12 @@ app.set('port', (process.env.PORT || port));
 app.use(express.static(path.join(__dirname, 'public/')));
 // Serve vue from node_modules as vue/
 app.use('/vue', express.static(path.join(__dirname, '/node_modules/vue/dist/')));
+
+// Serve test.html directly as root page
+app.get('/test', function (req, res) {
+  res.sendFile(path.join(__dirname, 'views/test.html'));
+});
+
 
 // Serve index.html directly as root page
 app.get('/', function (req, res) {
@@ -42,7 +49,7 @@ app.get('/heteronomy-autonomy1', function (req, res) {
 
 // Serve student.html as /student
 app.get('/student', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/student.html'));
+  res.sendFile(path.join(__dirname, 'views/student/student.html'));
 });
 
 // Serve teacher-admin.html as /dispatcher
@@ -53,19 +60,19 @@ app.get('/teacher-admin', function (req, res) {
 // Store data in an object to keep the global namespace clean and
 // prepare for multiple instances of data if necessary
 
-/* 
+ 
 function Data() {
-  this.orders = {};
-  this.taxis = {};
-  this.currentOrderNumber = 1000;
+  this.students = {};
+  this.currentStudentId = 1;
 }
 
 
-Data.prototype.getOrderNumber = function () {
-  this.currentOrderNumber += 1;
-  return this.currentOrderNumber;
+Data.prototype.getStudentId = function () {
+  this.currentStudentId += 1;
+  return this.currentStudentId;
 }
 
+/*
 //adds an order to to the queue
 Data.prototype.addOrder = function (order) {
   var orderId = this.getOrderNumber();
@@ -104,14 +111,27 @@ Data.prototype.updateTaxiDetails = function (taxi) {
 Data.prototype.removeTaxi = function (taxiId) {
     delete this.taxis[taxiId];
 };
+*/
 
-Data.prototype.getAllTaxis = function () {
-  return this.taxis;
+Data.prototype.getAllStudents = function () {
+  return this.students;
 };
 
 
 var data = new Data();
+var i = 1;
 
+var server = app.listen(app.get('port'), function () {
+  console.log('Server listening on port ' + app.get('port'));
+});
+
+var io = socket(server)
+
+io.on('connection', function(socket) {
+  console.log("client " + socket.id + " connected")
+  i++
+});
+/*
 io.on('connection', function (socket) {
   // Send list of orders when a client connects
   socket.emit('initialize', { orders: data.getAllOrders(),
@@ -160,8 +180,8 @@ io.on('connection', function (socket) {
   })
 });
 
-***/
 
 var server = http.listen(app.get('port'), function () {
   console.log('Server listening on port ' + app.get('port'));
 });
+**/

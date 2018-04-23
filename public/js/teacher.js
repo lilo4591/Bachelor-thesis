@@ -4,7 +4,7 @@
 'use strict';
 Vue.use(VueRouter)
 
-var socket = io();
+//var socket = io();
 
 const home = {template:  '<h1>homepage</h1>' }
 const help = {template: '<h1>this is the help page </h1>' }

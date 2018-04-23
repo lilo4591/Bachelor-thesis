@@ -9,9 +9,9 @@
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
-    <!--    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/teacher.js" defer></script>
+    <!--    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> -->
+    <script src="js/workshop.js" defer></script>
   </head>
   <body>
     <div>
@@ -30,11 +30,11 @@
         -->
         <div>
           <!-- want to loop the buttons, but then how to route to 2 different paths?-->
-          <button class="button" v-on:click="goTo('http://localhost:3000/teacher-start-workshop')"> 
-            {{ this.options[0].option }}
+          <button class="button" onclick="vm.startWorkshop('http://localhost:3000/teacher-start-workshop')"> 
+            {{ this.workshopOptions[0].workshopOption }}
           </button>
           <button class= "button"> 
-            {{ this.options[1].option }}
+            {{ this.workshopOptions[1].workshopOption }}
           </button>
         </div> 
 

@@ -8,8 +8,8 @@
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script> 
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/teacher-start-workshop.js" defer></script>
+    <script src="/socket.io/socket.io.js"></script> 
+    <script src="js/workshop.js" defer></script>
   </head>
   <body>
   <div id="headerpage">
@@ -17,11 +17,11 @@
   </div>
 
     <div id="page">
-      {{name}}
+     jsfile: {{name}}
       <!-- {{btnState ? 'The Button is disabled' : 'The button is active' }}
         <button v-on:click="changeName" v-bind:disabled="btnState">Change Name</button> 
       -->
-
+      <h1>Log in to localhost:3000/student with sessiontoken {{ token }} </h1>
       <ul>
         <li v-for="(data, index) in students" :key='index'>
           Student number {{students[index]}} has connected</li>
