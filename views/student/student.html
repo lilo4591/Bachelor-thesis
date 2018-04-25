@@ -4,14 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Student</title>
-    <link rel="stylesheet" href="css/colors.css">
-   <link rel="stylesheet" href="css/taxi.css">
-    <link rel="stylesheet" href="css/customer.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="/vue/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="js/student.js" defer></script>
     <script src="/socket.io/socket.io.js"></script>
-   <script src="js/student.js" defer></script>
    </head>
-  <body id="body">
-    <div>this is the studentpage</div>
+    <div id="student">
+      <h1>Student Page</h1>
+      <router-view></router-view>
+    </div>
   </body>
 </html>

@@ -63,63 +63,25 @@ app.get('/teacher-admin', function (req, res) {
  
 function Data() {
   this.students = {};
-  this.currentStudentId = 1;
+  this.currentStudentId = 0;
+  this.groups = {};
 }
-
 
 Data.prototype.getStudentId = function () {
   this.currentStudentId += 1;
   return this.currentStudentId;
 }
 
-/*
-//adds an order to to the queue
-Data.prototype.addOrder = function (order) {
-  var orderId = this.getOrderNumber();
-  //Store the order in an "associative array" with orderId as key
-  this.orders[orderId] = order;
-  return orderId;
-};
-
-// Just deleting the order when it's finished
-Data.prototype.finishOrder = function (orderId) {
-    delete this.orders[orderId];
-};
-
-// Only needs to know orderId. The rest is up to the client to decide
-Data.prototype.updateOrderDetails = function (order) {
-  for (var key in order) {
-    this.orders[order.orderId][key] = order[key];
-  }
-};
-
-Data.prototype.getAllOrders = function () {
-  return this.orders;
-};
-
-Data.prototype.addTaxi = function (taxi) {
-  //Store the order in an "associative array" with orderId as key
-  this.taxis[taxi.taxiId] = taxi;
-};
-
-Data.prototype.updateTaxiDetails = function (taxi) {
-  for (var key in taxi) {
-    this.taxis[taxi.taxiId][key] = taxi[key];
-  }
-};
-
-Data.prototype.removeTaxi = function (taxiId) {
-    delete this.taxis[taxiId];
-};
-*/
+Data.prototype.addStudent = function () {
+  var studentId = this.getStudentId();
+  this.students.push(studentId);
+}
 
 Data.prototype.getAllStudents = function () {
   return this.students;
 };
 
-
 var data = new Data();
-var i = 1;
 
 var server = app.listen(app.get('port'), function () {
   console.log('Server listening on port ' + app.get('port'));
@@ -127,10 +89,21 @@ var server = app.listen(app.get('port'), function () {
 
 var io = socket(server)
 
-io.on('connection', function(socket) {
-  console.log("client " + socket.id + " connected")
-  i++
+io.of("/student").on('connection', function(socket) {
+  console.log("student with socketID:  " + socket.id + " connected");
+  socket.on('loggedIn', function(data) {
+    console.log("student with socketID: " + socket.id + " logged in to the workshop");
+    data.addStudent();
+  });
+  socket.emit('getstudentId', this.studentId);
+
 });
+
+io.of("/test").on('connection', function(socket) {
+  console.log("Teacher with socketID:  " + socket.id + " connected")
+});
+
+
 /*
 io.on('connection', function (socket) {
   // Send list of orders when a client connects

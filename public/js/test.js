@@ -1,10 +1,10 @@
-var socket = io.connect();
+var socket = io.connect("http://localhost:3000/test");
 
 
 
 const Help = Vue.component('Help', {
   template: `
-  <div> <h1>this is the help page </h1>
+  <div> <h1>this is the teacher help page </h1>
         <router-link to="/">Back</router-link>
   </div>`
   });
@@ -162,7 +162,7 @@ const router = new VueRouter({
 });
 
 const app = new Vue({
-  el: '#app',
+  el: '#teacher',
   name: 'Workshop',
   router,
   data () {
