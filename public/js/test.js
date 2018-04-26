@@ -1,4 +1,4 @@
-var socket = io.connect("http://localhost:3000/test");
+var socket = io();
 
 
 
@@ -31,7 +31,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     return {
       name: 'teacherstartworkshop',
       student: '',
-      students: {"student": "23"},
+      students: ["23"],
       token: null,
     };
   },
@@ -55,18 +55,26 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   
   `,
-  created:function() {
+  created: function() {
       console.log("init");
       var t = getRandomInteger(1111,9999);
       this.token = t;
       socket.emit('initToken', {
             token: this.token
       });
-
-      socket.on('loggedIn', function(data) {
-        this.students.push(data.student);
+      console.log("prior to socket studentlogin");
+      socket.on("StudentLoggedIn", function(studentId) {
+        console.log("YES");
+        this.addStudent(studentId);
+        console.log(studentId);
       }.bind(this));    
-    }  
+    },
+
+ methods: {    
+    addStudent(studentId) { 
+      this.students.push(studentId);
+    }
+ }
 });
 
 const workshopExercises = Vue.component('WorkshopExercises', {
@@ -165,6 +173,7 @@ const app = new Vue({
   el: '#teacher',
   name: 'Workshop',
   router,
+  socket,
   data () {
     return {
       name: 'Workshop',

@@ -85,24 +85,28 @@ var data = new Data();
 
 var server = app.listen(app.get('port'), function () {
   console.log('Server listening on port ' + app.get('port'));
+  console.log(data);
 });
 
 var io = socket(server)
+var test = 0;
 
-io.of("/student").on('connection', function(socket) {
-  console.log("student with socketID:  " + socket.id + " connected");
+io.on('connection', function(socket) {
+  console.log("client with socketID:  " + socket.id + " connected");
   socket.on('loggedIn', function(data) {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
-    data.addStudent();
+    io.emit("StudentLoggedIn", test);
+    console.log("notificaton sent");
+    //socket.emit('getstudentId', this.studentId);
+    //data.addStudent();
   });
-  socket.emit('getstudentId', this.studentId);
 
 });
-
+/*
 io.of("/test").on('connection', function(socket) {
   console.log("Teacher with socketID:  " + socket.id + " connected")
 });
-
+*/
 
 /*
 io.on('connection', function (socket) {

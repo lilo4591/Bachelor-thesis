@@ -2,7 +2,7 @@
 /*global Vue, io */
 /* exported vm */
 'use strict';
-var socket = io.connect("http://localhost:3000/student");
+var socket = io();
 
 const Help = Vue.component('Help', {
   template: `
@@ -52,15 +52,18 @@ const Start = Vue.component('Start', {
   template: `
    <div>
     you are logged in
+    here should be your group number and studentID
   </div>
   `,
   created:function() {
 
     console.log("connected");
-    socket.emit('loggedIn', this.sessionToken);
+    socket.emit('loggedIn', {"sessiontoken": this.sessionToken,
+                             "studentId": this.studentId     
+    });
     socket.on('getStudentId', function(id) {
       this.studentId = id;
-    });
+    }.bind(this));
     
   }
 
@@ -87,6 +90,7 @@ const app = new Vue({
   el: '#student',
   name: 'StudentWorkshop',
   router,
+  socket,
   data () {
     return {
       name: 'StudentWorkshop',
