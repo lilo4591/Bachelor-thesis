@@ -1,16 +1,11 @@
 var socket = io();
 
-
-
 const Help = Vue.component('Help', {
   template: `
   <div> <h1>this is the teacher help page </h1>
         <router-link to="/">Back</router-link>
   </div>`
   });
-
-
-
 
 const TeacherStartPage = Vue.component('TeacherStartPage', {
   template:`
@@ -56,17 +51,15 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
-      console.log("init");
-      var t = getRandomInteger(1111,9999);
-      this.token = t;
-      socket.emit('initToken', {
-            token: this.token
-      });
+
+      socket.on("session", function(session) {
+        this.token = session;
+      }.bind(this));
       console.log("prior to socket studentlogin");
       socket.on("StudentLoggedIn", function(studentId) {
         console.log("YES");
         this.addStudent(studentId);
-        console.log(studentId);
+        console.log(this.students);
       }.bind(this));    
     },
 
@@ -111,7 +104,6 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
     }
   },
   methods: {
-     
     addThought() { 
       this.thoughts.push({thought: this.thought});
       this.thought = '';
@@ -138,8 +130,6 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
     </div>
   `
 });
-
-
 
 const router = new VueRouter({
   routes:[
@@ -178,57 +168,11 @@ const app = new Vue({
     return {
       name: 'Workshop',
       token: null,
-      //for workshop.html
-      exerciseOptions: [
-        {"exerciseOption": "Exercise 1"},
-        {"exerciseOption": "Exercise 2"},
-        {"exerciseOption": "Exercise 3"},
-        {"exerciseOption": "Exercise 4"}
-      ],
-      //autonomy-heteronomy.html
-      thought: '',
-      thoughts: [
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
     }
-   },
-  created: function() {
-    socket.on('initToken', function(data){
-      this.token = token;
-    }.bind(this));
   },
-  methods: {
-    getRandomInteger: function(min, max) {
-          return Math.floor(Math.random() * (max - min) ) + min;
-    },
-     goTo: function(url) {
-      window.location.href = url;
-      console.log("redirecting to next page..");
-      console.log(vm.token);
-    },
-
-     startWorkshop: function(url) {
-      console.log("init");
-      var t = vm.getRandomInteger(1111,9999);
-      vm.token = t;
-      socket.emit('initToken', {
-            token: vm.token
-      });
-      console.log(vm.token);
-    },
-
-  //for autonomy-heteronomy exercise
-    addThought() { 
-      this.thoughts.push({thought: this.thought});
-      this.thought = '';
-    },
-    removeThought(id) {
-      this.thoughts.splice(id,1);
-    } 
+  created: function() {
+    socket.on("session", function(session){
+      this.token = session;
+    }.bind(this));
   }
-});
-
-function getRandomInteger(min, max) {
-      return Math.floor(Math.random() * (max - min) ) + min;
-    }
-  
+}); 

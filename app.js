@@ -62,20 +62,21 @@ app.get('/teacher-admin', function (req, res) {
 
  
 function Data() {
-  this.students = {};
+  this.students = [];
   this.currentStudentId = 0;
-  this.groups = {};
+  this.groups = [];
+  this.session = null;
 }
 
 Data.prototype.getStudentId = function () {
   this.currentStudentId += 1;
   return this.currentStudentId;
-}
+};
 
 Data.prototype.addStudent = function () {
   var studentId = this.getStudentId();
   this.students.push(studentId);
-}
+};
 
 Data.prototype.getAllStudents = function () {
   return this.students;
@@ -83,22 +84,32 @@ Data.prototype.getAllStudents = function () {
 
 var data = new Data();
 
+Data.prototype.setSession = function(min, max) {
+  this.session = Math.floor(Math.random() * (max - min) )+ min;
+}
+
 var server = app.listen(app.get('port'), function () {
+  data.setSession(1111,9999);
+  console.log("The token for this session is: " + data.session);
   console.log('Server listening on port ' + app.get('port'));
-  console.log(data);
 });
 
 var io = socket(server)
-var test = 0;
 
 io.on('connection', function(socket) {
+  io.emit("session", data.session); 
   console.log("client with socketID:  " + socket.id + " connected");
-  socket.on('loggedIn', function(data) {
+  //listen for when students log in
+  socket.on('loggedIn', function() {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
-    io.emit("StudentLoggedIn", test);
+    //add student to global namespace and update id
+    data.addStudent();
+    console.log(data.currentStudentId);
+    //notify everyone that a student has logged in
+    io.emit("StudentLoggedIn", data.currentStudentId);
     console.log("notificaton sent");
     //socket.emit('getstudentId', this.studentId);
-    //data.addStudent();
+    console.log(data);
   });
 
 });

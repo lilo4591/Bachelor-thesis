@@ -15,7 +15,8 @@ const Help = Vue.component('Help', {
 const Login = Vue.component('Login', {
   data: function(){
     return {
-      sessionToken: null
+      sessionToken: null,
+      tokenInput: null
     }
   },
   methods: {
@@ -24,20 +25,29 @@ const Login = Vue.component('Login', {
     }
   },
 
-
+  //TODO validate sessiontoken and route, otherwise show error message
   template: `
    <div>
    <nav>
     <router-link to="/help">Help</router-link>
     </nav>
+    <h2>Enter Sessiontoken to join workshop</h2>
     <form @submit.prevent="validateToken">
-      <input type="number" placeholder="Enter Sessiontoken to join workshop" v-model="sessionToken">
+      <input type="number" v-model="tokenInput">
     </form> 
     <router-link to="/start">
     Log in
    </router-link>
   </div>
-  `
+  `,
+
+  created: function() {
+    
+    socket.on("session", function(session) {
+      this.sessionToken = session;
+      console.log(this.sessionToken);
+    }.bind(this));
+  }
 
 });
 
@@ -56,7 +66,7 @@ const Start = Vue.component('Start', {
   </div>
   `,
   created:function() {
-
+    //TODO sessiontoken here is null, only updated in login component atm
     console.log("connected");
     socket.emit('loggedIn', {"sessiontoken": this.sessionToken,
                              "studentId": this.studentId     
