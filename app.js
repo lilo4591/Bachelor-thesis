@@ -19,33 +19,10 @@ app.use(express.static(path.join(__dirname, 'public/')));
 // Serve vue from node_modules as vue/
 app.use('/vue', express.static(path.join(__dirname, '/node_modules/vue/dist/')));
 
-// Serve test.html directly as root page
+// Serve teacherpage.html directly as root page
 app.get('/teacher', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/teacherpage.html'));
 });
-
-/*
-// Serve index.html directly as root page
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/teacher.html'));
-});
-
-// Serve teacher-start-workshop.html as /teacher-start-workshop
-app.get('/teacher-start-workshop', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/teacher-start-workshop.html'));
-});
-
-// Serve workshop.html as /workshop
-app.get('/workshop', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/workshop.html'));
-});
-
-// Serve heteronomy-autonomy.html as /heteronomy-autonomy
-app.get('/heteronomy-autonomy1', function (req, res) {
-  res.sendFile(path.join(__dirname, 'views/heteronomy-autonomy1.html'));
-});
-
-*/
 
 // Serve student.html as /student
 app.get('/student', function (req, res) {
