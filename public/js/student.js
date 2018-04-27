@@ -141,18 +141,21 @@ const Exercise2 = Vue.component('Exercise2', {
       studentId: null,
       sessiontoken: null,
       thought: '',
-      thoughts: [
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
+      thoughts: [ "Example: I think this is wrong because of current laws.."]
     }
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      this.thoughts.push(this.thought);
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
+    },
+    collectThoughts() {
+      console.log(this.thoughts); 
+      console.log("emitting thoughts");
+      socket.emit('thoughts', this.thoughts[1]);
     }
   },
   template: `
@@ -170,10 +173,21 @@ const Exercise2 = Vue.component('Exercise2', {
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
-      </div>  
+      </div>
+      <div v-on:click="collectThoughts()"> 
+    <router-link to="/exercise2p1">
+    Next
+    </router-link>
+    </div>
     </div>
   `
 });
+
+const Exercise2p1 = Vue.component('Exercise2p1', {
+  template: `
+  <div> <h1>Exercise 2 heteronomy autonomy PART 2 YE</h1>
+  </div>`
+  });
 
 const router = new VueRouter({
   routes:[
@@ -196,6 +210,10 @@ const router = new VueRouter({
     {
       path:'/exercise2',
       component:Exercise2
+    },
+    {
+      path:'/exercise2p1',
+      component:Exercise2p1
     }
 
   ]
