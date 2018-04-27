@@ -24,7 +24,7 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
 const StartWorkshop = Vue.component('StartWorkshop', {
   data: function() {
     return {
-      name: 'teacherstartworkshop',
+      name: 'Startworkshop',
       student: '',
       students: ["23"],
       token: null,
@@ -33,7 +33,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
    template: `
  
     <div id="app">
-     jsfile: {{name}}
+     Component: {{name}}
       
       <h2>Log in to localhost:3000/student with sessiontoken {{ token }} </h2>
       <ul>
@@ -51,8 +51,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
-
-      socket.on("session", function(session) {
+      //TODO bugz!! sessiontoken not shown when going to startworkshop, only when a studentpage loads
+      socket.on('session', function(session) {
         this.token = session;
       }.bind(this));
       console.log("prior to socket studentlogin");
@@ -75,23 +75,75 @@ const workshopExercises = Vue.component('WorkshopExercises', {
     return {
       name: 'workshopExercises',
       exerciseOptions: [
-        {"exerciseOption": "Exercise 1"},
-        {"exerciseOption": "Exercise 2"},
-        {"exerciseOption": "Exercise 3"},
-        {"exerciseOption": "Exercise 4"}
+        "Exercise 1", "Exercise 2", "Exercise 3", "Exercise 4"
       ]
     };
   },
+  //TODO add more exercise
+  //TODO add despription of exercises
    template: `
  
     <div id="app">
-        <router-link to="/autonomyheteronomy1">
-        <button class="workshopbutton" v-for="(data, index) in exerciseOptions" :key='index'> {{data.exerciseOption}}</button>
+        <router-link to="/provocative1">
+        <button class="workshopbutton" v-on:click="navigateStudentsTo(1)"> {{this.exerciseOptions[0]}}</button>
         </router-link>
+    
+        <router-link to="/autonomyheteronomy1">
+        <button class="workshopbutton" v-on:click="navigateStudentsTo(2)"> {{this.exerciseOptions[1]}}</button>
+        </router-link>
+ 
     <br><router-link to="/startworkshop">Back</router-link>
     </div> 
   
-  `  
+  ` ,
+  methods: { 
+    navigateStudentsTo(exerciseNum) {
+      console.log("teacher called navigateStudentsTo");
+      socket.emit("navigateStudentsTo",exerciseNum);
+    }
+  }
+});
+
+const Provocative1 = Vue.component('provocative1', {
+  data: function() {
+    return {
+      thought: '',
+      thoughts: [
+        {"thought": "Example: I think this is wrong because of current laws.." }
+      ]
+    }
+  },
+  methods: {
+    addThought() { 
+      this.thoughts.push({thought: this.thought});
+      this.thought = '';
+    },
+    removeThought(id) {
+      this.thoughts.splice(id,1);
+    },
+    navigateStudentsTo(exerciseNum) {
+      socket.emit("navigateStudentsTo",exerciseNum);
+    }
+
+  },
+  template: `
+  <div id= "page"><!-- TODO Show first dilemma here-->
+      <!-- prevent: prevents from page reloading -->
+      <div class="holder">
+      <h2>Provocative</h2>
+        <form @submit.prevent="addThought">
+          <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
+        </form> 
+        <p>These are your thoughts</p>
+        <ul>
+          <li v-for="(data, index) in thoughts" :key='index'> 
+            {{data.thought}}
+            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>  
+    </div>
+  `
 });
 
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
@@ -110,7 +162,11 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
-    } 
+    },
+    navigateStudentsTo(exerciseNum) {
+      socket.emit("navigateStudentsTo",exerciseNum);
+    }
+
   },
   template: `
   <div id= "page"><!-- TODO Show first dilemma here-->
@@ -151,6 +207,10 @@ const router = new VueRouter({
       component:workshopExercises
     },
     {
+      path:'/provocative1',
+      component:Provocative1
+    },
+    {
       path:'/autonomyheteronomy1',
       component:autonomyHeteronomy1
     }
@@ -171,7 +231,7 @@ const app = new Vue({
     }
   },
   created: function() {
-    socket.on("session", function(session){
+    socket.on('session', function(session){
       this.token = session;
     }.bind(this));
   }

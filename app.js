@@ -73,7 +73,8 @@ var server = app.listen(app.get('port'), function () {
 var io = socket(server)
 
 io.on('connection', function(socket) {
-  io.emit("session", data.session); 
+  io.emit('session', data.session); 
+  console.log(data.session);
   console.log("client with socketID:  " + socket.id + " connected");
   //listen for when students log in
   socket.on('loggedIn', function() {
@@ -87,6 +88,9 @@ io.on('connection', function(socket) {
     //socket.emit('getstudentId', this.studentId);
     console.log(data);
   });
-
+  socket.on('navigateStudentsTo', function(exerciseNum) {
+      //route to first exercise
+      io.emit('redirect', exerciseNum)
+  });
 });
 
