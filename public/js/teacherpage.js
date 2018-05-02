@@ -182,11 +182,41 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
-      </div>  
+      </div> 
+      <router-link to="/autonomyheteronomy2">Show Thoughts</router-link>
     </div>
   `
 });
 
+
+const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
+  data: function() {
+    return {
+      thought: '',
+      thoughts: []
+    }
+  },
+  created: function() {
+    socket.on('displayThoughts', function(thoughts) {
+      for ( var i = 0, l = thoughts.length; i < l; i++) {
+        this.thoughts.push(thoughts[i]);
+    }
+      console.log("display thoughts"); 
+    }.bind(this));  
+  
+  },
+  template: `
+  <div id="app"> 
+  <p>These are your thoughts</p>
+    <ul>
+      <li v-for="(data, index) in thoughts" :key='index'> 
+        {{data.thought}}
+      </li>
+    </ul>
+  </div>
+  `
+});
+  
 const router = new VueRouter({
   routes:[
     {
@@ -213,8 +243,11 @@ const router = new VueRouter({
     {
       path:'/autonomyheteronomy1',
       component:autonomyHeteronomy1
+    },
+    {
+      path:'/autonomyheteronomy2',
+      component:autonomyHeteronomy2
     }
-
 
   ]
 });

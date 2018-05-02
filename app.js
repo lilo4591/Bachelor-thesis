@@ -42,6 +42,8 @@ function Data() {
   this.currentStudentId = 0;
   this.groups = [];
   this.session = null;
+  //exercise2 heteronomy autonomy
+  this.thoughts = [];
 }
 
 Data.prototype.getStudentId = function () {
@@ -57,6 +59,11 @@ Data.prototype.addStudent = function () {
 Data.prototype.getAllStudents = function () {
   return this.students;
 };
+
+Data.prototype.addThought = function (thoughts) {
+  this.thoughts.push(thoughts);
+};
+
 
 var data = new Data();
 
@@ -92,5 +99,14 @@ io.on('connection', function(socket) {
       //route to first exercise
       io.emit('redirect', exerciseNum)
   });
+  socket.on('thoughts', function(thoughts) {
+    console.log("server collecting thoughts");
+    for ( var i = 0, l = thoughts.length; i < l; i++) {
+      data.addThought(thoughts[i]);
+      console.log(data);
+    }
+    console.log(data.thoughts);
+    io.emit('displayThoughts', data.thoughts); 
+ });
 });
 

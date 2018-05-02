@@ -141,7 +141,7 @@ const Exercise2 = Vue.component('Exercise2', {
       studentId: null,
       sessiontoken: null,
       thought: '',
-      thoughts: [
+      thoughts: [ 
         {"thought": "Example: I think this is wrong because of current laws.." }
       ]
     }
@@ -153,6 +153,10 @@ const Exercise2 = Vue.component('Exercise2', {
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
+    },
+    collectThoughts() {
+      console.log("emitting thoughts");
+      socket.emit('thoughts', this.thoughts);
     }
   },
   template: `
@@ -170,10 +174,71 @@ const Exercise2 = Vue.component('Exercise2', {
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
-      </div>  
+      </div>
+      <div v-on:click="collectThoughts()"> 
+    <router-link to="/exercise2p1">
+    Submit Thoughts
+    </router-link>
+    </div>
     </div>
   `
 });
+
+const Exercise2p1 = Vue.component('Exercise2p1', {
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.1",
+      studentId: null,
+      sessiontoken: null
+    }
+ },
+ 
+ template: `
+  <div> 
+    <h1>Exercise 2 {{ name }}</h1>
+    <p>Please have a look at the bigger screen and discuss your thougts.<br>
+    When you the teacher tells you it is tome for the next step in this exercise press continue..<br>
+    To add more thoughts press go back</p>
+    <router-link to="/exercise2">
+    Go back
+    </router-link> 
+    /
+    <router-link to="/exercise2p2">
+    Continue
+    </router-link>
+  </div>`
+  });
+
+const Exercise2p2 = Vue.component('Exercise2p2', {
+  //TODO: Only one person in each groupshould be able to submit a dilemma,
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.2",
+      dilemma: "",
+      notsubmitted: true,
+      studentId: null,
+      sessiontoken: null
+    }
+ },
+  methods: {
+    updateSubmit() {
+      this.notsubmitted = false;
+    } 
+  }
+  ,
+   
+  //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
+   
+   template: `
+  <div>
+    <h2>Discuss in your group and formulate your own dilemma relevant to your occupation</h2>
+          <textarea placeholder="Enter your dilemma here please" class="largeInput" cols="40" rows="5" v-model="dilemma">
+          </textarea>
+       <span> {{ dilemma }} </span>
+  </div>
+  `
+});
+
 
 const router = new VueRouter({
   routes:[
@@ -193,10 +258,19 @@ const router = new VueRouter({
       path:'/exercise1',
       component:Exercise1
     },
-    {
+    { //autonomy heteronomy
       path:'/exercise2',
       component:Exercise2
+    },
+    {
+      path:'/exercise2p1',
+      component:Exercise2p1
+    },
+    {
+      path:'/exercise2p2',
+      component:Exercise2p2
     }
+
 
   ]
 });
