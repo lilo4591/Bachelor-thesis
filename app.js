@@ -44,6 +44,7 @@ function Data() {
   this.session = null;
   //exercise2 heteronomy autonomy
   this.thoughts = [];
+
 }
 
 Data.prototype.getStudentId = function () {
@@ -62,6 +63,7 @@ Data.prototype.getAllStudents = function () {
 
 Data.prototype.addThought = function (thoughts) {
   this.thoughts.push(thoughts);
+
 };
 
 
@@ -100,6 +102,7 @@ io.on('connection', function(socket) {
       io.emit('redirect', exerciseNum)
   });
   socket.on('thoughts', function(thoughts) {
+
     console.log("server collecting thoughts");
     for ( var i = 0, l = thoughts.length; i < l; i++) {
       data.addThought(thoughts[i]);

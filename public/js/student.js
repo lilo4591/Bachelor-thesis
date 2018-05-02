@@ -148,7 +148,7 @@ const Exercise2 = Vue.component('Exercise2', {
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      this.thoughts.push(this.thought);
       this.thought = '';
     },
     removeThought(id) {
@@ -240,6 +240,13 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
 });
 
 
+=======
+  template: `
+  <div> <h1>Exercise 2 heteronomy autonomy PART 2 YE</h1>
+  </div>`
+  });
+
+>>>>>>> c0ac7c2de8cc3c3fa6d24e1697dcfa5636325af9
 const router = new VueRouter({
   routes:[
     {
