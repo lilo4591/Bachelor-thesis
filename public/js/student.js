@@ -63,8 +63,8 @@ const Start = Vue.component('Start', {
 
   template: `
    <div>
-    <h2>you are logged in</h2>
-    <p>here should be your group number and studentID</p>
+    <h2>You are logged in</h2>
+    <p>Here should be your group number and studentID</p>
     <p>This should be the base for all starts of exercises</p>
   </div>
   `,
@@ -221,23 +221,85 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     }
  },
   methods: {
-    updateSubmit() {
-      this.notsubmitted = false;
+    updateSubmit(bool) {
+      this.notsubmitted = bool;
     } 
   }
   ,
    
   //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
-   
+  //TODO: Textara output {{dilemma}} should inlude linebreaks 
    template: `
   <div>
-    <h2>Discuss in your group and formulate your own dilemma relevant to your occupation</h2>
-          <textarea placeholder="Enter your dilemma here please" class="largeInput" cols="40" rows="5" v-model="dilemma">
+    <p>Discuss in your group and formulate your own dilemma relevant to your occupation.</p>
+        <div v-if="notsubmitted">
+          <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
           </textarea>
-       <span> {{ dilemma }} </span>
+          <button id="smallbutton" v-on:click="updateSubmit(false)">Submit dilemma</button>
+        </div>
+        <div v-if="notsubmitted===false"> {{ dilemma }} 
+          <button id="smallbutton" v-on:click="updateSubmit(true)">Edit dilemma</button>
+        </div>
+        <router-link to="/exercise2p3">
+        Continue
+        </router-link>
   </div>
   `
 });
+
+const Exercise2p3 = Vue.component('Exercise2p3', {
+  //TODO: This is individual
+  //TODO: Update relevant example thought
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.3: Reflex thoughts",
+      notsubmitted: true,
+      studentId: null,
+      sessiontoken: null,
+      reflex: "",
+      reflexthoughts: [ 
+        {"reflex": "Example thought: I think that this is not a problem...." }
+      ]
+  }
+ },
+  methods: {
+    addReflexThought() { 
+      this.reflexthoughts.push({reflex: this.reflex});
+      this.reflex = '';
+    },
+    removeReflexThought(id) {
+      this.reflexthoughts.splice(id,1);
+    },
+  }
+  ,
+   
+  //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
+  //TODO: send dilemma from previous route exercisep2.3 and write it out
+   template: `
+  <div>
+    {{name}}
+    <p>Individually write down instinctive thougts that occur about the dilemma
+    <br>What is the first thing you think about about this dilemma?? </p>
+      dilemma goex here
+      <div class="holder">
+        <form @submit.prevent="addReflexThought">
+          <input type="text" placeholder="Enter your reflex thoughts here plx..." v-model="reflex">
+        </form> 
+        <p>These are your reflex thoughts</p>
+        <ul>
+          <li v-for="(data, index) in reflexthoughts" :key='index'> 
+            {{data.reflex}}
+            <i class="material-icons" v-on:click="removeReflexThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+    <router-link to="/exercise2p3">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
 
 const router = new VueRouter({
   routes:[
@@ -268,9 +330,11 @@ const router = new VueRouter({
     {
       path:'/exercise2p2',
       component:Exercise2p2
+    },
+    {
+      path:'/exercise2p3',
+      component:Exercise2p3
     }
-
-
   ]
 });
 

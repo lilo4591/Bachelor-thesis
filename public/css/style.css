@@ -58,9 +58,9 @@ input {
   color: #687F7F;
 }
 
-.largeInput {
+textarea {
   text-align: center;
-  width: 100%;
+  width: 1000px;
   border: 0;
   border-radius: 4px;
   padding: 20px 0;
@@ -117,7 +117,7 @@ i {
   border-radius: 10px;
   font-family: Arial;
   color: #ffffff;
-  font-size: 50px;
+  font-size: 15px;
   padding: 9px 25px 10px 25px;
   text-decoration: none;
 }
