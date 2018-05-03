@@ -188,7 +188,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   `
 });
 
-
+//teacher displaying all thoughts of the first dilemma
 const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   data: function() {
     return {
@@ -213,10 +213,66 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
         {{data.thought}}
       </li>
     </ul>
+  <router-link to="/autonomyHeteronomy3">
+  Continue
+  </router-link>
+  </div>
+  `
+});
+
+//Instructions on formulation own dilemma and thought reflexes
+const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
+  data: function() {
+    return {
+      name: "autonomyHeteronomy3",
+      displayreflex: false
+    }
+  },
+  methods: {
+    updateDisplayReflex(bool) {
+      this.displayreflex = bool;      
+    }
+  }, 
+ template: `
+  <div id="app"> 
+    <h2 v-if="displayreflex===false">Formulate your own dilemma in your groups</h2>
+  
+      <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
+        <button id="smallbutton">
+        Start!
+        </button>
+      </div>
+        <div v-if="displayreflex">
+          <p>Write down your instinctive thoughts about this dilemma.<br>
+            This is Individuall, but discuss with your group.</p>
+        </div>
+    <router-link to="/autonomyHeteronomy4" v-if="displayreflex">
+      Continue
+    </router-link>
   </div>
   `
 });
   
+//Dogmatiska låsningar
+//TODO translate dogmatiska låsningar
+const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
+  data: function() {
+    return {
+      name: "autonomyHeteronomy4"
+    }
+  }, 
+ template: `
+  <div id="app"> 
+    <p>Write down dogmatic låsningar about this dilemma.<br>
+      This is Individuall but discuss with your group.</p>
+    <router-link to="/autonomyHeteronomy5">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
+
 const router = new VueRouter({
   routes:[
     {
@@ -247,7 +303,29 @@ const router = new VueRouter({
     {
       path:'/autonomyheteronomy2',
       component:autonomyHeteronomy2
+    },
+    {
+      //Reflex thoughts
+      path:'/autonomyheteronomy3',
+      component:autonomyHeteronomy3
+    },
+    {
+      //Dogmatiska låsningar
+      path:'/autonomyheteronomy4',
+      component:autonomyHeteronomy4
+    },
+    {
+      //Konkreta värden (vem berörs och vad är deras värderingar)
+      path:'/autonomyheteronomy5',
+      component:autonomyHeteronomy5
+    },
+    {
+      //Handlingalternativ och värden(vad kan göras?)
+      path:'/autonomyheteronomy6',
+      component:autonomyHeteronomy6
     }
+ 
+ 
 
   ]
 });
