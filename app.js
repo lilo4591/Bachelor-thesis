@@ -63,7 +63,6 @@ Data.prototype.getAllStudents = function () {
 
 Data.prototype.addThought = function (thoughts) {
   this.thoughts.push(thoughts);
-
 };
 
 
@@ -81,6 +80,8 @@ var server = app.listen(app.get('port'), function () {
 
 var io = socket(server)
 
+
+
 io.on('connection', function(socket) {
   io.emit('session', data.session); 
   console.log(data.session);
@@ -88,6 +89,7 @@ io.on('connection', function(socket) {
   //listen for when students log in
   socket.on('loggedIn', function() {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
+    //TODO: add student to a group and send group to student
     //add student to global namespace and update id
     data.addStudent();
     console.log(data.currentStudentId);

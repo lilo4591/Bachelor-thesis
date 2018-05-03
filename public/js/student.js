@@ -18,7 +18,8 @@ const Login = Vue.component('Login', {
   data: function(){
     return {
       sessionToken: null,
-      tokenInput: null
+      tokenInput: null,
+      groupId: null
     }
   },
   methods: {
@@ -49,7 +50,7 @@ const Login = Vue.component('Login', {
       this.sessionToken = session;
       console.log(this.sessionToken);
     }.bind(this));
-  }
+ }
 
 });
 
@@ -353,6 +354,6 @@ const app = new Vue({
       this.token = token;
     }.bind(this));
   }
-});
+  });
 
 

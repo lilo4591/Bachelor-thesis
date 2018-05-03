@@ -235,7 +235,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   }, 
  template: `
   <div id="app"> 
-    <h2 v-if="displayreflex===false">Formulate your own dilemma in your groups</h2>
+    <p v-if="displayreflex===false">Formulate your own dilemma in your groups</p>
   
       <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
         <button id="smallbutton">
@@ -272,7 +272,44 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
   `
 });
 
+//Konkreta värden
+//TODO: Evaluate concretee values and explain it further
+const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
+  data: function() {
+    return {
+      name: "autonomyHeteronomy5"
+    }
+  }, 
+ template: `
+  <div id="app"> 
+    <p>Write down concrete values about this dilemma.<br>
+      This is Individuall but discuss with your group.</p>
+    <router-link to="/autonomyHeteronomy6">
+      Continue
+    </router-link>
+  </div>
+  `
+});
 
+
+//Handlingalternativ och värden(vad kan göras?)
+//TODO: Evaluate actionoptions and explain it further
+const autonomyHeteronomy6 = Vue.component('autonomyHeteronomy6', {
+  data: function() {
+    return {
+      name: "autonomyHeteronomy5"
+    }
+  }, 
+ template: `
+  <div id="app"> 
+    <p>Write down what can be done about this dilemma.<br>
+      This is Individuall but discuss with your group.</p>
+    <router-link to="/autonomyHeteronomy6">
+      Continue
+    </router-link>
+  </div>
+  `
+});
 const router = new VueRouter({
   routes:[
     {
@@ -324,7 +361,6 @@ const router = new VueRouter({
       path:'/autonomyheteronomy6',
       component:autonomyHeteronomy6
     }
- 
  
 
   ]
