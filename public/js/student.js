@@ -158,6 +158,7 @@ const Exercise2 = Vue.component('Exercise2', {
     collectThoughts() {
       console.log("emitting thoughts");
       socket.emit('thoughts', this.thoughts);
+      this.thoughts = [];
     }
   },
   template: `

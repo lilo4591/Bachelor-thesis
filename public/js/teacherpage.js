@@ -146,6 +146,7 @@ const Provocative1 = Vue.component('provocative1', {
   `
 });
 
+//Teacher showing dilemma and displaying student thoughts
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   data: function() {
     return {
@@ -155,6 +156,12 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
       ]
     }
   },
+  created: function() {
+    socket.on('displayThoughts', function(thoughts) {
+     this.thoughts = thoughts;
+      
+    }.bind(this));  
+  } ,
   methods: {
     addThought() { 
       this.thoughts.push({thought: this.thought});
@@ -171,60 +178,25 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   template: `
   <div id= "page"><!-- TODO Show first dilemma here-->
       <!-- prevent: prevents from page reloading -->
+      <h2>Dilemma goes here</h2>
       <div class="holder">
-        <form @submit.prevent="addThought">
-          <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
-        </form> 
         <p>These are your thoughts</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
-            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
       </div> 
-      <router-link to="/autonomyheteronomy2">Show Thoughts</router-link>
+      <router-link to="/autonomyheteronomy2">Continue</router-link>
     </div>
   `
 });
 
-//teacher displaying all thoughts of the first dilemma
+//Instructions on formulation own dilemma and thought reflexes
 const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   data: function() {
     return {
-      thought: '',
-      thoughts: []
-    }
-  },
-  created: function() {
-    socket.on('displayThoughts', function(thoughts) {
-      for ( var i = 0, l = thoughts.length; i < l; i++) {
-        this.thoughts.push(thoughts[i]);
-    }
-      console.log("display thoughts"); 
-    }.bind(this));  
-  
-  },
-  template: `
-  <div id="app"> 
-  <p>These are your thoughts</p>
-    <ul>
-      <li v-for="(data, index) in thoughts" :key='index'> 
-        {{data.thought}}
-      </li>
-    </ul>
-  <router-link to="/autonomyHeteronomy3">
-  Continue
-  </router-link>
-  </div>
-  `
-});
-
-//Instructions on formulation own dilemma and thought reflexes
-const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
-  data: function() {
-    return {
-      name: "autonomyHeteronomy3",
+      name: "autonomyHeteronomy2",
       displayreflex: false
     }
   },
@@ -246,7 +218,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
           <p>Write down your instinctive thoughts about this dilemma.<br>
             This is Individuall, but discuss with your group.</p>
         </div>
-    <router-link to="/autonomyHeteronomy4" v-if="displayreflex">
+    <router-link to="/autonomyHeteronomy3" v-if="displayreflex">
       Continue
     </router-link>
   </div>
@@ -255,17 +227,17 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   
 //Dogmatiska låsningar
 //TODO translate dogmatiska låsningar
-const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
+const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   data: function() {
     return {
-      name: "autonomyHeteronomy4"
+      name: "autonomyHeteronomy3"
     }
   }, 
  template: `
   <div id="app"> 
     <p>Write down dogmatic låsningar about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/autonomyHeteronomy5">
+    <router-link to="/autonomyHeteronomy4">
       Continue
     </router-link>
   </div>
@@ -274,17 +246,17 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
 
 //Konkreta värden
 //TODO: Evaluate concretee values and explain it further
-const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
+const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
   data: function() {
     return {
-      name: "autonomyHeteronomy5"
+      name: "autonomyHeteronomy4"
     }
   }, 
  template: `
   <div id="app"> 
     <p>Write down concrete values about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/autonomyHeteronomy6">
+    <router-link to="/autonomyHeteronomy5">
       Continue
     </router-link>
   </div>
@@ -294,7 +266,7 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
 
 //Handlingalternativ och värden(vad kan göras?)
 //TODO: Evaluate actionoptions and explain it further
-const autonomyHeteronomy6 = Vue.component('autonomyHeteronomy6', {
+const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
   data: function() {
     return {
       name: "autonomyHeteronomy5"
@@ -338,31 +310,26 @@ const router = new VueRouter({
       component:autonomyHeteronomy1
     },
     {
+      //Reflex thoughts
       path:'/autonomyheteronomy2',
       component:autonomyHeteronomy2
     },
     {
-      //Reflex thoughts
+      //Dogmatiska låsningar
       path:'/autonomyheteronomy3',
       component:autonomyHeteronomy3
     },
     {
-      //Dogmatiska låsningar
+      //Konkreta värden (vem berörs och vad är deras värderingar)
       path:'/autonomyheteronomy4',
       component:autonomyHeteronomy4
     },
     {
-      //Konkreta värden (vem berörs och vad är deras värderingar)
+      //Handlingalternativ och värden(vad kan göras?)
       path:'/autonomyheteronomy5',
       component:autonomyHeteronomy5
-    },
-    {
-      //Handlingalternativ och värden(vad kan göras?)
-      path:'/autonomyheteronomy6',
-      component:autonomyHeteronomy6
     }
- 
-
+  
   ]
 });
 
@@ -375,6 +342,7 @@ const app = new Vue({
     return {
       name: 'Workshop',
       token: null,
+      thoughts: []
     }
   },
   created: function() {
