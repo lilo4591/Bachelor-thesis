@@ -72,15 +72,40 @@ Data.prototype.setSession = function(min, max) {
   this.session = Math.floor(Math.random() * (max - min) )+ min;
 }
 
+Data.prototype.setGroups = function (numStudents, groupSize, nameSpace) {
+  
+
+  var numGroups = (numStudents / groupSize);
+
+  for (i = 0; i < numGroups ; i++) {
+    for (j = 0; j < groupSize ; j ++) {
+      //add student to namespace 
+      //add student to group
+    }
+  //update current group
+  
+  }
+
+}
+
 var server = app.listen(app.get('port'), function () {
   data.setSession(1111,9999);
   console.log("The token for this session is: " + data.session);
   console.log('Server listening on port ' + app.get('port'));
 });
 
+
 var io = socket(server)
+const studentsio = io.of('/students');
+
+//namespace specific to students
+studentsio.on('connection', socket => { 
+  console.log('listen for student connection')
+  console.log("studentNamespace with socketID: " + socket.id + " connected");
+  socket.emit('connectionmessage', "student connected on namespace students");
 
 
+});
 
 io.on('connection', function(socket) {
   io.emit('session', data.session); 

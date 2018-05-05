@@ -2,6 +2,7 @@
 /*global Vue, io */
 /* exported vm */
 'use strict';
+var studentsocket = io('/students');
 var socket = io();
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
@@ -45,7 +46,11 @@ const Login = Vue.component('Login', {
   `,
 
   created: function() {
-    
+   
+    studentsocket.on('connectionmessage', message => {
+      console.log(message);
+    });
+
     socket.on('session', function(session) {
       this.sessionToken = session;
       console.log(this.sessionToken);
