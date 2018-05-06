@@ -42,9 +42,14 @@ function Data() {
   this.currentStudentId = 0;
   this.groups = [];
   this.session = null;
+  this.groupSize = null;
   //exercise2 heteronomy autonomy
   this.thoughts = [];
 
+}
+
+Data.prototype.getgroupSize = function () {
+  return this.groupSize;
 }
 
 Data.prototype.getStudentId = function () {
@@ -72,19 +77,9 @@ Data.prototype.setSession = function(min, max) {
   this.session = Math.floor(Math.random() * (max - min) )+ min;
 }
 
-Data.prototype.setGroups = function (numStudents, groupSize, nameSpace) {
+Data.prototype.setGroups = function (groupSize) {
   
-
-  var numGroups = (numStudents / groupSize);
-
-  for (i = 0; i < numGroups ; i++) {
-    for (j = 0; j < groupSize ; j ++) {
-      //add student to namespace 
-      //add student to group
-    }
-  //update current group
-  
-  }
+  this.groupSize = (data.students.length / groupSize);
 
 }
 
@@ -98,19 +93,19 @@ var server = app.listen(app.get('port'), function () {
 var io = socket(server)
 const studentsio = io.of('/students');
 
+
+const grouponeio = io.of('/groupone'); 
+const grouptwoio = io.of('/grouptwo'); 
+const grouphreeio = io.of('/groupthree'); 
+const groupfourio = io.of('/groupfour'); 
+
 //namespace specific to students
 studentsio.on('connection', socket => { 
   console.log('listen for student connection')
   console.log("studentNamespace with socketID: " + socket.id + " connected");
   socket.emit('connectionmessage', "student connected on namespace students");
+  console.log(Object.keys(studentsio.connected));
 
-
-});
-
-io.on('connection', function(socket) {
-  io.emit('session', data.session); 
-  console.log(data.session);
-  console.log("client with socketID:  " + socket.id + " connected");
   //listen for when students log in
   socket.on('loggedIn', function() {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
@@ -118,12 +113,22 @@ io.on('connection', function(socket) {
     //add student to global namespace and update id
     data.addStudent();
     console.log(data.currentStudentId);
-    //notify everyone that a student has logged in
+    //notify teacher that a student has logged in
     io.emit("StudentLoggedIn", data.currentStudentId);
-    console.log("notificaton sent");
-    //socket.emit('getstudentId', this.studentId);
-    console.log(data);
   });
+
+  socket.on('generateGroupsplz', function() {
+    socket.emit('startgroupnamespaxe', 'yay');
+    console.log("namespace student can start grouping");
+  });
+});
+
+io.on('connection', function(socket) {
+  io.emit('session', data.session); 
+  console.log(data.session);
+  console.log("client with socketID:  " + socket.id + " connected");
+ 
+  
   socket.on('navigateStudentsTo', function(exerciseNum) {
       //route to first exercise
       io.emit('redirect', exerciseNum)
@@ -138,5 +143,11 @@ io.on('connection', function(socket) {
     console.log(data.thoughts);
     io.emit('displayThoughts', data.thoughts); 
  });
+  socket.on('generateGroups', function(groupSize) {
+    console.log('server generating groups');
+    data.setGroups(data.students.length, groupSize);
+    io.to('/students').emit('generateGroupsplz', 'hej');
+  });
+
 });
 

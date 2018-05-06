@@ -3,6 +3,7 @@
 /* exported vm */
 'use strict';
 var studentsocket = io('/students');
+var groupsocket; 
 var socket = io();
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
@@ -76,13 +77,11 @@ const Start = Vue.component('Start', {
   `,
   created:function() {
     //TODO sessiontoken here is null, only updated in login component atm
-    console.log("connected");
-    socket.emit('loggedIn', {"sessiontoken": this.sessionToken,
+    //notify namespace students that student logged in
+    studentsocket.emit('loggedIn', {"sessiontoken": this.sessionToken,
                              "studentId": this.studentId     
     });
-    socket.on('getStudentId', function(id) {
-      this.studentId = id;
-    }.bind(this));
+ 
     socket.on('redirect', function(exerciseNum) {
       //TODO route based on exerciseNum
       console.log("redirection student to exercise...");

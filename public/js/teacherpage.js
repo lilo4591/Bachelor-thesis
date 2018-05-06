@@ -42,7 +42,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       </ul>
       <div>
         <router-link to="/workshopexercises">
-        <button class="button"> Start workshop </button>
+        <button class="button" v-on:click=generateGroups()> Start workshop </button>
         </router-link>
       </div> 
         <router-link to="/">Back</router-link>
@@ -66,6 +66,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
  methods: {    
     addStudent(studentId) { 
       this.students.push(studentId);
+    },
+    generateGroups() {
+    socket.emit('generateGroups', 2);
+    console.log("start generate"); 
     }
  }
 });
