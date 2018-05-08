@@ -95,12 +95,21 @@ var server = app.listen(app.get('port'), function () {
 
 var io = socket(server)
 const studentsio = io.of('/students');
+var groupconnection;
 
 
-const grouponeio = io.of('/groupone'); 
-const grouptwoio = io.of('/grouptwo'); 
-const grouphreeio = io.of('/groupthree'); 
-const groupfourio = io.of('/groupfour'); 
+//namespace specific to groups
+groupconnection = io.of(data.groupNames[0]).on('connection', socket => { 
+  console.log(data.groupnames[0] + " is now connected");
+
+});
+
+groupconnection = io.of(data.groupNames[1]).on('connection', socket => { 
+  console.log(data.groupname[1] + " is now connected");
+
+});
+
+
 
 //namespace specific to students
 var studentconnection = studentsio.on('connection', socket => { 
@@ -189,4 +198,14 @@ io.on('connection', function(socket) {
   });
 
 });
+/*
+//namespace specific to groups
+for (var i=0, len= data.groupsNum; i < len ; i++) { 
 
+groupconnection = io.of(groupNames[i]).on('connection', socket => { 
+  console.log(groupname[i] + " is now connected");
+
+});
+}
+
+*/
