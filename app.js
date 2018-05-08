@@ -41,6 +41,7 @@ function Data() {
   this.students = [];
   this.currentStudentId = 0;
   this.groups = [];
+  this.groupNames = [];
   this.session = null;
   this.groupNum = null;
   //exercise2 heteronomy autonomy
@@ -82,8 +83,7 @@ Data.prototype.setSession = function(min, max) {
 
 Data.prototype.setGroups = function (groupSize) {
   
-  this.groupsNum = (data.students.length / groupSize);
-
+  this.groupNum = (data.students.length / groupSize);
 }
 
 var server = app.listen(app.get('port'), function () {
@@ -124,15 +124,9 @@ var studentconnection = studentsio.on('connection', socket => {
     console.log("we can finally start, socketID: " + socketid);
     var allstudents = Object.keys(studentsio.connected);
   
-    //create namespace for each group
-    var groupnames = [];
-    for (i=0, len = data.groupNum ; i < len; i++) {
-      group = '/group' + i.toString();
-      groupnames.push(group);
-    }
-
-    for (i=0, len= Object.keys(students.io.connected).length; i < len ; i++) {
-      var index = getRansomArbitary(0,allstudents.length);
+    for (var i=0, len= Object.keys(studentsio.connected).length; i < len ; i++) {
+      var index = getRandomArbitrary(0,allstudents.length);
+      
       socket.emit('namespace', '/groupone');
       //delete used student
       allstudents.splice(index,1);
@@ -162,8 +156,28 @@ io.on('connection', function(socket) {
  });
   socket.on('generateGroups', function(groupSize) {
     console.log('server generating groups');
-    data.setGroups(data.students.length, groupSize);
-    studentconnection.emit('generateGroupsStudent', 'hej2015');
+    data.setGroups(groupSize);
+    console.log("studendt in socket" + data.students.length );
+    console.log("groupsize in socket" + groupSize );
+    console.log("groupnum in socket" + data.groupNum );
+  
+    //create namespace for each group
+    console.log("groupnum: " + data.groupNum);
+    for (var i=0, len = data.groupNum ; i < len; i++) {
+      var group = '/group' + i.toString();
+      data.groupNames.push(group);
+      console.log(data.groupNames);
+    }
+    var allstudents = Array.from(Object.keys(studentconnection.connected));
+    studentconnection.to(allstudents[0]).emit('generateGroupsStudent', 'eyes');
+    studentconnection.to(allstudents[1]).emit('generateGroupsStudent', 'for');
+    studentconnection.to(allstudents[2]).emit('generateGroupsStudent', 'only');
+    studentconnection.to(allstudents[3]).emit('generateGroupsStudent', 'lol');
+    
+    console.log("first connected students " + allstudents[0]); 
+    //studentconnection.emit('generateGroupsStudent', 'hej2015');
+
+
   });
 
 });
