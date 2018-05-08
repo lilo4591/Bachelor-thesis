@@ -81,7 +81,7 @@ Data.prototype.setSession = function(min, max) {
   this.session = Math.floor(Math.random() * (max - min) )+ min;
 }
 
-Data.prototype.setGroups = function (groupSize) {
+Data.prototype.setNumGroups = function (groupSize) {
   
   this.groupNum = (data.students.length / groupSize);
 }
@@ -104,10 +104,8 @@ const groupfourio = io.of('/groupfour');
 
 //namespace specific to students
 var studentconnection = studentsio.on('connection', socket => { 
-  console.log('listen for student connection')
   console.log("studentNamespace with socketID: " + socket.id + " connected");
   socket.emit('connectionmessage', "student connected on namespace students");
-  console.log(Object.keys(studentsio.connected));
 
   //listen for when students log in
   socket.on('loggedIn', function() {
@@ -122,16 +120,7 @@ var studentconnection = studentsio.on('connection', socket => {
 
   socket.on('startGenerateGroups', function(socketid) {
     console.log("we can finally start, socketID: " + socketid);
-    var allstudents = Object.keys(studentsio.connected);
-  
-    for (var i=0, len= Object.keys(studentsio.connected).length; i < len ; i++) {
-      var index = getRandomArbitrary(0,allstudents.length);
-      
-      socket.emit('namespace', '/groupone');
-      //delete used student
-      allstudents.splice(index,1);
-    }
-   });
+    });
 });
 
 io.on('connection', function(socket) {
@@ -155,8 +144,9 @@ io.on('connection', function(socket) {
     io.emit('displayThoughts', data.thoughts); 
  });
   socket.on('generateGroups', function(groupSize) {
+    //TODO: handle uneven number of students
     console.log('server generating groups');
-    data.setGroups(groupSize);
+    data.setNumGroups(groupSize);
     console.log("studendt in socket" + data.students.length );
     console.log("groupsize in socket" + groupSize );
     console.log("groupnum in socket" + data.groupNum );
@@ -169,13 +159,31 @@ io.on('connection', function(socket) {
       console.log(data.groupNames);
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
-    studentconnection.to(allstudents[0]).emit('generateGroupsStudent', 'eyes');
-    studentconnection.to(allstudents[1]).emit('generateGroupsStudent', 'for');
-    studentconnection.to(allstudents[2]).emit('generateGroupsStudent', 'only');
-    studentconnection.to(allstudents[3]).emit('generateGroupsStudent', 'lol');
+  
     
-    console.log("first connected students " + allstudents[0]); 
-    //studentconnection.emit('generateGroupsStudent', 'hej2015');
+    var g = 0;
+    var currentGroup = data.groupNames[g];
+    var count = 0; 
+    //send a random group to each connected student
+    for (var i=0, len= Array.from(Object.keys(studentsio.connected)).length; i < len ; i++) {
+      if (count < data.groupNum) {
+        var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        console.log('in count with random index: ' + index);
+        studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
+        //delete used student
+        allstudents.splice(index,1);
+        count = count + 1;
+      }
+      else {
+        console.log('in else');
+        g = g + 1;
+        currentGroup = data.groupNames[g];
+        var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        studentconnection.to(allstudents[index]).emit('namespace', currentGroup); 
+        count = 0;
+
+      }
+    }
 
 
   });
