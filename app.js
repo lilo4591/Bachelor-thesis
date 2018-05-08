@@ -71,20 +71,24 @@ Data.prototype.addThought = function (thoughts) {
   this.thoughts.push(thoughts);
 };
 
+Data.prototype.addGroupName = function (group) {
+  this.groupNames.push(group);
+};
+
+Data.prototype.setSession = function(min, max) {
+  this.session = Math.floor(Math.random() * (max - min) )+ min;
+};
+
+Data.prototype.setNumGroups = function (groupSize) {
+  
+  this.groupNum = (data.students.length / groupSize);
+};
+
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
 var data = new Data();
-
-Data.prototype.setSession = function(min, max) {
-  this.session = Math.floor(Math.random() * (max - min) )+ min;
-}
-
-Data.prototype.setNumGroups = function (groupSize) {
-  
-  this.groupNum = (data.students.length / groupSize);
-}
 
 var server = app.listen(app.get('port'), function () {
   data.setSession(1111,9999);
@@ -97,17 +101,6 @@ var io = socket(server)
 const studentsio = io.of('/students');
 var groupconnection;
 
-
-//namespace specific to groups
-groupconnection = io.of(data.groupNames[0]).on('connection', socket => { 
-  console.log(data.groupnames[0] + " is now connected");
-
-});
-
-groupconnection = io.of(data.groupNames[1]).on('connection', socket => { 
-  console.log(data.groupname[1] + " is now connected");
-
-});
 
 
 
@@ -130,6 +123,8 @@ var studentconnection = studentsio.on('connection', socket => {
   socket.on('startGenerateGroups', function(socketid) {
     console.log("we can finally start, socketID: " + socketid);
     });
+  
+
 });
 
 io.on('connection', function(socket) {
@@ -164,7 +159,7 @@ io.on('connection', function(socket) {
     console.log("groupnum: " + data.groupNum);
     for (var i=0, len = data.groupNum ; i < len; i++) {
       var group = '/group' + i.toString();
-      data.groupNames.push(group);
+      data.addGroupName(group);
       console.log(data.groupNames);
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
@@ -193,19 +188,15 @@ io.on('connection', function(socket) {
 
       }
     }
-
-
+  //namespace specific to groups
+  var i;
+  for (i=0, len= data.groupNames.length; i < len ; i++) {
+    console.log("debugg name of all groups " + data.groupNames);
+    var groupconnection = io.of(data.groupNames[i]).on('connection', function (socket) { 
+      console.log("A student joined group " + data.groupNames[0]);
+    });
+  }
   });
 
 });
-/*
-//namespace specific to groups
-for (var i=0, len= data.groupsNum; i < len ; i++) { 
 
-groupconnection = io.of(groupNames[i]).on('connection', socket => { 
-  console.log(groupname[i] + " is now connected");
-
-});
-}
-
-*/
