@@ -81,7 +81,12 @@ const Start = Vue.component('Start', {
     studentsocket.emit('loggedIn', {"sessiontoken": this.sessionToken,
                              "studentId": this.studentId     
     });
- 
+
+    studentsocket.on('generateGroupsStudent', function (message) {
+      console.log(message);
+      studentsocket.emit('startGenerateGroups', studentsocket.id);
+    });
+
     socket.on('redirect', function(exerciseNum) {
       //TODO route based on exerciseNum
       console.log("redirection student to exercise...");

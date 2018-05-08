@@ -68,6 +68,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentId);
     },
     generateGroups() {
+    //TODO: 2 should be based in input
     socket.emit('generateGroups', 2);
     console.log("start generate"); 
     }

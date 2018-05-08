@@ -42,7 +42,7 @@ function Data() {
   this.currentStudentId = 0;
   this.groups = [];
   this.session = null;
-  this.groupSize = null;
+  this.groupNum = null;
   //exercise2 heteronomy autonomy
   this.thoughts = [];
 
@@ -70,6 +70,9 @@ Data.prototype.addThought = function (thoughts) {
   this.thoughts.push(thoughts);
 };
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
 var data = new Data();
 
@@ -79,7 +82,7 @@ Data.prototype.setSession = function(min, max) {
 
 Data.prototype.setGroups = function (groupSize) {
   
-  this.groupSize = (data.students.length / groupSize);
+  this.groupsNum = (data.students.length / groupSize);
 
 }
 
@@ -100,7 +103,7 @@ const grouphreeio = io.of('/groupthree');
 const groupfourio = io.of('/groupfour'); 
 
 //namespace specific to students
-studentsio.on('connection', socket => { 
+var studentconnection = studentsio.on('connection', socket => { 
   console.log('listen for student connection')
   console.log("studentNamespace with socketID: " + socket.id + " connected");
   socket.emit('connectionmessage', "student connected on namespace students");
@@ -117,10 +120,24 @@ studentsio.on('connection', socket => {
     io.emit("StudentLoggedIn", data.currentStudentId);
   });
 
-  socket.on('generateGroupsplz', function() {
-    socket.emit('startgroupnamespaxe', 'yay');
-    console.log("namespace student can start grouping");
-  });
+  socket.on('startGenerateGroups', function(socketid) {
+    console.log("we can finally start, socketID: " + socketid);
+    var allstudents = Object.keys(studentsio.connected);
+  
+    //create namespace for each group
+    var groupnames = [];
+    for (i=0, len = data.groupNum ; i < len; i++) {
+      group = '/group' + i.toString();
+      groupnames.push(group);
+    }
+
+    for (i=0, len= Object.keys(students.io.connected).length; i < len ; i++) {
+      var index = getRansomArbitary(0,allstudents.length);
+      socket.emit('namespace', '/groupone');
+      //delete used student
+      allstudents.splice(index,1);
+    }
+   });
 });
 
 io.on('connection', function(socket) {
@@ -146,7 +163,7 @@ io.on('connection', function(socket) {
   socket.on('generateGroups', function(groupSize) {
     console.log('server generating groups');
     data.setGroups(data.students.length, groupSize);
-    io.to('/students').emit('generateGroupsplz', 'hej');
+    studentconnection.emit('generateGroupsStudent', 'hej2015');
   });
 
 });
