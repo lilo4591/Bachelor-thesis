@@ -83,10 +83,6 @@ const Start = Vue.component('Start', {
                              "studentId": this.studentId     
     });
 
-    studentsocket.on('generateGroupsStudent', function (message) {
-      console.log(message);
-      studentsocket.emit('startGenerateGroups', studentsocket.id);
-    });
     studentsocket.on('namespace', function (group) {
       groupsocket = io.connect(group);
       console.log(group);

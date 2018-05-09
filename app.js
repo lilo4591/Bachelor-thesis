@@ -34,9 +34,7 @@ app.get('/teacher-admin', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/teacher-admin.html'));
 });
 
-// Store data in an object to keep the global namespace clean and
-// prepare for multiple instances of data if necessary
- 
+//global data 
 function Data() {
   this.students = [];
   this.currentStudentId = 0;
@@ -96,13 +94,9 @@ var server = app.listen(app.get('port'), function () {
   console.log('Server listening on port ' + app.get('port'));
 });
 
-
 var io = socket(server)
 const studentsio = io.of('/students');
 var groupconnection;
-
-
-
 
 //namespace specific to students
 var studentconnection = studentsio.on('connection', socket => { 
@@ -120,19 +114,13 @@ var studentconnection = studentsio.on('connection', socket => {
     io.emit("StudentLoggedIn", data.currentStudentId);
   });
 
-  socket.on('startGenerateGroups', function(socketid) {
-    console.log("we can finally start, socketID: " + socketid);
-    });
-  
-
 });
 
 io.on('connection', function(socket) {
   io.emit('session', data.session); 
   console.log(data.session);
   console.log("client with socketID:  " + socket.id + " connected");
- 
-  
+   
   socket.on('navigateStudentsTo', function(exerciseNum) {
       //route to first exercise
       io.emit('redirect', exerciseNum)
@@ -142,7 +130,7 @@ io.on('connection', function(socket) {
     console.log("server collecting thoughts");
     for ( var i = 0, l = thoughts.length; i < l; i++) {
       data.addThought(thoughts[i]);
-      console.log(data);
+      //console.log(data);
     }
     console.log(data.thoughts);
     io.emit('displayThoughts', data.thoughts); 
@@ -151,9 +139,9 @@ io.on('connection', function(socket) {
     //TODO: handle uneven number of students
     console.log('server generating groups');
     data.setNumGroups(groupSize);
-    console.log("studendt in socket" + data.students.length );
-    console.log("groupsize in socket" + groupSize );
-    console.log("groupnum in socket" + data.groupNum );
+    console.log("Number of students connected in socket: " + data.students.length );
+    console.log("Groupsize in socket: " + groupSize );
+    console.log("Groupnum in socket: " + data.groupNum );
   
     //create namespace for each group
     console.log("groupnum: " + data.groupNum);
@@ -179,11 +167,13 @@ io.on('connection', function(socket) {
         count = count + 1;
       }
       else {
-        console.log('in else');
         g = g + 1;
         currentGroup = data.groupNames[g];
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        console.log('in else with random index:  ' + index);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup); 
+        //delete used student
+        allstudents.splice(index,1);
         count = 0;
 
       }
@@ -191,9 +181,8 @@ io.on('connection', function(socket) {
   //namespace specific to groups
   var i;
   for (i=0, len= data.groupNames.length; i < len ; i++) {
-    console.log("debugg name of all groups " + data.groupNames);
     var groupconnection = io.of(data.groupNames[i]).on('connection', function (socket) { 
-      console.log("A student joined group " + data.groupNames[0]);
+      console.log("A student joined group " + data.groupNames[i]);
     });
   }
   });

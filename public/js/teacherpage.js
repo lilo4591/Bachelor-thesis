@@ -55,9 +55,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       socket.on('session', function(session) {
         this.token = session;
       }.bind(this));
-      console.log("prior to socket studentlogin");
       socket.on("StudentLoggedIn", function(studentId) {
-        console.log("YES");
         this.addStudent(studentId);
         console.log(this.students);
       }.bind(this));    
@@ -103,7 +101,6 @@ const workshopExercises = Vue.component('WorkshopExercises', {
   ` ,
   methods: { 
     navigateStudentsTo(exerciseNum) {
-      console.log("teacher called navigateStudentsTo");
       socket.emit("navigateStudentsTo",exerciseNum);
     }
   }
