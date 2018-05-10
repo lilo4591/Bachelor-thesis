@@ -78,12 +78,17 @@ Data.prototype.setSession = function(min, max) {
 };
 
 Data.prototype.setNumGroups = function (groupSize) {
-  
-  this.groupNum = (data.students.length / groupSize);
+
+  if (groupSize == data.students.length) {
+    this.groupNum = 1;  
+  }
+  else {
+    this.groupNum = Math.floor(data.students.length / groupSize);
+  }
 };
 
 function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
+  return Math.random() * (max - min) + min;
 }
 
 var data = new Data();
@@ -96,7 +101,7 @@ var server = app.listen(app.get('port'), function () {
 
 var io = socket(server)
 const studentsio = io.of('/students');
-var groupconnection;
+var groupconnection = [];
 
 //namespace specific to students
 var studentconnection = studentsio.on('connection', socket => { 
@@ -120,10 +125,10 @@ io.on('connection', function(socket) {
   io.emit('session', data.session); 
   console.log(data.session);
   console.log("client with socketID:  " + socket.id + " connected");
-   
+
   socket.on('navigateStudentsTo', function(exerciseNum) {
-      //route to first exercise
-      io.emit('redirect', exerciseNum)
+    //route to first exercise
+    io.emit('redirect', exerciseNum)
   });
   socket.on('thoughts', function(thoughts) {
 
@@ -134,7 +139,7 @@ io.on('connection', function(socket) {
     }
     console.log(data.thoughts);
     io.emit('displayThoughts', data.thoughts); 
- });
+  });
   socket.on('generateGroups', function(groupSize) {
     //TODO: handle uneven number of students
     console.log('server generating groups');
@@ -142,7 +147,7 @@ io.on('connection', function(socket) {
     console.log("Number of students connected in socket: " + data.students.length );
     console.log("Groupsize in socket: " + groupSize );
     console.log("Groupnum in socket: " + data.groupNum );
-  
+
     //create namespace for each group
     console.log("groupnum: " + data.groupNum);
     for (var i=0, len = data.groupNum ; i < len; i++) {
@@ -151,14 +156,27 @@ io.on('connection', function(socket) {
       console.log(data.groupNames);
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
-  
-    
+
+
     var g = 0;
     var currentGroup = data.groupNames[g];
     var count = 0; 
+    var len = Array.from(Object.keys(studentsio.connected)).length;
+    
     //send a random group to each connected student
-    for (var i=0, len= Array.from(Object.keys(studentsio.connected)).length; i < len ; i++) {
-      if (count < data.groupNum) {
+      //uneven nr of students
+      if (len % 2 == 1) {
+        //put student in group
+        console.log("uneven number of students");
+        var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        console.log('in IF with random index: ' + index);
+        studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
+        //delete used student
+        allstudents.splice(index,1);
+        len = len - 1;
+       }
+      for (var i=0; i < len ; i++) {
+        if (count < data.groupNum) {
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
         console.log('in count with random index: ' + index);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
@@ -169,22 +187,26 @@ io.on('connection', function(socket) {
       else {
         g = g + 1;
         currentGroup = data.groupNames[g];
+        count = 0;
+        i = i - 1;
+        /*
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
         console.log('in else with random index:  ' + index);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup); 
         //delete used student
         allstudents.splice(index,1);
-        count = 0;
-
+        */
       }
     }
-  //namespace specific to groups
-  var i;
-  for (i=0, len= data.groupNames.length; i < len ; i++) {
-    var groupconnection = io.of(data.groupNames[i]).on('connection', function (socket) { 
-      console.log("A student joined group " + data.groupNames[i]);
-    });
-  }
+    //namespace specific to groups
+    var i;
+    for (i=0, len= data.groupNames.length; i < len ; i++) {
+      groupconnection.push(io.of(data.groupNames[i]).on('connection', function(index) {
+        return function (socket) { 
+           console.log("A student joined group " + data.groupNames[index]);
+        } 
+      }(i)));
+    }
   });
 
 });
