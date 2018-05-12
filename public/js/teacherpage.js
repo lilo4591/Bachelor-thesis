@@ -28,6 +28,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       student: '',
       students: ["23"],
       token: null,
+      groupNum: null
     };
   },
    template: `
@@ -40,9 +41,13 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         <li v-for="(data, index) in students" :key='index'>
           Student number {{students[index]}} has connected</li>
       </ul>
+      <form>
+        <input type=number placeholder="Enter number of students in each group" v-model="groupNum" required>
+        <button @submit.prevent="submitForm" class="smallButton" v-on:click=generateGroups(groupNum)>Generate groups</button>
+      </form>
       <div>
         <router-link to="/workshopexercises">
-        <button class="button" v-on:click=generateGroups()> Start workshop </button>
+        <button class="button"> Start workshop </button>
         </router-link>
       </div> 
         <router-link to="/">Back</router-link>
@@ -65,10 +70,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     addStudent(studentId) { 
       this.students.push(studentId);
     },
-    generateGroups() {
+    generateGroups(n) {
     //TODO: 2 should be based in input
-    socket.emit('generateGroups', 2);
-    console.log("start generate"); 
+    socket.emit('generateGroups', n);
+    console.log("start generate: " + n); 
     }
  }
 });
