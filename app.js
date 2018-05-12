@@ -82,6 +82,9 @@ Data.prototype.setNumGroups = function (groupSize) {
   if (groupSize == data.students.length) {
     this.groupNum = 1;  
   }
+  else if (data.students.length % groupSize > 1) {
+    this.groupNum = Math.ceil(data.students.length / groupSize);
+  }
   else {
     this.groupNum = Math.floor(data.students.length / groupSize);
   }
@@ -157,28 +160,23 @@ io.on('connection', function(socket) {
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
 
-
     var g = 0;
     var currentGroup = data.groupNames[g];
     var count = 0; 
     var len = Array.from(Object.keys(studentsio.connected)).length;
-    
     //send a random group to each connected student
-      //uneven nr of students
-      if (len % 2 == 1) {
+      //uneven nr of students or uneven number of groups
+      if (len % groupSize == 1)  {
         //put student in group
-        console.log("uneven number of students");
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
-        console.log('in IF with random index: ' + index);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
         len = len - 1;
        }
       for (var i=0; i < len ; i++) {
-        if (count < data.groupNum) {
+        if (count < groupSize) {
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
-        console.log('in count with random index: ' + index);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
@@ -189,13 +187,6 @@ io.on('connection', function(socket) {
         currentGroup = data.groupNames[g];
         count = 0;
         i = i - 1;
-        /*
-        var index = Math.floor(getRandomArbitrary(0,allstudents.length));
-        console.log('in else with random index:  ' + index);
-        studentconnection.to(allstudents[index]).emit('namespace', currentGroup); 
-        //delete used student
-        allstudents.splice(index,1);
-        */
       }
     }
     //namespace specific to groups
