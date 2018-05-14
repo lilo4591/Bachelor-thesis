@@ -44,6 +44,9 @@ function Data() {
   this.groupNum = null;
   //exercise2 heteronomy autonomy
   this.thoughts = [];
+  //groupname : dilemma
+  this.dilemmas = [];
+  this.reflexthoughts = [];
 
 }
 
@@ -88,6 +91,20 @@ Data.prototype.setNumGroups = function (groupSize) {
   else {
     this.groupNum = Math.floor(data.students.length / groupSize);
   }
+};
+
+Data.prototype.addDilemma = function (group, dilemma) {
+  //deletes dilemma if it already exists
+  if (this.dilemmas.hasOwnProperty(group)) {
+    delete this.dilemmas[group];
+  }
+  this.dilemmas[group] = dilemma;
+  console.log(this.dilemmas);
+};
+
+Data.prototype.addReflexThoughts = function (group, thoughts) {
+  this.reflexthoughts[group] = thoughts;
+  console.log(this.reflexthoughts);
 };
 
 function getRandomArbitrary(min, max) {
@@ -200,12 +217,16 @@ io.on('connection', function(socket) {
           socket.on('dilemma', function(info) {
             console.log("socketon dilemma");
             console.log(data.groupNames[index]);
+            data.addDilemma(data.groupNames[index], info.dilemma);
             io.of(data.groupNames[index]).emit('showdilemma', info)
           });
-         socket.on('edit', function(info) {
+          socket.on('edit', function(info) {
             console.log("socketon edit");
             io.of(data.groupNames[index]).emit('editdilemma', info)
           });
+          socket.on('reflexthoughts', function(thoughts) {
+            data.addReflexThoughts(data.groupNames[index], thoughts);
+        });
         } 
       }(i)));
     }

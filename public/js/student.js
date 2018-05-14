@@ -260,7 +260,10 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       console.log("notifyGroupEdit");
       this.notsubmitted = bool;
       groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
-    }
+    },
+ /*   saveDilemma(dilemma) {
+      groupsocket.emit('savedilemma', dilemma);
+    }*/
   }
   ,
    
@@ -277,7 +280,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted===false"> {{ dilemma }} <br> 
           <button id="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
-        <router-link to="/exercise2p3">
+        <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma} } ">
         Continue
         </router-link>
   </div>
@@ -296,9 +299,13 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       reflex: "",
       reflexthoughts: [ 
         {"reflex": "Example thought: I think that this is not a problem...." }
-      ]
+      ],
+      dilemma: "",
   }
  },
+  created: function() {
+    this.dilemma = this.$route.params.dilemma;
+  },
   methods: {
     addReflexThought() { 
       this.reflexthoughts.push({reflex: this.reflex});
@@ -307,17 +314,20 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
     removeReflexThought(id) {
       this.reflexthoughts.splice(id,1);
     },
+    collectReflexThoughts() {
+      console.log("collecting reflex thoughts");
+      groupsocket.emit('reflexthoughts', this.reflexthoughts);
+    }
   }
   ,
    
-  //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
-  //TODO: send dilemma from previous route exercisep2.3 and write it out
    template: `
   <div>
     {{name}}
     <p>Individually write down instinctive thougts that occur about the dilemma
     <br>What is the first thing you think about about this dilemma?? </p>
       dilemma goex here
+      {{dilemma}}
       <div class="holder">
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here plx..." v-model="reflex">
@@ -330,7 +340,45 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
           </li>
         </ul>
       </div>
-    <router-link to="/exercise2p3">
+    <router-link :to=" {name: 'exercise2p4', params: {dilemma: this.dilema} }" v-on:click="collectReflexThoughts">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
+
+const Exercise2p4 = Vue.component('Exercise2p4', {
+  //TODO: This is individual
+  //TODO: Update relevant example thought
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.4: Show groups reflex thoughts",
+      dilemma: "",
+      reflexthoughts: null
+  }
+ },
+  created: function() {
+    this.dilemma = this.$route.params.dilemma;
+  },
+   
+   template: `
+  <div>
+    {{name}}
+    <p>Group thoughts
+    <br>What is the first thing you think about about this dilemma?? </p>
+      dilemma goex here
+      {{dilemma}}
+      <div class="holder">
+        <p>These are all your reflex thoughts</p>
+        <ul>
+          <li v-for="(data, index) in reflexthoughts" :key='index'> 
+            {{data.reflex}}
+            <i class="material-icons" v-on:click="removeReflexThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+    <router-link to="/exercise2p4" v-on:click=collectReflexThoughts()>
       Continue
     </router-link>
   </div>
@@ -368,11 +416,17 @@ const router = new VueRouter({
       path:'/exercise2p2',
       component:Exercise2p2
     },
-    {
+    { //reflex thoughts individual
       path:'/exercise2p3',
-      component:Exercise2p3
+      component:Exercise2p3,
+      name: 'exercise2p3'
+    },
+    { //reflex thoughts all thoughts in group
+      path:'/exercise2p4',
+      component:Exercise2p4,
+      name: 'exercise2p4'
     }
-  ]
+ ]
 });
 
 const app = new Vue({
