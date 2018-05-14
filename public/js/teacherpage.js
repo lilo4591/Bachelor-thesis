@@ -28,9 +28,12 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       student: '',
       students: ["23"],
       token: null,
-      groupNum: null
+      numEachGroup: null,
+      groupNum: null,
+      groupNames: null
     };
   },
+  //TODO style the printing of the groups
    template: `
  
     <div id="app">
@@ -41,10 +44,18 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         <li v-for="(data, index) in students" :key='index'>
           Student number {{students[index]}} has connected</li>
       </ul>
-      <form>
-        <input type=number placeholder="Enter number of students in each group" v-model="groupNum" required>
-        <button @submit.prevent="submitForm" class="smallButton" v-on:click=generateGroups(groupNum)>Generate groups</button>
+      <form @submit.prevent="generateGroups(numEachGroup)">
+        Enter number of student in each group
+        <input type="number" min="0" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
+        <button type="submit" id="smallbutton" >Generate groups</button>
       </form>
+      <div v-if="this.groupNum != null">
+        <p>There are {{groupNum}} groups generated with {{ numEachGroup }} students in each.<br>
+        The groups are:</p>
+        <div v-for="(data,index) in groupNames" :key='index'> 
+        <ul><p>{{ groupNames[index] }}</p></ul>
+        </div>
+      </div>
       <div>
         <router-link to="/workshopexercises">
         <button class="button"> Start workshop </button>
@@ -64,6 +75,12 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         this.addStudent(studentId);
         console.log(this.students);
       }.bind(this));    
+      socket.on('groupInfo', function(data) {
+        this.groupNum = data.numberOfGroups;
+        this.groupNames = data.groupNames;
+        console.log("There are " + this.groupNum + " groups with " + this.numEachGroup + " students in each");
+        console.log(this.groupNames);
+      }.bind(this));
     },
 
  methods: {    
@@ -71,7 +88,6 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentId);
     },
     generateGroups(n) {
-    //TODO: 2 should be based in input
     socket.emit('generateGroups', n);
     console.log("start generate: " + n); 
     }

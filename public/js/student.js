@@ -73,8 +73,7 @@ const Start = Vue.component('Start', {
   template: `
    <div>
     <h2>You are logged in</h2>
-    <p>Your groupnumber is {{ groupName }}</p>
-    <p>studentID INSERT STUDENT ID</p>
+    <p v-if="this.groupName != null">The name of your group is {{ groupName }}</p>
     <p>This should be the base for all starts of exercises</p>
   </div>
   `,
@@ -89,7 +88,7 @@ const Start = Vue.component('Start', {
       groupsocket = io.connect(group);
       this.groupName = (group);
       console.log(group);
-    });
+    }.bind(this));
 
 
     socket.on('redirect', function(exerciseNum) {

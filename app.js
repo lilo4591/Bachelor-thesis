@@ -189,6 +189,8 @@ io.on('connection', function(socket) {
         i = i - 1;
       }
     }
+    socket.emit('groupInfo', {'numberOfGroups' : data.groupNum,
+                              'groupNames': data.groupNames});
     //namespace specific to groups
     var i;
     for (i=0, len= data.groupNames.length; i < len ; i++) {
