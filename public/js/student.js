@@ -148,6 +148,7 @@ const Exercise1 = Vue.component('Exercise1', {
   `
 });
 
+//all students together
 const Exercise2 = Vue.component('Exercise2', {
   data: function() {
     return {
@@ -235,10 +236,31 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       sessiontoken: null
     }
  },
+  created: function() {
+    groupsocket.on('showdilemma', function(data) {
+      console.log("showdilemma");
+      this.dilemma = data.dilemma;
+      this.notsubmitted = data.notsubmitted;
+    }.bind(this));
+
+    groupsocket.on('editdilemma', function(data) {
+      console.log("editDilemma");
+      this.dilemma = data.dilemma;
+      this.notsubmitted = data.notsubmitted;
+    }.bind(this));
+ },
   methods: {
-    updateSubmit(bool) {
+    
+    notifyGroupSubmit(bool, dilemma) {
+      console.log("notifyGroupSubmit");
       this.notsubmitted = bool;
-    } 
+      groupsocket.emit('dilemma', {'dilemma': dilemma, 'notsubmitted': false});
+    },
+    notifyGroupEdit(bool, dilemma) {
+      console.log("notifyGroupEdit");
+      this.notsubmitted = bool;
+      groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
+    }
   }
   ,
    
@@ -250,10 +272,10 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
           </textarea>
-          <button id="smallbutton" v-on:click="updateSubmit(false)">Submit dilemma</button>
+          <button id="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
         </div>
-        <div v-if="notsubmitted===false"> {{ dilemma }} 
-          <button id="smallbutton" v-on:click="updateSubmit(true)">Edit dilemma</button>
+        <div v-if="notsubmitted===false"> {{ dilemma }} <br> 
+          <button id="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
         <router-link to="/exercise2p3">
         Continue

@@ -196,7 +196,16 @@ io.on('connection', function(socket) {
     for (i=0, len= data.groupNames.length; i < len ; i++) {
       groupconnection.push(io.of(data.groupNames[i]).on('connection', function(index) {
         return function (socket) { 
-           console.log("A student joined group " + data.groupNames[index]);
+          console.log("A student joined group " + data.groupNames[index]);
+          socket.on('dilemma', function(info) {
+            console.log("socketon dilemma");
+            console.log(data.groupNames[index]);
+            io.of(data.groupNames[index]).emit('showdilemma', info)
+          });
+         socket.on('edit', function(info) {
+            console.log("socketon edit");
+            io.of(data.groupNames[index]).emit('editdilemma', info)
+          });
         } 
       }(i)));
     }
