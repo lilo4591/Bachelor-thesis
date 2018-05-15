@@ -362,6 +362,12 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
  },
   created: function() {
     this.dilemma = this.$route.params.dilemma;
+    groupsocket.on('showreflexthoughts', function(data) {
+      console.log("showreflexthougts");
+      console.log(data);
+      this.reflexthoughts = data;
+
+    }.bind(this));
   },
    
    template: `

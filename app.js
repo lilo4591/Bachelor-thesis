@@ -233,9 +233,12 @@ io.on('connection', function(socket) {
             console.log("socketon edit");
             io.of(data.groupNames[index]).emit('editdilemma', info)
           });
+          //collecting reflexthoughts
           socket.on('reflexthoughts', function(thoughts) {
             data.addReflexThoughts(data.groupNames[index], thoughts);
-        });
+            //sending reflexthoughts within each group
+            io.of(data.groupNames[index]).emit('showreflexthoughts', data.reflexthoughts[data.groupNames[index]]);
+          });
         } 
       }(i)));
     }
