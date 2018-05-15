@@ -2,7 +2,7 @@
 The Ethical competence workshop system is a website designed to be used during workshops to train and increase ethical competence.
 
 ## 1. Getting Started
-Clone the repository, and for now run the Python part and Go part separately.
+Clone the repository.
 
 ### 1.1 Prerequisites
 The program is written in Javascript with the library vue, see links below:
@@ -25,14 +25,14 @@ Install node.js package manager
 ```
 $ sudo apt-get install npm
 ```
-Clone this repo navigate to the folder and run to install depencencies
+Navigate to the folder and install depencencies
 ```
 npm install
 ```
 ## 2. Deployment
 
 ### 2.1 Run program
-navigate to the folder and start the server
+Navigate to the folder and start the server
 ```
 nodejs app.js
 ```
