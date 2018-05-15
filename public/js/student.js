@@ -211,7 +211,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
  
  template: `
   <div> 
-    <h1>Exercise 2 {{ name }}</h1>
+    <h2>Exercise 2 {{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your thougts.<br>
     When you the teacher tells you it is tome for the next step in this exercise press continue..<br>
     To add more thoughts press go back</p>
@@ -226,7 +226,6 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
   });
 
 const Exercise2p2 = Vue.component('Exercise2p2', {
-  //TODO: Only one person in each groupshould be able to submit a dilemma,
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.2",
@@ -271,6 +270,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   //TODO: Textara output {{dilemma}} should inlude linebreaks 
    template: `
   <div>
+    <h2>Exercise 2 {{ name }}</h2>
     <p>Discuss in your group and formulate your own dilemma relevant to your occupation.</p>
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
@@ -323,9 +323,12 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
    
    template: `
   <div>
-    {{name}}
-    <p>Individually write down instinctive thougts that occur about the dilemma
-    <br>What is the first thing you think about about this dilemma?? </p>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Discuss in your group.
+    <br>Individually write down instinctive thoughts that occur about the dilemma
+    <br>What is the first thing you think about about this dilemma?? 
+    <br>Also write possible instinctive thoughts of other perspectives.
+    <br>Write all thoughts you can come up with, independent of the solution you want to come to.</p>
       dilemma goex here
       {{dilemma}}
       <div class="holder">
@@ -341,7 +344,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
         </ul>
       </div>
       <div v-on:click="collectReflexThoughts()">
-    <router-link :to=" {name: 'exercise2p4', params: {dilemma: this.dilema} }">
+    <router-link :to="{ name: 'exercise2p4', params: {dilemma: this.dilemma} }">
       Continue
     </router-link>
     </div>
@@ -361,24 +364,23 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
   }
  },
   created: function() {
-    this.dilemma = this.$route.params.dilemma;
     groupsocket.on('showreflexthoughts', function(data) {
       console.log("showreflexthougts");
       console.log(data);
       this.reflexthoughts = data;
-
     }.bind(this));
+    this.dilemma = this.$route.params.dilemma;
   },
    
    template: `
   <div>
-    {{name}}
+    <h2>Exercise 2 {{ name }}</h2>
     <p>Group thoughts
     <br>What is the first thing you think about about this dilemma?? </p>
       dilemma goex here
       {{dilemma}}
       <div class="holder">
-        <p>These are all your reflex thoughts</p>
+        <p>These are your group's reflex thoughts</p>
         <ul>
           <li v-for="(data, index) in reflexthoughts" :key='index'> 
             {{data.reflex}}
@@ -386,13 +388,188 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
           </li>
         </ul>
       </div>
-    <router-link to="/exercise2p4" v-on:click=collectReflexThoughts()>
+    <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma} } ">
+      Go Back /
+    </router-link>
+    <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
       Continue
     </router-link>
   </div>
   `
 });
 
+const Exercise2p5 = Vue.component('Exercise2p5', {
+  //TODO: This is individual
+  //TODO: translate dogmatic låsningar
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.5: Principle fixations",
+      notsubmitted: true,
+      studentId: null,
+      sessiontoken: null,
+      principle: "",
+      principles: [ 
+        {"principle": "Example principle: You have to follow the law...." }
+      ],
+      dilemma: "",
+  }
+ },
+  created: function() {
+    this.dilemma = this.$route.params.dilemma;
+  },
+  methods: {
+    addPrinciple() { 
+      this.principles.push({principle: this.principle});
+      this.principle = '';
+    },
+    removePrinciple(id) {
+      this.principles.splice(id,1);
+    },
+    collectPrinciples() {
+      console.log("collecting principle thoughts");
+      groupsocket.emit('principles', this.principles);
+    }
+  }
+  ,
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Discuss with your group.
+    <br>Individually write down principles that relates to the dilemma.
+    <br>These principles are the reason for the moral dilemma since you can't follow them all.
+    <br>Write all principles you can come up with, independent of the solution you want to come to.</p>
+      Your group's dilemma is the following: 
+      {{dilemma}}
+      <div class="holder">
+        <form @submit.prevent="addPrinciple">
+          <input type="text" placeholder="Enter your principle here plx..." v-model="principle">
+        </form> 
+        <p>These are your principles</p>
+        <ul>
+          <li v-for="(data, index) in principles" :key='index'> 
+            {{data.principle}}
+            <i class="material-icons" v-on:click="removePrinciple(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+      <div v-on:click="collectPrinciples()">
+    <router-link :to="{ name: 'exercise2p6', params: {dilemma: this.dilemma} }">
+      Continue
+    </router-link>
+    </div>
+  </div>
+  `
+});
+
+
+const Exercise2p6 = Vue.component('Exercise2p6', {
+  //TODO: This is individual
+  //TODO: Update relevant example thought
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.6: Show groups principles",
+      dilemma: "",
+      principles: null
+  }
+ },
+  created: function() {
+    groupsocket.on('showprinciples', function(data) {
+      console.log("showprinciples");
+      console.log(data);
+      this.principles = data;
+    }.bind(this));
+    this.dilemma = this.$route.params.dilemma;
+  },
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Group thoughts
+    <br>If you fixate by a principle will make you bild to the others </p>
+      Your group's dilemma is: 
+      {{dilemma}}
+      <div class="holder">
+        <p>These are your group's thoughts on principles</p>
+        <ul>
+          <li v-for="(data, index) in principles" :key='index'> 
+            {{data.principle}}
+            <i class="material-icons" v-on:click="removePrinciple(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+    <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
+      Go Back /
+    </router-link>
+    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
+//concrete values
+const Exercise2p7 = Vue.component('Exercise2p7', {
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.7: Concrete and relecant values",
+      notsubmitted: true,
+      studentId: null,
+      sessiontoken: null,
+      concreteValue: "",
+      concreteValues: [ 
+        {"concreteValue": "Example value: Is the collaboration with this customer important.." }
+      ],
+      dilemma: "",
+  }
+ },
+  created: function() {
+    this.dilemma = this.$route.params.dilemma;
+  },
+  methods: {
+    addConcreteValue() { 
+      this.concreteValues.push({concreteValue: this.concreteValue});
+      this.concreteValue = '';
+    },
+    removeConcreteValue(id) {
+      this.concreteValues.splice(id,1);
+    },
+    collectConcreteValues() {
+      console.log("collecting concrete values thoughts");
+      groupsocket.emit('concretevalues', this.concreteValues);
+    }
+  }
+  ,
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Discuss with your group.
+    <br>Think about the stakeholders effeced by the dilemma 
+    <br>and individually write down their values.
+    <br>Write all values you can come up with, independent of the solution you want to come to.</p>
+      Your group's dilemma is the following: 
+      {{dilemma}}
+      <div class="holder">
+        <form @submit.prevent="addConcreteValue">
+          <input type="text" placeholder="Enter your value here plx..." v-model="concreteValue">
+        </form> 
+        <p>These are your stakeholder values</p>
+        <ul>
+          <li v-for="(data, index) in concreteValues" :key='index'> 
+            {{data.concreteValue}}
+            <i class="material-icons" v-on:click="removeConcreteValue(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+      <div v-on:click="collectConcreteValues()">
+    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} }">
+      Continue
+    </router-link>
+    </div>
+  </div>
+  `
+});
 
 const router = new VueRouter({
   routes:[
@@ -433,7 +610,23 @@ const router = new VueRouter({
       path:'/exercise2p4',
       component:Exercise2p4,
       name: 'exercise2p4'
+    },
+    { //Principles individual (Dogmatic låsningar)
+      path:'/exercise2p5',
+      component:Exercise2p5,
+      name: 'exercise2p5'
+    },
+    { //Principles show all in group
+      path:'/exercise2p6',
+      component:Exercise2p6,
+      name: 'exercise2p6'
+    },
+    { //concrete values individual
+      path:'/exercise2p7',
+      component:Exercise2p7,
+      name: 'exercise2p7'
     }
+ 
  ]
 });
 

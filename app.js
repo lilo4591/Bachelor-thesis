@@ -47,6 +47,8 @@ function Data() {
   //groupname : dilemma
   this.dilemmas = [];
   this.reflexthoughts = [];
+  this.principles = [];
+  this.concreteValues = [];
 
 }
 
@@ -114,6 +116,34 @@ Data.prototype.addReflexThoughts = function (group, thoughts) {
   }
   console.log("This is group" + group);
   console.log(this.reflexthoughts[group]);
+};
+
+Data.prototype.addPrinciples = function (group, principles) {
+  
+  if (this.principles.hasOwnProperty(group)) {
+    for (var key in principles) {
+      this.principles[group].push(principles[key]);
+    }
+  }
+  else {
+    this.principles[group] = principles;
+  }
+  console.log("This is group " + group + " principles");
+  console.log(this.principles[group]);
+};
+
+Data.prototype.addConcreteValues = function (group, concreteValues) {
+  
+  if (this.concreteValues.hasOwnProperty(group)) {
+    for (var key in concreteValues) {
+      this.concreteValues[group].push(concreteValues[key]);
+    }
+  }
+  else {
+    this.concreteValues[group] = concreteValues;
+  }
+  console.log("This is group " + group + " values");
+  console.log(this.concreteValues[group]);
 };
 
 function getRandomArbitrary(min, max) {
@@ -239,6 +269,19 @@ io.on('connection', function(socket) {
             //sending reflexthoughts within each group
             io.of(data.groupNames[index]).emit('showreflexthoughts', data.reflexthoughts[data.groupNames[index]]);
           });
+          //collecting principles
+          socket.on('principles', function(principles) {
+            data.addPrinciples(data.groupNames[index], principles);
+            //sending principles within each group
+            io.of(data.groupNames[index]).emit('showprinciples', data.principles[data.groupNames[index]]);
+          });
+         //collecting concreteValues
+          socket.on('concretevalues', function(concreteValues) {
+            data.addConcreteValues(data.groupNames[index], concreteValues);
+            //sending concretevalues within each group
+            io.of(data.groupNames[index]).emit('showconcretevalues', data.concreteValues[data.groupNames[index]]);
+          });
+ 
         } 
       }(i)));
     }
