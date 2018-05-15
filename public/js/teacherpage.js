@@ -170,6 +170,8 @@ const Provocative1 = Vue.component('provocative1', {
 });
 
 //Teacher showing dilemma and displaying student thoughts
+//TODO: should the theacher route the students here to first input dilemma? 
+//instead ofcontinuing
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   data: function() {
     return {
