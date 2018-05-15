@@ -340,9 +340,11 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
           </li>
         </ul>
       </div>
-    <router-link :to=" {name: 'exercise2p4', params: {dilemma: this.dilema} }" v-on:click="collectReflexThoughts">
+      <div v-on:click="collectReflexThoughts()">
+    <router-link :to=" {name: 'exercise2p4', params: {dilemma: this.dilema} }">
       Continue
     </router-link>
+    </div>
   </div>
   `
 });

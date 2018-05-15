@@ -103,8 +103,17 @@ Data.prototype.addDilemma = function (group, dilemma) {
 };
 
 Data.prototype.addReflexThoughts = function (group, thoughts) {
-  this.reflexthoughts[group] = thoughts;
-  console.log(this.reflexthoughts);
+  
+  if (this.reflexthoughts.hasOwnProperty(group)) {
+    for (var key in thoughts) {
+      this.reflexthoughts[group].push(thoughts[key]);
+    }
+  }
+  else {
+    this.reflexthoughts[group] = thoughts;
+  }
+  console.log("This is group" + group);
+  console.log(this.reflexthoughts[group]);
 };
 
 function getRandomArbitrary(min, max) {
