@@ -45,9 +45,9 @@ Happy learning!
 ## 4. Authors
 * **Linn Löfquist**
 
-## 6. License
+## 5. License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-## 7. USED CODE AND LINKS
+## 6. USED CODE AND LINKS
 This project has used sceletoncode on the serverside as a basis from this project
 [Sceleton Code] [very-taxi-skeleton](https://github.com/laaksoharju/very-taxi-skeleton)
