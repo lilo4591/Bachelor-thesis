@@ -37,7 +37,7 @@ app.get('/teacher-admin', function (req, res) {
 //global data 
 function Data() {
   this.students = [];
-  this.currentStudentId = 0;
+  this.currentStudentNumber = 0;
   this.groups = [];
   this.groupNames = [];
   this.session = null;
@@ -50,8 +50,8 @@ function Data() {
   this.principles = [];
   this.concreteValues = [];
 
-  this.GROUP = {};
-  this.GROUPS = [];
+  //list of groupbj:{name, no of students, studentid(studentsocketconnection)}
+  this.groupObj = [];
 
 }
 
@@ -59,14 +59,14 @@ Data.prototype.getgroupSize = function () {
   return this.groupSize;
 }
 
-Data.prototype.getStudentId = function () {
-  this.currentStudentId += 1;
-  return this.currentStudentId;
+Data.prototype.getStudentNumber = function () {
+  this.currentStudentNumber += 1;
+  return this.currentStudentNumber;
 };
 
 Data.prototype.addStudent = function () {
-  var studentId = this.getStudentId();
-  this.students.push(studentId);
+  var student = this.getStudentNumber();
+  this.students.push(student);
 };
 
 Data.prototype.getAllStudents = function () {
@@ -82,19 +82,18 @@ Data.prototype.addGroupName = function (group) {
 };
 
 //testing obj group
-Data.prototype.addGROUP = function (group) {
+Data.prototype.addGroupObj = function (group) {
   var GROUP = {name: null, noOfStudents: 0, studentsId: []};
   GROUP.name = group;
-  GROUP.noOfStudents = 0;
-  this.GROUPS.push(GROUP); 
+  this.groupObj.push(GROUP); 
 
 }
 
-Data.prototype.addSTUDENT = function(student, group) {
-  for (var i in this.GROUPS) {
-    if (this.GROUPS[i].name == group) {
-      this.GROUPS[i].noOfStudents += 1;
-      this.GROUPS[i].studentsId.push(student);
+Data.prototype.addStudentToGroupObj = function(student, group) {
+  for (var i in this.groupObj) {
+    if (this.groupObj[i].name == group) {
+      this.groupObj[i].noOfStudents += 1;
+      this.groupObj[i].studentsId.push(student);
     }
   }
 }
@@ -191,19 +190,16 @@ var studentconnection = studentsio.on('connection', socket => {
   //listen for when students log in
   socket.on('loggedIn', function() {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
-    //TODO: add student to a group and send group to student
-    //add student to global namespace and update id
+    //add student to global namespace and update currentstudent number
     data.addStudent();
-    console.log(data.currentStudentId);
     //notify teacher that a student has logged in
-    io.emit("StudentLoggedIn", data.currentStudentId);
+    io.emit("StudentLoggedIn", data.currentStudentNumber);
   });
 
 });
 
 io.on('connection', function(socket) {
   io.emit('session', data.session); 
-  console.log(data.session);
   console.log("client with socketID:  " + socket.id + " connected");
 
   socket.on('navigateStudentsTo', function(exerciseNum) {
@@ -215,27 +211,18 @@ io.on('connection', function(socket) {
     console.log("server collecting thoughts");
     for ( var i = 0, l = thoughts.length; i < l; i++) {
       data.addThought(thoughts[i]);
-      //console.log(data);
     }
-    console.log(data.thoughts);
     io.emit('displayThoughts', data.thoughts); 
   });
   socket.on('generateGroups', function(groupSize) {
-    //TODO: handle uneven number of students
-    console.log('server generating groups');
     data.setNumGroups(groupSize);
-    console.log("Number of students connected in socket: " + data.students.length );
-    console.log("Groupsize in socket: " + groupSize );
-    console.log("Groupnum in socket: " + data.groupNum );
 
     //create namespace for each group
-    console.log("groupnum: " + data.groupNum);
     for (var i=0, len = data.groupNum ; i < len; i++) {
       var group = '/group' + i.toString();
       data.addGroupName(group);
       //groupobj to print to teacher
-      data.addGROUP(group);
-      console.log(data.groupNames);
+      data.addGroupObj(group);
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
 
@@ -248,7 +235,7 @@ io.on('connection', function(socket) {
       if (len % groupSize == 1)  {
         //put student in group
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
-        data.addSTUDENT(allstudents[index], currentGroup);
+        data.addStudentToGroupObj(allstudents[index], currentGroup);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
@@ -257,7 +244,7 @@ io.on('connection', function(socket) {
       for (var i=0; i < len ; i++) {
         if (count < groupSize) {
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
-        data.addSTUDENT(allstudents[index], currentGroup);
+        data.addStudentToGroupObj(allstudents[index], currentGroup);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
@@ -270,7 +257,8 @@ io.on('connection', function(socket) {
         i = i - 1;
       }
     }
-    socket.emit('groupInfo', {'groupObject': data.GROUPS});
+    //sending groupname,size and ids to teacherpage to print
+    socket.emit('groupInfo', {'groupObject': data.groupObj});
     //namespace specific to groups
     var i;
     for (i=0, len= data.groupNames.length; i < len ; i++) {
@@ -278,13 +266,10 @@ io.on('connection', function(socket) {
         return function (socket) { 
           console.log("A student joined group " + data.groupNames[index]);
           socket.on('dilemma', function(info) {
-            console.log("socketon dilemma");
-            console.log(data.groupNames[index]);
             data.addDilemma(data.groupNames[index], info.dilemma);
             io.of(data.groupNames[index]).emit('showdilemma', info)
           });
           socket.on('edit', function(info) {
-            console.log("socketon edit");
             io.of(data.groupNames[index]).emit('editdilemma', info)
           });
           //collecting reflexthoughts

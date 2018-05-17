@@ -71,8 +71,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       socket.on('session', function(session) {
         this.token = session;
       }.bind(this));
-      socket.on("StudentLoggedIn", function(studentId) {
-        this.addStudent(studentId);
+      socket.on("StudentLoggedIn", function(studentNumber) {
+        this.addStudent(studentNumber);
         console.log(this.students);
       }.bind(this));    
       socket.on('groupInfo', function(data) {
@@ -81,8 +81,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     },
 
  methods: {    
-    addStudent(studentId) { 
-      this.students.push(studentId);
+    addStudent(studentNumber) { 
+      this.students.push(studentNumber);
     },
     generateGroups(n) {
     socket.emit('generateGroups', n);
