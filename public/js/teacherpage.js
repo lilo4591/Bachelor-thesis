@@ -15,7 +15,7 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
         </nav>
         <router-link to="/startworkshop">
           <button class="button">Start Workshop</button>
-          </router-link>
+          </router-link><br>
           <button class= "button">Edit Workshop</button> 
         </div>
     `
@@ -26,11 +26,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     return {
       name: 'Startworkshop',
       student: '',
-      students: ["23"],
+      students: [],
       token: null,
       numEachGroup: null,
-      groupNum: null,
-      groupNames: null
+      groupObject: null,
     };
   },
   //TODO style the printing of the groups
@@ -45,23 +44,24 @@ const StartWorkshop = Vue.component('StartWorkshop', {
           Student number {{students[index]}} has connected</li>
       </ul>
       <form @submit.prevent="generateGroups(numEachGroup)">
-        Enter number of student in each group
+        Enter number of student in each group<br>
         <input type="number" min="0" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
-        <button type="submit" id="smallbutton" >Generate groups</button>
+        <br>
+        <button v-if="this.groupObject==null" type="submit" class="button" >Generate groups</button>
       </form>
-      <div v-if="this.groupNum != null">
-        <p>There are {{groupNum}} groups generated with {{ numEachGroup }} students in each.<br>
-        The groups are:</p>
-        <div v-for="(data,index) in groupNames" :key='index'> 
-        <ul><p>{{ groupNames[index] }}</p></ul>
+      <div v-if="this.groupObject != null">
+        <h2>The groups are:</h2>
+        <ul>
+        <div v-for="(data,index) in groupObject" :key='index'> 
+          <li class="groups">{{ groupObject[index].name }} with {{ groupObject[index].noOfStudents }} students</li>
         </div>
-      </div>
-      <div>
+        </ul>
         <router-link to="/workshopexercises">
         <button class="button"> Start workshop </button>
         </router-link>
-      </div> 
+        <br>
         <router-link to="/">Back</router-link>
+      </div>
     </div>
   
   
@@ -76,10 +76,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         console.log(this.students);
       }.bind(this));    
       socket.on('groupInfo', function(data) {
-        this.groupNum = data.numberOfGroups;
-        this.groupNames = data.groupNames;
-        console.log("There are " + this.groupNum + " groups with " + this.numEachGroup + " students in each");
-        console.log(this.groupNames);
+        this.groupObject = data.groupObject;
       }.bind(this));
     },
 

@@ -50,6 +50,9 @@ function Data() {
   this.principles = [];
   this.concreteValues = [];
 
+  this.GROUP = {};
+  this.GROUPS = [];
+
 }
 
 Data.prototype.getgroupSize = function () {
@@ -77,6 +80,24 @@ Data.prototype.addThought = function (thoughts) {
 Data.prototype.addGroupName = function (group) {
   this.groupNames.push(group);
 };
+
+//testing obj group
+Data.prototype.addGROUP = function (group) {
+  var GROUP = {name: null, noOfStudents: 0, studentsId: []};
+  GROUP.name = group;
+  GROUP.noOfStudents = 0;
+  this.GROUPS.push(GROUP); 
+
+}
+
+Data.prototype.addSTUDENT = function(student, group) {
+  for (var i in this.GROUPS) {
+    if (this.GROUPS[i].name == group) {
+      this.GROUPS[i].noOfStudents += 1;
+      this.GROUPS[i].studentsId.push(student);
+    }
+  }
+}
 
 Data.prototype.setSession = function(min, max) {
   this.session = Math.floor(Math.random() * (max - min) )+ min;
@@ -212,6 +233,8 @@ io.on('connection', function(socket) {
     for (var i=0, len = data.groupNum ; i < len; i++) {
       var group = '/group' + i.toString();
       data.addGroupName(group);
+      //groupobj to print to teacher
+      data.addGROUP(group);
       console.log(data.groupNames);
     }
     var allstudents = Array.from(Object.keys(studentconnection.connected));
@@ -225,6 +248,7 @@ io.on('connection', function(socket) {
       if (len % groupSize == 1)  {
         //put student in group
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        data.addSTUDENT(allstudents[index], currentGroup);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
@@ -233,6 +257,7 @@ io.on('connection', function(socket) {
       for (var i=0; i < len ; i++) {
         if (count < groupSize) {
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
+        data.addSTUDENT(allstudents[index], currentGroup);
         studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
@@ -245,8 +270,7 @@ io.on('connection', function(socket) {
         i = i - 1;
       }
     }
-    socket.emit('groupInfo', {'numberOfGroups' : data.groupNum,
-                              'groupNames': data.groupNames});
+    socket.emit('groupInfo', {'groupObject': data.GROUPS});
     //namespace specific to groups
     var i;
     for (i=0, len= data.groupNames.length; i < len ; i++) {
