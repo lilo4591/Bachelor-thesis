@@ -32,7 +32,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       groupObject: null,
     };
   },
-  //TODO style the printing of the groups
+  //TODO in case on no students connected print appropiate
+  //TODO redo group generating
    template: `
  
     <div id="app">

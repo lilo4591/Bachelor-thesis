@@ -180,3 +180,11 @@ i {
   text-align: center;
   font-family: inherit;
 }
+
+#student {
+  width: 900px;
+}
+
+#teacher {
+  width: 800px;
+}

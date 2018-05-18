@@ -73,7 +73,7 @@ const Start = Vue.component('Start', {
   template: `
    <div>
     <h2>You are logged in</h2>
-    <p v-if="this.groupName != null">The name of your group is {{ groupName }}</p>
+    <p v-if="this.groupName != null">The name of your group is <ul><li class="groups">{{ groupName }}</li></ul></p>
     <p>This should be the base for all starts of exercises</p>
   </div>
   `,
@@ -156,9 +156,7 @@ const Exercise2 = Vue.component('Exercise2', {
       studentId: null,
       sessiontoken: null,
       thought: '',
-      thoughts: [ 
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
+      thoughts: []
     }
   },
   methods: {
@@ -184,6 +182,7 @@ const Exercise2 = Vue.component('Exercise2', {
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
         </form> 
+        <ul><li>Example: I think this is wrong because of current laws..</li></ul>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
@@ -287,6 +286,32 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   `
 });
 
+const ReflexHelp = Vue.component('ReflexHelp', {
+  data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.3: Instructions explanation",
+      dilemma: "",
+    }
+  },  
+  created: function () {
+    this.dilemma = this.$route.params.dilemma;
+  },
+
+  template: `
+  <div>
+    <h1>Instructions explanation</h1>
+      <p> This question is about the reflex thoughts that occur, for example 
+        <ul><li>This is someone elses responsibility and does not apply to me, so I'll ignore it</li></ul>
+        <br>Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
+        <br>Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
+        <br>Write all thoughts you can come up with, independent of the solution you want to come to.
+      </p>
+      <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma } ">
+        Back
+      </router-link>
+  </div>`
+  });
+
 const Exercise2p3 = Vue.component('Exercise2p3', {
   //TODO: This is individual
   //TODO: Update relevant example thought
@@ -297,9 +322,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       studentId: null,
       sessiontoken: null,
       reflex: "",
-      reflexthoughts: [ 
-        {"reflex": "Example thought: I think that this is not a problem...." }
-      ],
+      reflexthoughts: [],
       dilemma: "",
   }
  },
@@ -324,18 +347,21 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
+    <nav>
+      <router-link :to="{ name: 'reflexhelp', params: {dilemma: this.dilemma} } ">
+        Explain More!
+      </router-link>
+    </nav>
     <p>Discuss in your group.
-    <br>Individually write down instinctive thoughts that occur about the dilemma
-    <br>What is the first thing you think about about this dilemma?? 
-    <br>Also write possible instinctive thoughts of other perspectives.
-    <br>Write all thoughts you can come up with, independent of the solution you want to come to.</p>
-      dilemma goex here
-      <p class="text">{{dilemma}}</p>
+    <br>What is the first things that comes to your mind?</p> 
+     Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here plx..." v-model="reflex">
         </form> 
         <p>These are your reflex thoughts</p>
+        <ul><li>Example thought: If I don't do this someone else will do it!</li></ul>
         <ul>
           <li v-for="(data, index) in reflexthoughts" :key='index'> 
             {{data.reflex}}
@@ -376,9 +402,9 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <p>Group thoughts
-    <br>What is the first thing you think about about this dilemma?? </p>
-      dilemma goex here
-      {{dilemma}}
+    <br>What is the first thing you think about? </p>
+      Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
       <div class="holder">
         <p>These are your group's reflex thoughts</p>
         <ul>
@@ -398,6 +424,34 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
   `
 });
 
+const PrincipleHelp = Vue.component('PrincipleHelp', {
+  data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.3: Instructions explanation",
+      dilemma: ""
+    }
+  },  
+  created: function () {
+    this.dilemma = this.$route.params.dilemma;
+  },
+
+  template: `
+  <div>
+    <h1>Instructions explanation</h1>
+      <p> This question is about the big principles which one believes or fixations by something, for example 
+        <ul><li>Our company's reputation is very important!</li></ul>
+        <br>These principles are the reason for the moral dilemma since you can't follow them all.
+        <br>Discuss in your group but individually write down relevant big principles that you believe in.
+        <br>Think about principle fixations of other perspectives, you don't need to agree with all.
+        <br>Write all thoughts you can come up with, independent of the solution you want to come to.
+      </p>
+      <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
+        Back
+      </router-link>
+  </div>`
+  });
+
+
 const Exercise2p5 = Vue.component('Exercise2p5', {
   //TODO: This is individual
   //TODO: translate dogmatic låsningar
@@ -408,9 +462,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       studentId: null,
       sessiontoken: null,
       principle: "",
-      principles: [ 
-        {"principle": "Example principle: You have to follow the law...." }
-      ],
+      principles: [],
       dilemma: "",
   }
  },
@@ -435,17 +487,22 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
-    <p>Discuss with your group.
-    <br>Individually write down principles that relates to the dilemma.
-    <br>These principles are the reason for the moral dilemma since you can't follow them all.
+    <nav>
+      <router-link :to="{ name: 'principlehelp', params: {dilemma: this.dilemma} } ">
+        Explain More!
+      </router-link>
+    </nav>
+     <p>Discuss with your group.
+    <br>Individually write down principles fixations that relates to the dilemma.
     <br>Write all principles you can come up with, independent of the solution you want to come to.</p>
       Your group's dilemma is the following: 
-      {{dilemma}}
+      <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addPrinciple">
           <input type="text" placeholder="Enter your principle here plx..." v-model="principle">
         </form> 
         <p>These are your principles</p>
+        <ul><li>Example principle: You have to follow the law....</li></ul>
         <ul>
           <li v-for="(data, index) in principles" :key='index'> 
             {{data.principle}}
@@ -487,8 +544,8 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
     <h2>Exercise 2 {{ name }}</h2>
     <p>Group thoughts
     <br>If you fixate by a principle will make you bild to the others </p>
-      Your group's dilemma is: 
-      {{dilemma}}
+      Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
       <div class="holder">
         <p>These are your group's thoughts on principles</p>
         <ul>
@@ -549,7 +606,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
     <br>and individually write down their values.
     <br>Write all values you can come up with, independent of the solution you want to come to.</p>
       Your group's dilemma is the following: 
-      {{dilemma}}
+      <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addConcreteValue">
           <input type="text" placeholder="Enter your value here plx..." v-model="concreteValue">
@@ -606,6 +663,11 @@ const router = new VueRouter({
       component:Exercise2p3,
       name: 'exercise2p3'
     },
+    { //page explaining the reflex question
+      path:'/reflexhelp',
+      component: ReflexHelp,
+      name: 'reflexhelp'
+    },
     { //reflex thoughts all thoughts in group
       path:'/exercise2p4',
       component:Exercise2p4,
@@ -616,7 +678,12 @@ const router = new VueRouter({
       component:Exercise2p5,
       name: 'exercise2p5'
     },
-    { //Principles show all in group
+    { //page explaining the reflex question
+      path:'/principlehelp',
+      component: PrincipleHelp,
+      name: 'principlehelp'
+    },
+     { //Principles show all in group
       path:'/exercise2p6',
       component:Exercise2p6,
       name: 'exercise2p6'
