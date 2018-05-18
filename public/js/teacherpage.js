@@ -53,7 +53,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         <h2>The groups are:</h2>
         <ul>
         <div v-for="(data,index) in groupObject" :key='index'> 
-          <li class="groups">{{ groupObject[index].name }} with {{ groupObject[index].noOfStudents }} students</li>
+          <li class="groups"><b>{{ groupObject[index].name }}</b> with {{ groupObject[index].noOfStudents }} students</li>
         </div>
         </ul>
         <router-link to="/workshopexercises">

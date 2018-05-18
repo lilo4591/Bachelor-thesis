@@ -178,8 +178,8 @@ const Exercise2 = Vue.component('Exercise2', {
   template: `
   <div id= "page"><!-- TODO Show first dilemma here-->
       <!-- prevent: prevents from page reloading -->
+      <h3>This exercise is about {{ name }} </h3>
       <div class="holder">
-      <h3>This exercise is about heteronomy and autonomy</h3>
         <p>Description of dilemma goes here</p>
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
@@ -213,7 +213,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
   <div> 
     <h2>Exercise 2 {{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your thougts.<br>
-    When you the teacher tells you it is tome for the next step in this exercise press continue..<br>
+    When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     To add more thoughts press go back</p>
     <router-link to="/exercise2">
     Go back
@@ -269,7 +269,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
   //TODO: Textara output {{dilemma}} should inlude linebreaks 
    template: `
-  <div>
+  <div id="student">
     <h2>Exercise 2 {{ name }}</h2>
     <p>Discuss in your group and formulate your own dilemma relevant to your occupation.</p>
         <div v-if="notsubmitted">
@@ -277,7 +277,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
           </textarea>
           <button id="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
         </div>
-        <div v-if="notsubmitted===false"> {{ dilemma }} <br> 
+        <div v-if="notsubmitted===false"><div class="text"> {{ dilemma }}</div> 
           <button id="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
         <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma} } ">
@@ -330,7 +330,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
     <br>Also write possible instinctive thoughts of other perspectives.
     <br>Write all thoughts you can come up with, independent of the solution you want to come to.</p>
       dilemma goex here
-      {{dilemma}}
+      <p class="text">{{dilemma}}</p>
       <div class="holder">
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here plx..." v-model="reflex">

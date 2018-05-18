@@ -2,6 +2,19 @@
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import "https://fonts.googleapis.com/css?family=Montserrat:400,700";
 
+html {
+  display: table;
+  margin: auto;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  padding-top: 50px;
+  background-color: #EEEEEE;
+  display: table-cell;
+  vertical-align: middle;
+}
+/*
 body {
   background-color: #EEEEEE;
   font-family: 'Montserrat', sans-serif;
@@ -10,7 +23,7 @@ body {
   justify-items: center;
   padding-top: 50px;
 }
-
+*/
 nav {
   padding: 20px 20px 20px 0;
 }
@@ -60,7 +73,7 @@ input {
 
 textarea {
   text-align: center;
-  width: 1000px;
+  width: 100%;
   border: 0;
   border-radius: 4px;
   padding: 20px 0;
@@ -115,7 +128,6 @@ i {
   box-shadow: 0px 0px 40px lightgray;
 }
 
-/* for header and footer*/
 
 #smallbutton {
   border-radius: 4px;
@@ -138,7 +150,7 @@ i {
   text-decoration: none;
 }
 
-/* for workshop.html page */
+/* for workshop page */
 
 .workshopbutton {
   border-radius: 4px;
@@ -162,3 +174,9 @@ i {
   text-decoration: none;
 }
 
+.text {
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+  text-align: center;
+  font-family: inherit;
+}
