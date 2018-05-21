@@ -258,7 +258,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   }, 
  template: `
   <div id="app"> 
-    <p>Write down dogmatic låsningar about this dilemma.<br>
+    <p>Write down principlee fixations about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link to="/autonomyHeteronomy4">
       Continue

@@ -302,11 +302,11 @@ const ReflexHelp = Vue.component('ReflexHelp', {
     <h1>Instructions explanation</h1>
       <p> This question is about the reflex thoughts that occur, for example 
         <ul><li>This is someone elses responsibility and does not apply to me, so I'll ignore it</li></ul>
-        <br>Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
-        <br>Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
-        <br>Write all thoughts you can come up with, independent of the solution you want to come to.
+        Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
+        Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
+        Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma } ">
+      <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma } }">
         Back
       </router-link>
   </div>`
@@ -410,7 +410,6 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
         <ul>
           <li v-for="(data, index) in reflexthoughts" :key='index'> 
             {{data.reflex}}
-            <i class="material-icons" v-on:click="removeReflexThought(index)">delete</i>
           </li>
         </ul>
       </div>
@@ -427,7 +426,7 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
 const PrincipleHelp = Vue.component('PrincipleHelp', {
   data: function() {
     return {
-      name: "Autonomy and Heteronomy part 2.3: Instructions explanation",
+      name: "Autonomy and Heteronomy part 2.5: Instructions explanation",
       dilemma: ""
     }
   },  
@@ -440,10 +439,10 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
     <h1>Instructions explanation</h1>
       <p> This question is about the big principles which one believes or fixations by something, for example 
         <ul><li>Our company's reputation is very important!</li></ul>
-        <br>These principles are the reason for the moral dilemma since you can't follow them all.
-        <br>Discuss in your group but individually write down relevant big principles that you believe in.
-        <br>Think about principle fixations of other perspectives, you don't need to agree with all.
-        <br>Write all thoughts you can come up with, independent of the solution you want to come to.
+        These principles are the reason for the moral dilemma since you can't follow them all.
+        Discuss in your group but individually write down relevant big principles that you believe in.
+        Think about principle fixations of other perspectives, you don't need to agree with all.
+        Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
       <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
         Back
@@ -493,8 +492,8 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       </router-link>
     </nav>
      <p>Discuss with your group.
-    <br>Individually write down principles fixations that relates to the dilemma.
-    <br>Write all principles you can come up with, independent of the solution you want to come to.</p>
+    Individually write down principles fixations that relates to the dilemma.
+    Write all principles you can come up with, independent of the solution you want to come to.</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -551,7 +550,6 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
         <ul>
           <li v-for="(data, index) in principles" :key='index'> 
             {{data.principle}}
-            <i class="material-icons" v-on:click="removePrinciple(index)">delete</i>
           </li>
         </ul>
       </div>
@@ -565,18 +563,44 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
   `
 });
 
+const ValueHelp = Vue.component('ValueHelp', {
+  data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.7: Instructions explanation",
+      dilemma: ""
+    }
+  },  
+  created: function () {
+    this.dilemma = this.$route.params.dilemma;
+  },
+
+  template: `
+  <div>
+    <h1>Instructions explanation</h1>
+      <p> This question is about the interests and concrete values of the concerned parties, for example 
+        <ul><li>Do we want to implement this customer's demand?</li></ul>
+        There is a risk to leave out relevant arguments here, to eliminate that risk try to first
+        identify all parties which the moral dilemma concerns (groups, companies, people organisation, environment, society etc) 
+        but always question your conclusions. Discuss in group what values, interests duties feelings etc these parties have.
+        Be critical and prepared to go back and revise your conclusions.
+      </p>
+      <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+        Back
+      </router-link>
+  </div>`
+  });
+
+
 //concrete values
 const Exercise2p7 = Vue.component('Exercise2p7', {
  data: function() {
     return {
-      name: "Autonomy and Heteronomy part 2.7: Concrete and relecant values",
+      name: "Autonomy and Heteronomy part 2.7: Concrete and relevant values",
       notsubmitted: true,
       studentId: null,
       sessiontoken: null,
       concreteValue: "",
-      concreteValues: [ 
-        {"concreteValue": "Example value: Is the collaboration with this customer important.." }
-      ],
+      concreteValues: [],
       dilemma: "",
   }
  },
@@ -601,10 +625,13 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
+    <nav>
+      <router-link :to="{ name: 'valuehelp', params: {dilemma: this.dilemma} } ">
+        Explain More!
+      </router-link>
+     </nav>
     <p>Discuss with your group.
-    <br>Think about the stakeholders effeced by the dilemma 
-    <br>and individually write down their values.
-    <br>Write all values you can come up with, independent of the solution you want to come to.</p>
+    <br>Think about the stakeholders the dilemma concerns and individually write down their values.</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -613,6 +640,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
         </form> 
         <p>These are your stakeholder values</p>
         <ul>
+        <li>Example value: Is the collaboration with this customer important.?..</li>
           <li v-for="(data, index) in concreteValues" :key='index'> 
             {{data.concreteValue}}
             <i class="material-icons" v-on:click="removeConcreteValue(index)">delete</i>
@@ -620,13 +648,191 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
         </ul>
       </div>
       <div v-on:click="collectConcreteValues()">
-    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} }">
+    <router-link :to="{ name: 'exercise2p8showvalues', params: {dilemma: this.dilemma} }">
       Continue
     </router-link>
     </div>
   </div>
   `
 });
+
+const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.8: Show groups stakeholder values",
+      dilemma: "",
+      concreteValues: null
+  }
+ },
+  created: function() {
+    groupsocket.on('showconcretevalues', function(data) {
+      console.log("showvalues");
+      console.log(data);
+      this.concreteValues = data;
+    }.bind(this));
+    this.dilemma = this.$route.params.dilemma;
+  },
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Group thoughts</p>
+      Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
+      <div class="holder">
+        <p>These are your group's thoughts on values and interests</p>
+        <ul>
+          <li v-for="(data, index) in concreteValues" :key='index'> 
+            {{data.concreteValue}}
+          </li>
+        </ul>
+      </div>
+    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+      Go Back /
+    </router-link>
+    <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
+const ActionOptionHelp = Vue.component('ActionOptionHelp', {
+  data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.9: Instructions explanation",
+      dilemma: ""
+    }
+  },  
+  created: function () {
+    this.dilemma = this.$route.params.dilemma;
+  },
+
+  template: `
+  <div>
+    <h1>Instructions explanation</h1>
+      <p> This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example
+        <ul><li>actionoption first, with this action how are we going to make it finanially?</li></ul>
+        Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
+        There is always a risk to miss a good action alternative, so be prepared to go back and revise the list of action alternatives.
+      </p>
+      <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+        Back
+      </router-link>
+  </div>`
+  });
+
+
+const Exercise2p9 = Vue.component('Exercise2p9', {
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.9: Action alternatives and relevant values",
+      notsubmitted: true,
+      studentId: null,
+      sessiontoken: null,
+      actionAlternative: "",
+      actionAlternatives: [],
+      dilemma: "",
+  }
+ },
+  created: function() {
+    this.dilemma = this.$route.params.dilemma;
+  },
+  methods: {
+    addActionAlternative() { 
+      this.actionAlternatives.push({actionAlternative: this.actionAlternative});
+      this.actionAlternative = '';
+    },
+    removeActionAlternative(id) {
+      this.actionAlternatives.splice(id,1);
+    },
+    collectActionAlternatives() {
+      console.log("collecting action alternative thoughts");
+      groupsocket.emit('actionalternatives', this.actionAlternatives);
+    }
+  }
+  ,
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <nav>
+      <router-link :to="{ name: 'actionoptionhelp', params: {dilemma: this.dilemma} } ">
+        Explain More!
+      </router-link>
+     </nav>
+    <p>Discuss with your group.<br>
+    What possible actions could one take and how does that effect the values from the previous question?</p>
+      Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
+      <div class="holder">
+        <form @submit.prevent="addActionAlternative()">
+          <input type="text" placeholder="Enter your action alternative here plx..." v-model="actionAlternative">
+        </form> 
+        <p>These are your action alternatives and their effects</p>
+        <ul>
+        <li>Example: state an action alternative, how will this affect our reputation?</li>
+          <li v-for="(data, index) in actionAlternatives" :key='index'> 
+            {{data.actionAlternative}}
+            <i class="material-icons" v-on:click="removeActionAlternative(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+      <div v-on:click="collectActionAlternatives()">
+    <router-link :to="{ name: 'exercise2p9showalter', params: {dilemma: this.dilemma} }">
+      Continue
+    </router-link>
+    </div>
+  </div>
+  `
+});
+
+const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
+ data: function() {
+    return {
+      name: "Autonomy and Heteronomy part 2.8: Show groups action alternatives and values",
+      dilemma: "",
+      actionAlternatives: null
+  }
+ },
+  created: function() {
+    groupsocket.on('showactionalternatives', function(data) {
+      console.log("actionalternatives");
+      console.log(data);
+      this.actionAlternatives = data;
+    }.bind(this));
+    this.dilemma = this.$route.params.dilemma;
+  },
+   
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Group thoughts</p>
+      Your group's dilemma is the following: 
+      <div class="text">{{dilemma}}</div>
+      <div class="holder">
+        <p>These are your group's thoughts on action alternatives</p>
+        <ul>
+          <li v-for="(data, index) in actionAlternatives" :key='index'> 
+            {{data.actionAlternative}}
+          </li>
+        </ul>
+      </div>
+    <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+      Go Back /
+    </router-link>
+    <router-link :to="{ name: 'summary', params: {dilemma: this.dilemma} } ">
+      Continue
+    </router-link>
+  </div>
+  `
+});
+
+const Summary = Vue.component('Summary', {
+  template: `
+  <div> <h1>this is the summarypage </h1>
+  </div>`
+  });
 
 const router = new VueRouter({
   routes:[
@@ -692,6 +898,36 @@ const router = new VueRouter({
       path:'/exercise2p7',
       component:Exercise2p7,
       name: 'exercise2p7'
+    },
+    { //page explaining the value question
+      path:'/valuehelp',
+      component: ValueHelp,
+      name: 'valuehelp'
+    },
+    { //concrete values show all in group
+      path:'/exercise2p8showvalues',
+      component:Exercise2p8ShowValues,
+      name: 'exercise2p8showvalues'
+    },
+    { //action alternatives individual
+      path:'/exercise2p9',
+      component:Exercise2p9,
+      name: 'exercise2p9'
+    },
+    { //page explaining the actionalternatives question
+      path:'/actionoptionhelp',
+      component: ActionOptionHelp,
+      name: 'actionoptionhelp'
+    },
+    { //action alternatives show all in group
+      path:'/exercise2p9showalter',
+      component:Exercise2p9ShowAlter,
+      name: 'exercise2p9showalter'
+    },
+    { //summary of each groups answer
+      path:'/summary',
+      component:Summary,
+      name: 'summary'
     }
  
  ]

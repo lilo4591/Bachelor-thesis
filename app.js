@@ -49,6 +49,7 @@ function Data() {
   this.reflexthoughts = [];
   this.principles = [];
   this.concreteValues = [];
+  this.actionAlternatives = [];
 
   //list of groupbj:{name, no of students, studentid(studentsocketconnection)}
   this.groupObj = [];
@@ -116,6 +117,7 @@ Data.prototype.setNumGroups = function (groupSize) {
 };
 
 Data.prototype.addDilemma = function (group, dilemma) {
+  
   //deletes dilemma if it already exists
   if (this.dilemmas.hasOwnProperty(group)) {
     delete this.dilemmas[group];
@@ -124,6 +126,7 @@ Data.prototype.addDilemma = function (group, dilemma) {
   console.log(this.dilemmas);
 };
 
+  
 Data.prototype.addReflexThoughts = function (group, thoughts) {
   
   if (this.reflexthoughts.hasOwnProperty(group)) {
@@ -166,6 +169,19 @@ Data.prototype.addConcreteValues = function (group, concreteValues) {
   console.log(this.concreteValues[group]);
 };
 
+Data.prototype.addActionAlternatives = function (group, actionAlternatives) {
+  
+  if (this.actionAlternatives.hasOwnProperty(group)) {
+    for (var key in actionAlternatives) {
+      this.actionAlternatives[group].push(actionAlternatives[key]);
+    }
+  }
+  else {
+    this.actionAlternatives[group] = actionAlternatives;
+  }
+  console.log("This is group " + group + " values");
+  console.log(this.actionAlternatives[group]);
+};
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -290,6 +306,13 @@ io.on('connection', function(socket) {
             //sending concretevalues within each group
             io.of(data.groupNames[index]).emit('showconcretevalues', data.concreteValues[data.groupNames[index]]);
           });
+          //collecting action alternatives
+          socket.on('actionalternatives', function(actionAlternatives) {
+            data.addActionAlternatives(data.groupNames[index], actionAlternatives);
+            //sending action alternatives within each group
+            io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
+          });
+ 
  
         } 
       }(i)));
