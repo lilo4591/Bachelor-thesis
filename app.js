@@ -312,7 +312,18 @@ io.on('connection', function(socket) {
             //sending action alternatives within each group
             io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
           });
- 
+          //sending summary to grooups
+          socket.on('wantsummary', function() {
+            console.log('summartt');
+            //sending all groups input within each group
+            io.of(data.groupNames[index]).emit('summarydata', 
+              { 
+                'actionAlternatives': data.actionAlternatives[data.groupNames[index]],
+                'concreteValues': data.concreteValues[data.groupNames[index]], 
+                'principles': data.principles[data.groupNames[index]],
+                'reflexThoughts': data.reflexthoughts[data.groupNames[index]] 
+              });
+          }); 
  
         } 
       }(i)));

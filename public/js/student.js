@@ -1,10 +1,13 @@
 /*jslint es5:true, indent: 2 */
 /*global Vue, io */
 /* exported vm */
+//import { Summary } from './exercise2.js'
 'use strict';
 var studentsocket = io('/students');
 var groupsocket; 
 var socket = io();
+
+
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
 
@@ -93,7 +96,7 @@ const Start = Vue.component('Start', {
 
     socket.on('redirect', function(exerciseNum) {
       //TODO route based on exerciseNum
-      console.log("redirection student to exercise...");
+      //console.log("redirection student to exercise...");
       if (exerciseNum === 1) {
         router.push('/exercise1');
       }
@@ -168,7 +171,7 @@ const Exercise2 = Vue.component('Exercise2', {
       this.thoughts.splice(id,1);
     },
     collectThoughts() {
-      console.log("emitting thoughts");
+      //console.log("emitting thoughts");
       socket.emit('thoughts', this.thoughts);
       this.thoughts = [];
     }
@@ -236,13 +239,13 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
  },
   created: function() {
     groupsocket.on('showdilemma', function(data) {
-      console.log("showdilemma");
+      //console.log("showdilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
     }.bind(this));
 
     groupsocket.on('editdilemma', function(data) {
-      console.log("editDilemma");
+      //console.log("editDilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
     }.bind(this));
@@ -250,12 +253,12 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   methods: {
     
     notifyGroupSubmit(bool, dilemma) {
-      console.log("notifyGroupSubmit");
+      //console.log("notifyGroupSubmit");
       this.notsubmitted = bool;
       groupsocket.emit('dilemma', {'dilemma': dilemma, 'notsubmitted': false});
     },
     notifyGroupEdit(bool, dilemma) {
-      console.log("notifyGroupEdit");
+      //console.log("notifyGroupEdit");
       this.notsubmitted = bool;
       groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
     },
@@ -338,7 +341,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       this.reflexthoughts.splice(id,1);
     },
     collectReflexThoughts() {
-      console.log("collecting reflex thoughts");
+      //console.log("collecting reflex thoughts");
       groupsocket.emit('reflexthoughts', this.reflexthoughts);
     }
   }
@@ -391,8 +394,8 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
  },
   created: function() {
     groupsocket.on('showreflexthoughts', function(data) {
-      console.log("showreflexthougts");
-      console.log(data);
+      //console.log("showreflexthougts");
+      //console.log(data);
       this.reflexthoughts = data;
     }.bind(this));
     this.dilemma = this.$route.params.dilemma;
@@ -477,7 +480,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       this.principles.splice(id,1);
     },
     collectPrinciples() {
-      console.log("collecting principle thoughts");
+      //console.log("collecting principle thoughts");
       groupsocket.emit('principles', this.principles);
     }
   }
@@ -531,8 +534,8 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
  },
   created: function() {
     groupsocket.on('showprinciples', function(data) {
-      console.log("showprinciples");
-      console.log(data);
+      //console.log("showprinciples");
+      //console.log(data);
       this.principles = data;
     }.bind(this));
     this.dilemma = this.$route.params.dilemma;
@@ -616,7 +619,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
       this.concreteValues.splice(id,1);
     },
     collectConcreteValues() {
-      console.log("collecting concrete values thoughts");
+      //console.log("collecting concrete values thoughts");
       groupsocket.emit('concretevalues', this.concreteValues);
     }
   }
@@ -666,8 +669,8 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
  },
   created: function() {
     groupsocket.on('showconcretevalues', function(data) {
-      console.log("showvalues");
-      console.log(data);
+      //console.log("showvalues");
+      //console.log(data);
       this.concreteValues = data;
     }.bind(this));
     this.dilemma = this.$route.params.dilemma;
@@ -747,7 +750,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
       this.actionAlternatives.splice(id,1);
     },
     collectActionAlternatives() {
-      console.log("collecting action alternative thoughts");
+      //console.log("collecting action alternative thoughts");
       groupsocket.emit('actionalternatives', this.actionAlternatives);
     }
   }
@@ -797,8 +800,8 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
  },
   created: function() {
     groupsocket.on('showactionalternatives', function(data) {
-      console.log("actionalternatives");
-      console.log(data);
+     // console.log("actionalternatives");
+     // console.log(data);
       this.actionAlternatives = data;
     }.bind(this));
     this.dilemma = this.$route.params.dilemma;
@@ -828,11 +831,136 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
   `
 });
 
+
 const Summary = Vue.component('Summary', {
+ data: function() {
+    return {
+      name: "Summary",
+      dilemma: "",
+      
+      reflex: "",
+      reflexthoughts: [],
+           
+      principle: "",
+      principles: [],
+   
+      concreteValue: "",
+      concreteValues: [],
+      
+      actionAlternative: "",
+      actionAlternatives: [],
+  }
+ },
+
+ created: function() {
+    groupsocket.emit('wantsummary', function() {
+      console.log("want summary");
+    });
+    groupsocket.on('summarydata', function(data) { 
+      console.log(data);
+      this.actionAlternatives = data.actionAlternatives;
+      this.concreteValues = data.concreteValues;
+      this.principles = data.principles;
+      this.reflexthoughts = data.reflexThoughts;
+    }.bind(this)); 
+    this.dilemma = this.$route.params.dilemma;
+  },
+  methods: {
+  
+    removeAlternative(index, type) {
+      if (type == "reflex") {
+        this.reflexthoughts.splice(index,1); 
+      }
+      if (type == "principle") {
+        this.principles.splice(index,1); 
+      }
+      if (type == "concretevalue") {
+        this.concreteValues.splice(index,1);
+      }
+      if (type == "actionalternative") {
+        this.actionAlternatives.splice(index,1);
+      }
+    },
+
+    addinput(type) {
+      if (type == "reflex") {
+        this.reflexthoughts.push({reflex: this.reflex});
+        this.reflex = '';
+      }
+      if (type == "principle") {
+        this.principles.push({principle: this.principle});
+        this.principle = '';
+      }
+      if (type == "concretevalue") {
+        this.concreteValues.push({concreteValue: this.concreteValue});
+        this.concreteValue = '';
+      }
+      if (type == "actionalternative") {
+        this.actionAlternatives.push({actionAlternative: this.actionAlternative});
+        this.actionAlternative = ''; 
+      }
+    }
+  },
   template: `
-  <div> <h1>this is the summarypage </h1>
-  </div>`
+  <div> <h2>This is a summary of your group's analysis</h2>
+  <p>You may change your analysis</p>
+    <div class="wrapper">
+      <div class="box a"><h2>A. Heteronomy</h2></div>
+        <div class="box b"><h2>B. Autonomy</h2></div>
+        <div class="box c">
+          <div class="box g"><h3>G. Reflex thoughts</h3>
+            <form @submit.prevent="addinput('reflex')">
+              <input type="text" placeholder="Enter additional reflex thoughts..." v-model="reflex">
+            </form> 
+            <ul class="summaryList">
+              <li v-for="(data, index) in reflexthoughts" :key='index'> 
+                {{data.reflex}}
+                <i class="material-icons" v-on:click="removeAlternative(index, 'reflex')">delete</i>
+              </li>
+            </ul>
+          </div>
+          <div class="box h"><h3>H. Dogmatic fixations</h3> 
+            <form @submit.prevent="addinput('principle')">
+              <input type="text" placeholder="Enter additional principle thoughts..." v-model="principle">
+            </form> 
+            <ul class="summaryList">
+              <li v-for="(data, index) in principles" :key='index'> 
+                {{data.principle}}
+              <i class="material-icons" v-on:click="removeAlternative(index, 'principle')">delete</i>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="box d">
+          <div class="box e"><h3>E. Concrete Values</h3>
+          <form @submit.prevent="addinput('concretevalue')">
+              <input type="text" placeholder="Enter additional value thoughts..." v-model="concreteValue">
+            </form> 
+            <ul class="summaryList">
+              <li v-for="(data, index) in concreteValues" :key='index'> 
+                {{data.concreteValue}}
+                <i class="material-icons" v-on:click="removeAlternative(index, 'concretevalue')">delete</i>
+              </li>
+            </ul> 
+          </div>
+          <div class="box f"><h3>F. Action alternatives and Values</h3>
+            <form @submit.prevent="addinput('actionalternative')">
+              <input type="text" placeholder="Enter additional action alternatives..." v-model="actionAlternative">
+            </form> 
+            <ul class="summaryList">
+              <li v-for="(data, index) in actionAlternatives" :key='index'> 
+                {{data.actionAlternative}}
+                <i class="material-icons" v-on:click="removeAlternative(index, 'actionalternative')">delete</i>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </div>
+  </div>
+    `
+
   });
+
 
 const router = new VueRouter({
   routes:[
