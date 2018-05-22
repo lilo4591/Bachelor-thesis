@@ -315,7 +315,7 @@ io.on('connection', function(socket) {
           //sending summary to grooups
           socket.on('wantsummary', function() {
             console.log('summartt');
-            //sending all groups input within each group
+            //sending all groups input on summary page first shown within each group
             io.of(data.groupNames[index]).emit('summarydata', 
               { 
                 'actionAlternatives': data.actionAlternatives[data.groupNames[index]],
@@ -324,8 +324,28 @@ io.on('connection', function(socket) {
                 'reflexThoughts': data.reflexthoughts[data.groupNames[index]] 
               });
           }); 
- 
-        } 
+          //updating server data if students removes a summary input and notify group
+          socket.on('removesummaryinput', function(info) {
+           if (info.inputtype == "reflex") {
+              data.reflexthoughts[data.groupNames[index]].splice(info.indx,1); 
+              io.of(data.groupNames[index]).emit('showreflexthoughts', data.reflexthoughts[data.groupNames[index]]);
+            }
+            if (info.inputtype == "principle") {
+              data.principles[data.groupNames[index]].splice(info.indx,1); 
+              io.of(data.groupNames[index]).emit('showprinciples', data.principles[data.groupNames[index]]);
+            }
+            if (info.inputtype == "concretevalue") {
+              data.concreteValues[data.groupNames[index]].splice(info.indx,1);
+              io.of(data.groupNames[index]).emit('showconcretevalues', data.concreteValues[data.groupNames[index]]);
+            }
+            if (info.inputtype == "actionalternative") {
+              data.actionAlternatives[data.groupNames[index]].splice(info.indx,1);
+              io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
+            }
+
+          });
+
+        }   
       }(i)));
     }
   });

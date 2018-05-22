@@ -853,6 +853,7 @@ const Summary = Vue.component('Summary', {
  },
 
  created: function() {
+    //notify that we want the input from the questions
     groupsocket.emit('wantsummary', function() {
       console.log("want summary");
     });
@@ -863,6 +864,23 @@ const Summary = Vue.component('Summary', {
       this.principles = data.principles;
       this.reflexthoughts = data.reflexThoughts;
     }.bind(this)); 
+    //so that changes on input will be seen by allgroup members
+    groupsocket.on('showreflexthoughts', function(data) {
+      this.reflexthoughts = data; 
+    }.bind(this));
+    
+    groupsocket.on('showprinciples', function(data) {
+      this.principles = data;
+    }.bind(this));
+    
+    groupsocket.on('showconcretevalues', function(data) {
+      this.concreteValues = data;
+    }.bind(this));
+   
+    groupsocket.on('showactionalternatives', function(data) {
+      this.actionAlternatives = data;
+    }.bind(this));
+
     this.dilemma = this.$route.params.dilemma;
   },
   methods: {
@@ -870,33 +888,41 @@ const Summary = Vue.component('Summary', {
     removeAlternative(index, type) {
       if (type == "reflex") {
         this.reflexthoughts.splice(index,1); 
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
       }
       if (type == "principle") {
         this.principles.splice(index,1); 
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
       }
       if (type == "concretevalue") {
         this.concreteValues.splice(index,1);
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
       }
       if (type == "actionalternative") {
         this.actionAlternatives.splice(index,1);
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
       }
     },
 
     addinput(type) {
       if (type == "reflex") {
         this.reflexthoughts.push({reflex: this.reflex});
+        groupsocket.emit('reflexthoughts', [{ reflex : this.reflex }]);
         this.reflex = '';
       }
       if (type == "principle") {
         this.principles.push({principle: this.principle});
+        groupsocket.emit('principles', [ { principle: this.principle }]);
         this.principle = '';
       }
       if (type == "concretevalue") {
         this.concreteValues.push({concreteValue: this.concreteValue});
+        groupsocket.emit('concretevalues', [ {concreteValue: this.concreteValue }]);
         this.concreteValue = '';
       }
       if (type == "actionalternative") {
         this.actionAlternatives.push({actionAlternative: this.actionAlternative});
+        groupsocket.emit('actionalternatives', [{actionAlternative: this.actionAlternative}]);
         this.actionAlternative = ''; 
       }
     }
@@ -904,6 +930,8 @@ const Summary = Vue.component('Summary', {
   template: `
   <div> <h2>This is a summary of your group's analysis</h2>
   <p>You may change your analysis</p>
+    This is your groups dilemma: <br>
+    {{dilemma}}
     <div class="wrapper">
       <div class="box a"><h2>A. Heteronomy</h2></div>
         <div class="box b"><h2>B. Autonomy</h2></div>
