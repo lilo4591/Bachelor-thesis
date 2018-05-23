@@ -342,10 +342,22 @@ io.on('connection', function(socket) {
               data.actionAlternatives[data.groupNames[index]].splice(info.indx,1);
               io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
             }
-
           });
-
-        }   
+          //listening for groups to submit their final analysis
+          socket.on('submitanalysis', function() {
+            io.emit('showanalysis', {
+                //sending analysis to teacher
+                'group' : data.groupNames[index],
+                'dilemma' : data.dilemmas[data.groupNames[index]],
+                'actionAlternatives': data.actionAlternatives[data.groupNames[index]],
+                'concreteValues': data.concreteValues[data.groupNames[index]], 
+                'principles': data.principles[data.groupNames[index]],
+                'reflexThoughts': data.reflexthoughts[data.groupNames[index]] 
+            });
+            //notify group that analysis is submitted
+            io.of(data.groupNames[index]).emit('analysissubmitted', 'The analysis is submitted');
+          });
+        }
       }(i)));
     }
   });

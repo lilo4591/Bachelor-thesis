@@ -299,12 +299,104 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
   <div id="app"> 
     <p>Write down what can be done about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/autonomyHeteronomy6">
+    <router-link to="/analysis">
       Continue
     </router-link>
   </div>
   `
 });
+
+const analysis = Vue.component('analysis', {
+  data: function() {
+    return {
+      groupsanalysis: [], 
+    }
+  
+  },
+   created: function() {
+    socket.on('showanalysis', function(data) {
+      //check if this groups analysis already exists
+      this.groupsanalysis.push(data)
+    }.bind(this));  
+   },
+  template:`
+  <div id="app">
+    <nav v-for="obj in groupsanalysis">
+      <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }">{{ obj.group }}</router-link>
+    </nav>
+  </div>
+    `
+});
+
+const showAnalysis = Vue.component('showAnalysis', {
+  data:function() {
+    return {
+      dilemma: "",
+      group: "",
+      actionAlternatives: [],
+      concreteValues: [],
+      principles: [],
+      reflexthoughts: []
+    }
+  },
+  created: function () {
+    this.dilemma = this.$route.params.groupanalys.dilemma;
+    this.group = this.$route.params.groupanalys.group;
+    this.actionAlternatives = this.$route.params.groupanalys.actionAlternatives;
+    this.concreteValues = this.$route.params.groupanalys.concreteValues;
+    this.principles = this.$route.params.groupanalys.principles; 
+    this.reflexthoughts = this.$route.params.groupanalys.reflexThoughts;
+    
+  },
+
+  template: `
+  <div> <h2>This is a summary of {{group}}'s analysis</h2>
+    This is your groups dilemma: <br>
+    {{dilemma}}
+    <div class="wrapper">
+      <div class="box a"><h2>A. Heteronomy</h2></div>
+        <div class="box b"><h2>B. Autonomy</h2></div>
+        <div class="box c">
+          <div class="box g"><h3>G. Reflex thoughts</h3>
+            <ul class="summaryList">
+              <li v-for="(data, index) in reflexthoughts" :key='index'> 
+                {{data.reflex}}
+              </li>
+            </ul>
+          </div>
+          <div class="box h"><h3>H. Dogmatic fixations</h3> 
+            <ul class="summaryList">
+              <li v-for="(data, index) in principles" :key='index'> 
+                {{data.principle}}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="box d">
+          <div class="box e"><h3>E. Concrete Values</h3>
+            <ul class="summaryList">
+              <li v-for="(data, index) in concreteValues" :key='index'> 
+                {{data.concreteValue}}
+              </li>
+            </ul> 
+          </div>
+          <div class="box f"><h3>F. Action alternatives and Values</h3>
+            <ul class="summaryList">
+              <li v-for="(data, index) in actionAlternatives" :key='index'> 
+                {{data.actionAlternative}}
+              </li>
+            </ul>
+          </div>
+        </div>
+    </div>
+    <router-link to="/analysis">
+      Go back
+    </router-link>
+  </div>
+` 
+
+});
+
 const router = new VueRouter({
   routes:[
     {
@@ -351,8 +443,21 @@ const router = new VueRouter({
       //Handlingalternativ och värden(vad kan göras?)
       path:'/autonomyheteronomy5',
       component:autonomyHeteronomy5
+    },
+    {
+      //rediricting page with summaryanalyisis links
+      path:'/analysis',
+      component: analysis,
+      name: 'analysis'
+    },
+    {
+      //rediricting page with summaryanalyisis links
+      path:'/showanalysis',
+      component: showAnalysis,
+      name: 'showanalysis'
     }
-  
+ 
+ 
   ]
 });
 

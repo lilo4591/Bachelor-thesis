@@ -849,6 +849,8 @@ const Summary = Vue.component('Summary', {
       
       actionAlternative: "",
       actionAlternatives: [],
+
+      submitted: false
   }
  },
 
@@ -881,6 +883,11 @@ const Summary = Vue.component('Summary', {
       this.actionAlternatives = data;
     }.bind(this));
 
+    groupsocket.on('analysissubmitted', function(message) {
+      this.submitted = true;
+    }.bind(this));
+
+ 
     this.dilemma = this.$route.params.dilemma;
   },
   methods: {
@@ -925,14 +932,21 @@ const Summary = Vue.component('Summary', {
         groupsocket.emit('actionalternatives', [{actionAlternative: this.actionAlternative}]);
         this.actionAlternative = ''; 
       }
+    },
+
+    submitAnalysis() {
+      groupsocket.emit('submitanalysis', function() {
+        console.log('submitanalysis');
+      });
     }
   },
   template: `
   <div> <h2>This is a summary of your group's analysis</h2>
-  <p>You may change your analysis</p>
+  <p v-if="submitted==false">You may change your analysis</p>
+    <p v-if="submitted">Your analysis is now submitted, wait for your turn to present it!</p>
     This is your groups dilemma: <br>
     {{dilemma}}
-    <div class="wrapper">
+    <div class="wrapper" v-if="submitted==false">
       <div class="box a"><h2>A. Heteronomy</h2></div>
         <div class="box b"><h2>B. Autonomy</h2></div>
         <div class="box c">
@@ -984,6 +998,7 @@ const Summary = Vue.component('Summary', {
           </div>
         </div>
     </div>
+    <button id="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
   </div>
     `
 
