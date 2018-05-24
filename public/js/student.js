@@ -860,7 +860,7 @@ const Summary = Vue.component('Summary', {
       console.log("want summary");
     });
     groupsocket.on('summarydata', function(data) { 
-      console.log(data);
+      //console.log(data);
       this.actionAlternatives = data.actionAlternatives;
       this.concreteValues = data.concreteValues;
       this.principles = data.principles;
@@ -945,7 +945,7 @@ const Summary = Vue.component('Summary', {
   <p v-if="submitted==false">You may change your analysis</p>
     <p v-if="submitted">Your analysis is now submitted, wait for your turn to present it!</p>
     This is your groups dilemma: <br>
-    {{dilemma}}
+    {{dilemma}} <br>
     <div class="wrapper" v-if="submitted==false">
       <div class="box a"><h2>A. Heteronomy</h2></div>
         <div class="box b"><h2>B. Autonomy</h2></div>
@@ -998,7 +998,7 @@ const Summary = Vue.component('Summary', {
           </div>
         </div>
     </div>
-    <button id="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
+    <button v-if="submitted==false" id="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
   </div>
     `
 

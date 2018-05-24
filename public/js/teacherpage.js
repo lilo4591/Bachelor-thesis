@@ -1,4 +1,6 @@
 var socket = io();
+
+//global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
 
 
@@ -315,20 +317,41 @@ var analysis = Vue.component('analysis', {
   },
    created: function() {
     socket.on('showanalysis', function(data) {
-      //check if this groups analysis already exists
-      //this.addGlobalAnalysis(data);
-      console.log('analysis');
-      this.$analys.push(data);
-      console.log(this.$analys);
-      console.log(this.$analys[0]);
-      
+      var contains = false;
+      var index;
+      //console.log("new analys " + data.group);
+      for (var i in this.$analys) {
+        //if this groups analysis already existis
+        //console.log("existing analys in index " + i + this.$analys[i].group);
+        if (data.group === this.$analys[i].group) {
+          //console.log('match');
+          contains = true;
+          index = i;
+        }
+      }
+      if (contains){
+        //replace old analysis with new
+        this.$analys.splice(index,1);
+        this.$analys.push(data);
+      }
+      else {
+        //just add the new analysis
+        this.$analys.push(data); 
+      }
+
     }.bind(this));  
    },
 
   template:`
   <div id="app">
-    <nav v-for="obj in groupsanalys">
-      <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }">{{ obj.group }}</router-link>
+    <h3>Presentation</h3>
+    <p>All sumitted analyses will be presented here</p>
+    <nav>
+    <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }" 
+      v-for="obj in groupsanalys" 
+      v-bind:key="obj.group" >
+        {{ obj.group }}
+    </router-link>
     </nav>
   </div>
     `
