@@ -1,4 +1,6 @@
 var socket = io();
+Vue.prototype.$analys = [];
+
 
 const Help = Vue.component('Help', {
   template: `
@@ -101,8 +103,6 @@ const workshopExercises = Vue.component('WorkshopExercises', {
       ]
     };
   },
-  //TODO add more exercise
-  //TODO add despription of exercises
    template: `
  
     <div id="app">
@@ -306,22 +306,28 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
   `
 });
 
-const analysis = Vue.component('analysis', {
+var analysis = Vue.component('analysis', {
   data: function() {
     return {
-      groupsanalysis: [], 
+      groupsanalys: this.$analys,
     }
   
   },
    created: function() {
     socket.on('showanalysis', function(data) {
       //check if this groups analysis already exists
-      this.groupsanalysis.push(data)
+      //this.addGlobalAnalysis(data);
+      console.log('analysis');
+      this.$analys.push(data);
+      console.log(this.$analys);
+      console.log(this.$analys[0]);
+      
     }.bind(this));  
    },
+
   template:`
   <div id="app">
-    <nav v-for="obj in groupsanalysis">
+    <nav v-for="obj in groupsanalys">
       <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }">{{ obj.group }}</router-link>
     </nav>
   </div>
@@ -470,7 +476,7 @@ const app = new Vue({
     return {
       name: 'Workshop',
       token: null,
-      thoughts: []
+      thoughts: [],
     }
   },
   created: function() {

@@ -15,7 +15,8 @@
     "nodejs": "0.0.0",
     "socket.io": "^2.1.1",
     "uniq": "^1.0.1",
-    "vue": "^2.5.16"
+    "vue": "^2.5.16",
+    "vue-stash": "^2.0.1-beta"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

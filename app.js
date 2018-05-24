@@ -345,6 +345,7 @@ io.on('connection', function(socket) {
           });
           //listening for groups to submit their final analysis
           socket.on('submitanalysis', function() {
+            console.log('submitanalysis');
             io.emit('showanalysis', {
                 //sending analysis to teacher
                 'group' : data.groupNames[index],
