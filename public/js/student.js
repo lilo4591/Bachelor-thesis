@@ -99,8 +99,6 @@ const Start = Vue.component('Start', {
 
 
     socket.on('redirect', function(exerciseNum) {
-      //TODO route based on exerciseNum
-      //console.log("redirection student to exercise...");
       if (exerciseNum === 1) {
         router.push('/exercise1');
       }
@@ -175,7 +173,6 @@ const Exercise2 = Vue.component('Exercise2', {
       this.thoughts.splice(id,1);
     },
     collectThoughts() {
-      //console.log("emitting thoughts");
       socket.emit('thoughts', this.thoughts);
       this.thoughts = [];
     }
@@ -243,28 +240,25 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
  },
   created: function() {
     groupsocket.on('showdilemma', function(data) {
-      //console.log("showdilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
       Vue.prototype.$dilemma = data.dilemma;
     }.bind(this));
 
     groupsocket.on('editdilemma', function(data) {
-      //console.log("editDilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
+      //update global variable since dilemma changed
       Vue.prototype.$dilemma = data.dilemma;
     }.bind(this));
  },
   methods: {
     
     notifyGroupSubmit(bool, dilemma) {
-      //console.log("notifyGroupSubmit");
       this.notsubmitted = bool;
       groupsocket.emit('dilemma', {'dilemma': dilemma, 'notsubmitted': false});
     },
     notifyGroupEdit(bool, dilemma) {
-      //console.log("notifyGroupEdit");
       this.notsubmitted = bool;
       groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
     }
@@ -331,7 +325,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
     this.dilemma = this.$dilemma;
     this.reflexthoughts = this.$input;
     console.log("global: " + this.$dilemma);
-    console.log("instance" + this.dilemma);
+    console.log("instance: " + this.dilemma);
  },
   methods: {
     addReflexThought() { 
@@ -342,7 +336,6 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       this.reflexthoughts.splice(id,1);
     },
     collectReflexThoughts() {
-      //console.log("collecting reflex thoughts");
       groupsocket.emit('reflexthoughts', this.reflexthoughts);
       Vue.prototype.$input = [];
     }
@@ -396,8 +389,6 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
  },
   created: function() {
     groupsocket.on('showreflexthoughts', function(data) {
-      //console.log("showreflexthougts");
-      //console.log(data);
       this.reflexthoughts = data;
     }.bind(this));
     this.dilemma = this.$dilemma;
@@ -534,10 +525,7 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
  },
   created: function() {
     //set global input to [] to not save state when going back
-    this.$input = [];
     groupsocket.on('showprinciples', function(data) {
-      //console.log("showprinciples");
-      //console.log(data);
       this.principles = data;
     }.bind(this));
     this.dilemma = this.$dilemma;
@@ -621,7 +609,6 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
       this.concreteValues.splice(id,1);
     },
     collectConcreteValues() {
-      //console.log("collecting concrete values thoughts");
       groupsocket.emit('concretevalues', this.concreteValues);
       Vue.prototype.$input = [];
     }
@@ -672,8 +659,6 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
  },
   created: function() {
     groupsocket.on('showconcretevalues', function(data) {
-      //console.log("showvalues");
-      //console.log(data);
       this.concreteValues = data;
     }.bind(this));
     this.dilemma = this.$dilemma;
@@ -750,7 +735,6 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
       this.actionAlternatives.splice(id,1);
     },
     collectActionAlternatives() {
-      //console.log("collecting action alternative thoughts");
       groupsocket.emit('actionalternatives', this.actionAlternatives);
       //set global input to [] for backing option not saving data
       Vue.prototype.$input = [];
@@ -802,8 +786,6 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
  },
   created: function() {
     groupsocket.on('showactionalternatives', function(data) {
-     // console.log("actionalternatives");
-     // console.log(data);
       this.actionAlternatives = data;
     }.bind(this));
     this.dilemma = this.$dilemma;
@@ -859,10 +841,9 @@ const Summary = Vue.component('Summary', {
  created: function() {
     //notify that we want the input from the questions
     groupsocket.emit('wantsummary', function() {
-      console.log("want summary");
+      //console.log("want summary");
     });
     groupsocket.on('summarydata', function(data) { 
-      //console.log(data);
       this.actionAlternatives = data.actionAlternatives;
       this.concreteValues = data.concreteValues;
       this.principles = data.principles;
@@ -938,7 +919,7 @@ const Summary = Vue.component('Summary', {
 
     submitAnalysis() {
       groupsocket.emit('submitanalysis', function() {
-        console.log('submitanalysis');
+        //console.log('submitanalysis');
       });
     }
   },
