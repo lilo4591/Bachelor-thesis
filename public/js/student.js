@@ -6,6 +6,8 @@
 var studentsocket = io('/students');
 var groupsocket; 
 var socket = io();
+//global variable to save input when going to 'explain more'
+Vue.prototype.$input = [];
 
 
 
@@ -331,6 +333,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
  },
   created: function() {
     this.dilemma = this.$route.params.dilemma;
+    this.reflexthoughts = this.$input;
   },
   methods: {
     addReflexThought() { 
@@ -343,6 +346,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
     collectReflexThoughts() {
       //console.log("collecting reflex thoughts");
       groupsocket.emit('reflexthoughts', this.reflexthoughts);
+      Vue.prototype.$input = [];
     }
   }
   ,
@@ -351,7 +355,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'reflexhelp', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'reflexhelp', params: {dilemma: this.dilemma} }">
         Explain More!
       </router-link>
     </nav>
@@ -470,7 +474,8 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
  },
   created: function() {
     this.dilemma = this.$route.params.dilemma;
-  },
+    this.principles = this.$input;
+ },
   methods: {
     addPrinciple() { 
       this.principles.push({principle: this.principle});
@@ -480,17 +485,17 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       this.principles.splice(id,1);
     },
     collectPrinciples() {
-      //console.log("collecting principle thoughts");
       groupsocket.emit('principles', this.principles);
+      Vue.prototype.$input = [];
     }
-  }
+   }
   ,
    
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'principlehelp', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'principlehelp', params: {dilemma: this.dilemma} } " >
         Explain More!
       </router-link>
     </nav>
@@ -533,6 +538,8 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
   }
  },
   created: function() {
+    //set global input to [] to not save state when going back
+    this.$input = [];
     groupsocket.on('showprinciples', function(data) {
       //console.log("showprinciples");
       //console.log(data);
@@ -609,7 +616,9 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
  },
   created: function() {
     this.dilemma = this.$route.params.dilemma;
-  },
+    //set global variable to this input instance
+    this.concreteValues = this.$input;
+ },
   methods: {
     addConcreteValue() { 
       this.concreteValues.push({concreteValue: this.concreteValue});
@@ -621,6 +630,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
     collectConcreteValues() {
       //console.log("collecting concrete values thoughts");
       groupsocket.emit('concretevalues', this.concreteValues);
+      Vue.prototype.$input = [];
     }
   }
   ,
@@ -740,6 +750,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
  },
   created: function() {
     this.dilemma = this.$route.params.dilemma;
+    this.actionAlternatives = this.$input;
   },
   methods: {
     addActionAlternative() { 
@@ -752,6 +763,8 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
     collectActionAlternatives() {
       //console.log("collecting action alternative thoughts");
       groupsocket.emit('actionalternatives', this.actionAlternatives);
+      //set global input to [] for backing option not saving data
+      Vue.prototype.$input = [];
     }
   }
   ,
