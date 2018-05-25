@@ -8,6 +8,8 @@ var groupsocket;
 var socket = io();
 //global variable to save input when going to 'explain more'
 Vue.prototype.$input = [];
+//global dilemma to not having to passit trough routes
+Vue.prototype.$dilemma = "";
 
 
 
@@ -244,12 +246,14 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       //console.log("showdilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
+      Vue.prototype.$dilemma = data.dilemma;
     }.bind(this));
 
     groupsocket.on('editdilemma', function(data) {
       //console.log("editDilemma");
       this.dilemma = data.dilemma;
       this.notsubmitted = data.notsubmitted;
+      Vue.prototype.$dilemma = data.dilemma;
     }.bind(this));
  },
   methods: {
@@ -263,15 +267,9 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       //console.log("notifyGroupEdit");
       this.notsubmitted = bool;
       groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
-    },
- /*   saveDilemma(dilemma) {
-      groupsocket.emit('savedilemma', dilemma);
-    }*/
-  }
-  ,
+    }
+   },
    
-  //<form class="largeInput" v-if="this.notsubmitted" @submit=updateSubmit() >
-  //TODO: Textara output {{dilemma}} should inlude linebreaks 
    template: `
   <div id="student">
     <h2>Exercise 2 {{ name }}</h2>
@@ -284,7 +282,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted===false"><div class="text"> {{ dilemma }}</div> 
           <button id="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
-        <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma} } ">
+        <router-link :to="{ name: 'exercise2p3' }">
         Continue
         </router-link>
   </div>
@@ -297,9 +295,6 @@ const ReflexHelp = Vue.component('ReflexHelp', {
       name: "Autonomy and Heteronomy part 2.3: Instructions explanation",
       dilemma: "",
     }
-  },  
-  created: function () {
-    this.dilemma = this.$route.params.dilemma;
   },
 
   template: `
@@ -311,7 +306,7 @@ const ReflexHelp = Vue.component('ReflexHelp', {
         Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma } }">
+      <router-link :to="{ name: 'exercise2p3'}">
         Back
       </router-link>
   </div>`
@@ -332,9 +327,12 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
   }
  },
   created: function() {
-    this.dilemma = this.$route.params.dilemma;
+    //this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
     this.reflexthoughts = this.$input;
-  },
+    console.log("global: " + this.$dilemma);
+    console.log("instance" + this.dilemma);
+ },
   methods: {
     addReflexThought() { 
       this.reflexthoughts.push({reflex: this.reflex});
@@ -355,7 +353,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'reflexhelp', params: {dilemma: this.dilemma} }">
+      <router-link :to="{ name: 'reflexhelp'}">
         Explain More!
       </router-link>
     </nav>
@@ -377,7 +375,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
         </ul>
       </div>
       <div v-on:click="collectReflexThoughts()">
-    <router-link :to="{ name: 'exercise2p4', params: {dilemma: this.dilemma} }">
+    <router-link :to="{ name: 'exercise2p4'}">
       Continue
     </router-link>
     </div>
@@ -402,7 +400,7 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
       //console.log(data);
       this.reflexthoughts = data;
     }.bind(this));
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
   },
    
    template: `
@@ -420,10 +418,10 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p3', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p3'} ">
       Go Back /
     </router-link>
-    <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p5'} ">
       Continue
     </router-link>
   </div>
@@ -437,9 +435,6 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
       dilemma: ""
     }
   },  
-  created: function () {
-    this.dilemma = this.$route.params.dilemma;
-  },
 
   template: `
   <div>
@@ -451,7 +446,7 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
         Think about principle fixations of other perspectives, you don't need to agree with all.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'exercise2p5'} ">
         Back
       </router-link>
   </div>`
@@ -473,7 +468,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
   }
  },
   created: function() {
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
     this.principles = this.$input;
  },
   methods: {
@@ -495,7 +490,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'principlehelp', params: {dilemma: this.dilemma} } " >
+      <router-link :to="{ name: 'principlehelp'} " >
         Explain More!
       </router-link>
     </nav>
@@ -518,7 +513,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
         </ul>
       </div>
       <div v-on:click="collectPrinciples()">
-    <router-link :to="{ name: 'exercise2p6', params: {dilemma: this.dilemma} }">
+    <router-link :to="{ name: 'exercise2p6' }">
       Continue
     </router-link>
     </div>
@@ -545,7 +540,7 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
       //console.log(data);
       this.principles = data;
     }.bind(this));
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
   },
    
    template: `
@@ -563,10 +558,10 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p5', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p5'} ">
       Go Back /
     </router-link>
-    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p7'} ">
       Continue
     </router-link>
   </div>
@@ -580,9 +575,6 @@ const ValueHelp = Vue.component('ValueHelp', {
       dilemma: ""
     }
   },  
-  created: function () {
-    this.dilemma = this.$route.params.dilemma;
-  },
 
   template: `
   <div>
@@ -594,7 +586,7 @@ const ValueHelp = Vue.component('ValueHelp', {
         but always question your conclusions. Discuss in group what values, interests duties feelings etc these parties have.
         Be critical and prepared to go back and revise your conclusions.
       </p>
-      <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'exercise2p7' } ">
         Back
       </router-link>
   </div>`
@@ -615,7 +607,8 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
   }
  },
   created: function() {
-    this.dilemma = this.$route.params.dilemma;
+    //set dilemma to global dilemma
+    this.dilemma = this.$dilemma;
     //set global variable to this input instance
     this.concreteValues = this.$input;
  },
@@ -639,7 +632,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'valuehelp', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'valuehelp'} ">
         Explain More!
       </router-link>
      </nav>
@@ -661,7 +654,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
         </ul>
       </div>
       <div v-on:click="collectConcreteValues()">
-    <router-link :to="{ name: 'exercise2p8showvalues', params: {dilemma: this.dilemma} }">
+    <router-link :to="{ name: 'exercise2p8showvalues'}">
       Continue
     </router-link>
     </div>
@@ -683,7 +676,7 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
       //console.log(data);
       this.concreteValues = data;
     }.bind(this));
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
   },
    
    template: `
@@ -700,10 +693,10 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p7', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p7'} ">
       Go Back /
     </router-link>
-    <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p9'} ">
       Continue
     </router-link>
   </div>
@@ -714,12 +707,8 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.9: Instructions explanation",
-      dilemma: ""
     }
   },  
-  created: function () {
-    this.dilemma = this.$route.params.dilemma;
-  },
 
   template: `
   <div>
@@ -729,7 +718,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
         Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
         There is always a risk to miss a good action alternative, so be prepared to go back and revise the list of action alternatives.
       </p>
-      <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'exercise2p9'} ">
         Back
       </router-link>
   </div>`
@@ -749,7 +738,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
   }
  },
   created: function() {
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
     this.actionAlternatives = this.$input;
   },
   methods: {
@@ -773,7 +762,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
   <div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
-      <router-link :to="{ name: 'actionoptionhelp', params: {dilemma: this.dilemma} } ">
+      <router-link :to="{ name: 'actionoptionhelp'} ">
         Explain More!
       </router-link>
      </nav>
@@ -795,7 +784,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
         </ul>
       </div>
       <div v-on:click="collectActionAlternatives()">
-    <router-link :to="{ name: 'exercise2p9showalter', params: {dilemma: this.dilemma} }">
+    <router-link :to="{ name: 'exercise2p9showalter'}">
       Continue
     </router-link>
     </div>
@@ -817,7 +806,7 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
      // console.log(data);
       this.actionAlternatives = data;
     }.bind(this));
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
   },
    
    template: `
@@ -834,10 +823,10 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p9', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'exercise2p9'} ">
       Go Back /
     </router-link>
-    <router-link :to="{ name: 'summary', params: {dilemma: this.dilemma} } ">
+    <router-link :to="{ name: 'summary'} ">
       Continue
     </router-link>
   </div>
@@ -901,7 +890,7 @@ const Summary = Vue.component('Summary', {
     }.bind(this));
 
  
-    this.dilemma = this.$route.params.dilemma;
+    this.dilemma = this.$dilemma;
   },
   methods: {
   
