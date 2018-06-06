@@ -482,7 +482,7 @@ const Vote = Vue.component('Vote', {
         this.showNextButton = false;
       }
       else {
-      this.i += 1;
+        this.i += 1;
       }
 
     },
@@ -491,23 +491,25 @@ const Vote = Vue.component('Vote', {
       
     }
   },
+  //TODO add initial dilemma here
+  //TODO sync with student votes
+  //TODO no voting possibilty on teacher side only student side
   template: `
-  <div> <h1>Inital dilemma</h1>
-        <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
-        <div v-for="(data, index) in thoughts">
-        {{index}}
-        {{ i }}
-        <div v-if="i == index">
+  <div> 
+    <h1>Inital dilemma</h1>
+    <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+    <div v-for="(data, index) in thoughts">
+      <div v-if="i == index">
         <ul>
           <li>
             {{data.thought}}
           </li>
         </ul>
-       <vue-poll v-bind="listoptions[index].options" @addvote="addVote"/>
+        <vue-poll v-bind="listoptions[index].options" @addvote="addVote"/>
         <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
-        </div>
-        </div>
-        <router-link to="/">Back</router-link>
+      </div>
+    </div>
+    <router-link to="/workshopexercises">Exit exercise</router-link>
   </div>`
   });
 

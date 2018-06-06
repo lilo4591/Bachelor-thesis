@@ -211,7 +211,12 @@ var studentconnection = studentsio.on('connection', socket => {
     //notify teacher that a student has logged in
     io.emit("StudentLoggedIn", data.currentStudentNumber);
   });
-
+   //listening for Student to want to display the inital dilemma thoughts
+    socket.on('initialThoughtsStudent', function(message) {
+      console.log(message);
+      socket.emit('displayInitialThoughts', data.thoughts);
+    });
+ 
 });
 
 io.on('connection', function(socket) {
@@ -281,6 +286,8 @@ io.on('connection', function(socket) {
       console.log(message);
       socket.emit('displayInitialThoughts', data.thoughts);
     });
+
+
  
     
     //namespace specific to groups

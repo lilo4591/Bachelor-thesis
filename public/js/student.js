@@ -10,8 +10,7 @@ var socket = io();
 Vue.prototype.$input = [];
 //global dilemma to not having to passit trough routes
 Vue.prototype.$dilemma = "";
-
-
+Vue.use(VuePoll);
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
 
@@ -982,9 +981,95 @@ const Summary = Vue.component('Summary', {
         </div>
     </div>
     <button v-if="submitted==false" id="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
+    <br><router-link v-if="submitted==true" to="/studentvote">Next</router-link>
   </div>
     `
 
+  });
+
+
+const StudentVote = Vue.component('StudentVote', {
+  data: function() {
+    return {
+      thought: '',
+      thoughts: [],
+      i: 0,
+      showNextButton: true,
+      listoptions: [ 
+            {options: {
+              customId: 0,
+              showTotalVotes: true,
+              question: 'Do you think this thought is heteronomy or autonomy?',
+              answers: [
+                { value: 1, text: 'Heteronomy', votes: 0 },
+                { value: 2, text: 'Autonomy', votes: 0 }
+              ],
+            }
+            }]  
+
+    }
+  },
+  created: function() {
+    console.log("studentvote created");
+    studentsocket.emit('initialThoughtsStudent', 'want inital thoughts student');
+    studentsocket.on('displayInitialThoughts', function(thoughts) {
+     this.thoughts = thoughts;
+      //initialize component with as many poll objs as there are thoughts
+      for (var n = 0; n < thoughts.length; n++) {
+        console.log("loop step: " + n);
+          this.listoptions.push(
+            {options: {
+              customId: 0,
+              showTotalVotes: true,
+              question: 'Do you think this thought is heteronomy or autonomy?',
+              answers: [
+                { value: 1, text: 'Heteronomy', votes: 0 },
+                { value: 2, text: 'Autonomy', votes: 0 }
+              ],
+            }
+            }  
+          );      
+    }
+   }.bind(this));
+   } ,
+  methods: {
+    updateShowIndex() {
+      if (this.i == this.thoughts.length - 1) {
+        this.showNextButton = false;
+      }
+      else {
+        this.i += 1;
+      }
+
+    },
+    addVote(obj){
+      console.log('You voted ' + obj.value + '!');
+      
+    }
+  },
+  //TODO add initial dilemma here
+  //TODO sync with student votes
+  //TODO no voting possibilty on teacher side only student side
+  template: `
+  <div> 
+    <h1>Inital dilemma</h1>
+    <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+    <div v-for="(data, index) in thoughts">
+      <div v-if="i == index">
+        <ul>
+          <li>
+            {{data.thought}}
+          </li>
+        </ul>
+        Index: {{index}}
+        i: {{ i }}
+        <vue-poll v-bind="listoptions[i].options" @addvote="addVote"/>
+        <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
+      </div>
+    
+    </div>
+    <router-link to="/summary">Go back</router-link> 
+  </div>`
   });
 
 
@@ -1082,8 +1167,11 @@ const router = new VueRouter({
       path:'/summary',
       component:Summary,
       name: 'summary'
+    },
+    { //vote on the inital dilemma input if auto or hetero?
+      path:'/studentvote',
+      component:StudentVote
     }
- 
  ]
 });
 
