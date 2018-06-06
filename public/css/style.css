@@ -152,6 +152,10 @@ i {
   text-decoration: none;
 }
 
+#boldtext {
+  font-weight: bold;
+}
+
 /* for workshop page */
 
 .workshopbutton {

@@ -275,6 +275,14 @@ io.on('connection', function(socket) {
     }
     //sending groupname,size and ids to teacherpage to print
     socket.emit('groupInfo', {'groupObject': data.groupObj});
+    
+    //listening for teacher to want to display the inital dilemma thoughts
+    socket.on('initialThoughts', function(message) {
+      console.log(message);
+      socket.emit('displayInitialThoughts', data.thoughts);
+    });
+ 
+    
     //namespace specific to groups
     var i;
     for (i=0, len= data.groupNames.length; i < len ; i++) {
@@ -358,6 +366,7 @@ io.on('connection', function(socket) {
             //notify group that analysis is submitted
             io.of(data.groupNames[index]).emit('analysissubmitted', 'The analysis is submitted');
           });
+    
         }
       }(i)));
     }

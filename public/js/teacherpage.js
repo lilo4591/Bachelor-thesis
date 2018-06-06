@@ -2,7 +2,7 @@ var socket = io();
 
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
-
+Vue.use(VuePoll);
 
 const Help = Vue.component('Help', {
   template: `
@@ -345,14 +345,28 @@ var analysis = Vue.component('analysis', {
   template:`
   <div id="app">
     <h3>Presentation</h3>
-    <p>All sumitted analyses will be presented here</p>
+    <p id="boldtext">The goal with this exercise was to learn to differentiate between the different ways of thinking,
+      Heteronomy and Autonomy and thus becoming more concious of one owns thoughtprocess and being able to controll it. 
+    </p>
+    <p> 
+      Heteronomy and Autonomy are two different ways of thinking. Heteronomy is the fast way of accepting one truth without reflecting
+      based on for example authority, strong principles or that you know that this is right and this is wrong so that you don't need to reflect upon it.
+      Autonomy on the other hand is when you analyse the dilemma from different perspectives and weights the possible solutions against each other.
+      <br>
+      <br>
+      All sumitted analyses will be presented here</p>
     <nav>
     <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }" 
       v-for="obj in groupsanalys" 
       v-bind:key="obj.group" >
         {{ obj.group }}
     </router-link>
+
     </nav>
+
+    <router-link to="/vote">
+      Continue 
+    </router-link>
   </div>
     `
 });
@@ -426,6 +440,77 @@ const showAnalysis = Vue.component('showAnalysis', {
 
 });
 
+const Vote = Vue.component('Vote', {
+  data: function() {
+    return {
+      thought: '',
+      thoughts: null,
+      i: 0,
+      showNextButton: true,
+      listoptions: [ {options: {
+                      customId: 0,
+                      showTotalVotes: true,
+                      question: 'Do you think this thought is heteronomy or autonomy?',
+                        answers: [
+                                    { value: 1, text: 'Heteronomy', votes: 53 },
+                                    { value: 2, text: 'Autonomy', votes: 35 }
+                                  ],
+                                }
+      } ]
+
+    }
+  },
+  created: function() {
+    socket.emit('initialThoughts', 'want inital thoughts');
+    socket.on('displayInitialThoughts', function(thoughts) {
+     this.thoughts = thoughts;
+    //initalise options for all thoughts
+    console.log(this.thoughts.length);
+    console.log(this.listoptions[0].options);
+    for (var i in thoughts) {
+      console.log(i);
+      if (i != thoughts.length-1) {
+        this.listoptions.push(this.listoptions[0]);
+      }      
+      console.log(this.listoptions);
+    }
+   }.bind(this));
+   } ,
+  methods: {
+    updateShowIndex() {
+      if (this.i == this.thoughts.length - 1) {
+        this.showNextButton = false;
+      }
+      else {
+      this.i += 1;
+      }
+
+    },
+    addVote(obj){
+      console.log('You voted ' + obj.value + '!');
+      
+    }
+  },
+  template: `
+  <div> <h1>Inital dilemma</h1>
+        <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+        <div v-for="(data, index) in thoughts">
+        {{index}}
+        {{ i }}
+        <div v-if="i == index">
+        <ul>
+          <li>
+            {{data.thought}}
+          </li>
+        </ul>
+       <vue-poll v-bind="listoptions[index].options" @addvote="addVote"/>
+        <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
+        </div>
+        </div>
+        <router-link to="/">Back</router-link>
+  </div>`
+  });
+
 const router = new VueRouter({
   routes:[
     {
@@ -484,6 +569,11 @@ const router = new VueRouter({
       path:'/showanalysis',
       component: showAnalysis,
       name: 'showanalysis'
+    },
+    {
+      //voting on the inital dilemma input, autonomy or heteronomy?
+      path:'/vote',
+      component:Vote
     }
  
  
