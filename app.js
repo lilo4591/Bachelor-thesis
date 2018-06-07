@@ -29,7 +29,7 @@ app.get('/student', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/student/student.html'));
 });
 
-// Serve teacher-admin.html as /dispatcher
+// Serve teacher-admin.html as /teacher-admin
 app.get('/teacher-admin', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/teacher-admin.html'));
 });
@@ -42,6 +42,11 @@ function Data() {
   this.groupNames = [];
   this.session = null;
   this.groupNum = null;
+  //exercise1 provocative
+  //groupname : situations
+  this.groupSituations = [];
+  this.situations = [];
+
   //exercise2 heteronomy autonomy
   this.thoughts = [];
   //groupname : dilemma
@@ -81,6 +86,11 @@ Data.prototype.addThought = function (thoughts) {
 Data.prototype.addGroupName = function (group) {
   this.groupNames.push(group);
 };
+
+Data.prototype.addSituation = function (situation) {
+  this.situations.push(situation);
+};
+
 
 //testing obj group
 Data.prototype.addGroupObj = function (group) {
@@ -186,6 +196,20 @@ function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+Data.prototype.addGroupSituations = function (group, groupsituations) {
+  
+  if (this.groupSituations.hasOwnProperty(group)) {
+    for (var key in groupsituations) {
+      this.groupSituations[group].push(groupsituations[key]);
+    }
+  }
+  else {
+    this.groupSituations[group] = groupsituations;
+  }
+  console.log("This is group " + group + " situations");
+  console.log(this.groupSituations[group]);
+};
+
 var data = new Data();
 
 var server = app.listen(app.get('port'), function () {
@@ -223,11 +247,42 @@ io.on('connection', function(socket) {
   io.emit('session', data.session); 
   console.log("client with socketID:  " + socket.id + " connected");
 
+  /**Relevent for teacher to route students to different pages(components)**/
   socket.on('navigateStudentsTo', function(exerciseNum) {
     //route to first exercise
     io.emit('redirect', exerciseNum)
   });
-  socket.on('thoughts', function(thoughts) {
+  socket.on('navigateStudentsToComp', function(component) {
+    //route students to component
+    console.log("tocomp");
+    socket.broadcast.emit('redirectcomponent', component)
+  });
+  /**End of teacher route student**/
+
+  /** 
+    Relevant to exercise 1: Provocative
+  **/
+   socket.on('situations', function(situations) {
+
+    console.log("server collecting situations");
+    for ( var i = 0, l = situations.length; i < l; i++) {
+      data.addSituation(situations[i]);
+    }
+    io.emit('displaySituation', data.situations); 
+  });
+  
+    socket.on('wantsituations', function() {
+      var allsituations = [];
+      for (var i in data.groupNames) {
+       allsituations = allsituations.concat(data.groupSituations[data.groupNames[i]]);
+      }
+      console.log(allsituations);
+      io.emit('collectsituations', allsituations);
+    });
+  /** 
+    Relevant to exercise 2: heteronomy autonomy  
+  **/
+   socket.on('thoughts', function(thoughts) {
 
     console.log("server collecting thoughts");
     for ( var i = 0, l = thoughts.length; i < l; i++) {
@@ -242,6 +297,12 @@ io.on('connection', function(socket) {
     socket.broadcast.emit('vote', obj);
   });  
  
+  /** end of exercise 2: heteronoy autonomy**/
+
+  /**
+    * Teacher generating groups depending on size of connected students
+    **/
+
   socket.on('generateGroups', function(groupSize) {
     data.setNumGroups(groupSize);
 
@@ -332,6 +393,19 @@ io.on('connection', function(socket) {
             //sending action alternatives within each group
             io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
           });
+          //collecting situations for each group
+          socket.on('groupsituations', function(situations) {
+            data.addGroupSituations(data.groupNames[index], situations);
+            //sending situations within each group
+            io.of(data.groupNames[index]).emit('showgroupsituations', data.groupSituations[data.groupNames[index]]);
+          });
+         
+          //updating server data if students removes a situation input and notify group
+          socket.on('removesituation', function(id) {
+              data.groupSituations[data.groupNames[index]].splice(id,1); 
+              io.of(data.groupNames[index]).emit('showgroupsituations', data.groupSituations[data.groupNames[index]]);
+            });
+ 
           //sending summary to grooups
           socket.on('wantsummary', function() {
             console.log('summartt');

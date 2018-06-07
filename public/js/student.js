@@ -75,7 +75,7 @@ const Start = Vue.component('Start', {
 
     }
   },
-
+//TODO: base for all exercise, should not say you are logged in at all routes here maybe only first om ens det
   template: `
    <div>
     <h2>You are logged in</h2>
@@ -118,39 +118,114 @@ const Exercise1 = Vue.component('Exercise1', {
       studentId: null,
       sessiontoken: null,
       thought: '',
-      thoughts: [
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
+      thoughts: []
     }
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      this.thoughts.push({situation: this.thought});
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
+    },
+    collectSituations() {
+      groupsocket.emit('groupsituations', this.thoughts);
+      this.thoughts = [];
     }
   },
   template: `
   <div id= "page"><!-- TODO Show first dilemma here-->
       <!-- prevent: prevents from page reloading -->
+      <h2>This exercise is about ethical awareness</h2>
+      <p>The first part of this exercise is to come up with real life situations which has no moral implication at all.</p>
       <div class="holder">
-      <h2>This exercise is provocative</h2>
         <form @submit.prevent="addThought">
-          <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
+          <input type="text" placeholder="Enter your sitations here please..." v-model="thought">
         </form> 
-        <p>These are your thoughts</p>
+        <p>These are your situations</p>
         <ul>
+          <li>Example sitations: Deciding which company to by harddrive from.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
-            {{data.thought}}
+            {{data.situation}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
       </div>  
+      <div v-on:click="collectSituations()"> 
+        <router-link to="/exercise1p2">
+          Submit situations to group
+        </router-link>
+      </div>
     </div>
   `
 });
+
+//group by group
+const Exercise1p2 = Vue.component('Exercise1p2', {
+ data: function() {
+    return {
+      name: "Ethical awareness part 1.1: Show groups situations",
+      situations: null
+  }
+ },
+  created: function() {
+    groupsocket.on('showgroupsituations', function(data) {
+      this.situations = data;
+    }.bind(this));
+
+    socket.on('redirectcomponent', function(component) {
+        router.push('/situationsfullclass');
+    }.bind(this));
+  },
+  methods: {
+    removeThought(id) {
+      this.situations.splice(id,1);
+      groupsocket.emit('removesituation', id);  
+  },
+ 
+  },  
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Discuss your groups list of situations that has no moral implication.
+    <br>Discuss and revise the list</p>
+      <div class="holder">
+        <p>These are your group's sitations with no moral implications </p>
+        <ul>
+          <li v-for="(data, index) in situations" :key='index'> 
+            {{data.situation}}
+            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+    <router-link :to="{ name: 'exercise1'} ">
+      Go Back /
+    </router-link>
+  </div>
+  `
+});
+
+const SituationsFullClass = Vue.component('SituationsFullClass', {
+  data: function() {
+    return {
+      name: "Ethical awareness part 1.2",
+    }
+  },
+
+  template: `
+  <div> 
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Please have a look at the bigger screen and discuss your situations.<br>
+    When you the teacher tells you it is time for the next step in this exercise press continue..<br>
+    You can not add more situations now.</p>
+    <router-link to="/exercise2p2">
+    Continue
+    </router-link>
+  </div>`
+});
+
+
 
 //all students together
 const Exercise2 = Vue.component('Exercise2', {
@@ -203,15 +278,15 @@ const Exercise2 = Vue.component('Exercise2', {
 });
 
 const Exercise2p1 = Vue.component('Exercise2p1', {
- data: function() {
+  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.1",
       studentId: null,
       sessiontoken: null
     }
- },
- 
- template: `
+  },
+
+  template: `
   <div> 
     <h2>Exercise 2 {{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your thougts.<br>
@@ -225,7 +300,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
     Continue
     </router-link>
   </div>`
-  });
+});
 
 const Exercise2p2 = Vue.component('Exercise2p2', {
  data: function() {
@@ -307,7 +382,6 @@ const ReflexHelp = Vue.component('ReflexHelp', {
 
 const Exercise2p3 = Vue.component('Exercise2p3', {
   //TODO: This is individual
-  //TODO: Update relevant example thought
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.3: Reflex thoughts",
@@ -377,8 +451,6 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
 
 
 const Exercise2p4 = Vue.component('Exercise2p4', {
-  //TODO: This is individual
-  //TODO: Update relevant example thought
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.4: Show groups reflex thoughts",
@@ -444,8 +516,6 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
 
 
 const Exercise2p5 = Vue.component('Exercise2p5', {
-  //TODO: This is individual
-  //TODO: translate dogmatic låsningar
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.5: Principle fixations",
@@ -513,8 +583,6 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
 
 
 const Exercise2p6 = Vue.component('Exercise2p6', {
-  //TODO: This is individual
-  //TODO: Update relevant example thought
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.6: Show groups principles",
@@ -1047,6 +1115,13 @@ const StudentVote = Vue.component('StudentVote', {
       console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
     }
   }.bind(this));
+  
+  socket.on('redirectcomponent', function(component) {
+    console.log("redirect componet");  
+    if (component === "Start") {
+        router.push('/start');
+      }
+    }.bind(this));
  
   } ,
   methods: {
@@ -1070,8 +1145,6 @@ const StudentVote = Vue.component('StudentVote', {
       }
   },
   //TODO add initial dilemma here
-  //TODO sync with student votes
-  //TODO no voting possibilty on teacher side only student side
   template: `
   <div> 
     <h1>Inital dilemma</h1>
@@ -1111,6 +1184,7 @@ const router = new VueRouter({
     },
     {
       path:'/exercise1',
+      name: "exercise1",
       component:Exercise1
     },
     { //autonomy heteronomy
@@ -1193,7 +1267,17 @@ const router = new VueRouter({
     { //vote on the inital dilemma input if auto or hetero?
       path:'/studentvote',
       component:StudentVote
-    }
+    },
+    { //show group situatons
+      path:'/exercise1p2',
+      component:Exercise1p2
+    },
+    { //
+      path:'/situationsfullclass',
+      component:SituationsFullClass,
+      name: 'situationssfullclass'
+    },
+
  ]
 });
 

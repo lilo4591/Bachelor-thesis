@@ -131,14 +131,18 @@ const Provocative1 = Vue.component('provocative1', {
   data: function() {
     return {
       thought: '',
-      thoughts: [
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
+      thoughts: []
     }
+  },
+  created: function() {
+    socket.on('collectsituations', function(situations) {
+      this.thoughts = situations;
+      console.log(situations);
+  }.bind(this));
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      this.thoughts.push({situation: this.thought});
       this.thought = '';
     },
     removeThought(id) {
@@ -146,21 +150,21 @@ const Provocative1 = Vue.component('provocative1', {
     },
     navigateStudentsTo(exerciseNum) {
       socket.emit("navigateStudentsTo",exerciseNum);
+    },
+    collectAllSituations() {
+      socket.emit("wantsituations");
+      socket.emit("navigateStudentsToComp", "situationsfullclass");
     }
-
   },
   template: `
-  <div id= "page"><!-- TODO Show first dilemma here-->
-      <!-- prevent: prevents from page reloading -->
+  <div id= "page">
+      <h2>Ethical awareness exercise</h2>
       <div class="holder">
-      <h2>Provocative</h2>
-        <form @submit.prevent="addThought">
-          <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
-        </form> 
-        <p>These are your thoughts</p>
+      <button class="button" v-on:click="collectAllSituations">Show group's situations</button>
+        <p>These are situations from all groups</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
-            {{data.thought}}
+            {{data.situation}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
@@ -512,6 +516,10 @@ const Vote = Vue.component('Vote', {
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
       
+    },
+    navigateStudentsToStart() {
+      console.log("navcomp");
+      socket.emit('navigateStudentsToComp', "Start");
     }
   },
   //TODO add initial dilemma here
@@ -532,7 +540,9 @@ const Vote = Vue.component('Vote', {
         <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
       </div>
     </div>
-    <router-link to="/workshopexercises">Exit exercise</router-link>
+    <div v-on:click="navigateStudentsToStart()">
+      <router-link to="/workshopexercises">Exit exercise</router-link>
+    </div>
   </div>`
   });
 
