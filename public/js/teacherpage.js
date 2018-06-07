@@ -450,7 +450,7 @@ const Vote = Vue.component('Vote', {
       listoptions: [ {options: {
                       customId: 0,
                       showTotalVotes: true,
-                      //showResults: true,
+                      showResults: true,
                       question: 'Do you think this thought is heteronomy or autonomy?',
                         answers: [
                                     { value: 1, text: 'Heteronomy', votes: 0 },
@@ -472,7 +472,7 @@ const Vote = Vue.component('Vote', {
             {options: {
               customId: 0,
               showTotalVotes: true,
-              //showResults: true,
+              showResults: true,
               question: 'Do you think this thought is heteronomy or autonomy?',
               answers: [
                 { value: 1, text: 'Heteronomy', votes: 0 },
@@ -484,20 +484,16 @@ const Vote = Vue.component('Vote', {
     }
    }.bind(this));
    
+  //listen for student votes and updating the poll votes accordingly
   socket.on('vote', function(obj) {
     console.log('vote recieved');
-    console.log(obj.answer);
     if (obj.answer === "Heteronomy") {
-      console.log("hee");
       console.log(obj.answer);
-      console.log("before update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
       this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
       console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
     }
     else if (obj.answer === "Autonomy") {
-      console.log("au");
       console.log(obj.answer);
-      console.log("before update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
       this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
       console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
     }
@@ -505,7 +501,7 @@ const Vote = Vue.component('Vote', {
   } ,
   methods: {
     updateShowIndex() {
-      if (this.i == this.thoughts.length - 1) {
+      if (this.i >= this.thoughts.length - 1) {
         this.showNextButton = false;
       }
       else {

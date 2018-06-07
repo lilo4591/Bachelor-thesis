@@ -238,7 +238,8 @@ io.on('connection', function(socket) {
   
   socket.on('studentvote', function(obj) {
     console.log("a student haz voted");
-    io.emit('vote', obj);
+    //sending to all clients except sender
+    socket.broadcast.emit('vote', obj);
   });  
  
   socket.on('generateGroups', function(groupSize) {

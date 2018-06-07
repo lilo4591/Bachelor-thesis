@@ -1032,7 +1032,23 @@ const StudentVote = Vue.component('StudentVote', {
     console.log("customId: " + this.listoptions[n].options.customId);
       }
    }.bind(this));
-   } ,
+   
+  //listen for student votes and updating the poll votes accordingly
+  socket.on('vote', function(obj) {
+    console.log('vote recieved');
+    if (obj.answer === "Heteronomy") {
+      console.log(obj.answer);
+      this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+    }
+    else if (obj.answer === "Autonomy") {
+      console.log(obj.answer);
+      this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+    }
+  }.bind(this));
+ 
+  } ,
   methods: {
     updateShowIndex() {
       if (this.i == this.thoughts.length - 1) {
