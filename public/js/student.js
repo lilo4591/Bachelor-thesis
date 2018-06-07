@@ -698,7 +698,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   <div>
     <h1>Instructions explanation</h1>
       <p> This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example
-        <ul><li>actionoption first, with this action how are we going to make it finanially?</li></ul>
+        <ul><li>actionoption first, with this action how are we going to make it financially?</li></ul>
         Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
         There is always a risk to miss a good action alternative, so be prepared to go back and revise the list of action alternatives.
       </p>
@@ -1019,7 +1019,7 @@ const StudentVote = Vue.component('StudentVote', {
         console.log("loop step: " + n);
           this.listoptions.push(
             {options: {
-              customId: 0,
+              customId: n+1,
               showTotalVotes: true,
               question: 'Do you think this thought is heteronomy or autonomy?',
               answers: [
@@ -1029,7 +1029,8 @@ const StudentVote = Vue.component('StudentVote', {
             }
             }  
           );      
-    }
+    console.log("customId: " + this.listoptions[n].options.customId);
+      }
    }.bind(this));
    } ,
   methods: {
@@ -1044,8 +1045,13 @@ const StudentVote = Vue.component('StudentVote', {
     },
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
-      
-    }
+      if (obj.value === 1) {
+        socket.emit('studentvote', {answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
+        }
+      if (obj.value === 2) {
+        socket.emit('studentvote', {answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
+        }
+      }
   },
   //TODO add initial dilemma here
   //TODO sync with student votes

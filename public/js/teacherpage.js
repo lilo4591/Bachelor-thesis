@@ -450,10 +450,11 @@ const Vote = Vue.component('Vote', {
       listoptions: [ {options: {
                       customId: 0,
                       showTotalVotes: true,
+                      //showResults: true,
                       question: 'Do you think this thought is heteronomy or autonomy?',
                         answers: [
-                                    { value: 1, text: 'Heteronomy', votes: 53 },
-                                    { value: 2, text: 'Autonomy', votes: 35 }
+                                    { value: 1, text: 'Heteronomy', votes: 0 },
+                                    { value: 2, text: 'Autonomy', votes: 0 }
                                   ],
                                 }
       } ]
@@ -464,18 +465,44 @@ const Vote = Vue.component('Vote', {
     socket.emit('initialThoughts', 'want inital thoughts');
     socket.on('displayInitialThoughts', function(thoughts) {
      this.thoughts = thoughts;
-    //initalise options for all thoughts
-    console.log(this.thoughts.length);
-    console.log(this.listoptions[0].options);
-    for (var i in thoughts) {
-      console.log(i);
-      if (i != thoughts.length-1) {
-        this.listoptions.push(this.listoptions[0]);
-      }      
-      console.log(this.listoptions);
+    //initialize component with as many poll objs as there are thoughts
+      for (var n = 0; n < thoughts.length; n++) {
+        console.log("loop step: " + n);
+          this.listoptions.push(
+            {options: {
+              customId: 0,
+              showTotalVotes: true,
+              //showResults: true,
+              question: 'Do you think this thought is heteronomy or autonomy?',
+              answers: [
+                { value: 1, text: 'Heteronomy', votes: 0 },
+                { value: 2, text: 'Autonomy', votes: 0 }
+              ],
+            }
+            }  
+          );      
     }
    }.bind(this));
-   } ,
+   
+  socket.on('vote', function(obj) {
+    console.log('vote recieved');
+    console.log(obj.answer);
+    if (obj.answer === "Heteronomy") {
+      console.log("hee");
+      console.log(obj.answer);
+      console.log("before update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+      this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+    }
+    else if (obj.answer === "Autonomy") {
+      console.log("au");
+      console.log(obj.answer);
+      console.log("before update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+      this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+    }
+  }.bind(this));
+  } ,
   methods: {
     updateShowIndex() {
       if (this.i == this.thoughts.length - 1) {
