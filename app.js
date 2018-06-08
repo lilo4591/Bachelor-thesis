@@ -45,6 +45,8 @@ function Data() {
   //exercise1 provocative
   //groupname : situations
   this.groupSituations = [];
+  this.groupRisks = [];
+  //not needed? -->
   this.situations = [];
 
   //exercise2 heteronomy autonomy
@@ -90,6 +92,7 @@ Data.prototype.addGroupName = function (group) {
 Data.prototype.addSituation = function (situation) {
   this.situations.push(situation);
 };
+
 
 
 //testing obj group
@@ -210,6 +213,21 @@ Data.prototype.addGroupSituations = function (group, groupsituations) {
   console.log(this.groupSituations[group]);
 };
 
+Data.prototype.addGroupRisks = function (group, grouprisks) {
+  
+  if (this.groupRisks.hasOwnProperty(group)) {
+    for (var key in grouprisks) {
+      this.groupRisks[group].push(grouprisks[key]);
+    }
+  }
+  else {
+    this.groupRisks[group] = grouprisks;
+  }
+  console.log("This is group " + group + " risk");
+  console.log(this.groupRisks[group]);
+};
+
+
 var data = new Data();
 
 var server = app.listen(app.get('port'), function () {
@@ -279,7 +297,17 @@ io.on('connection', function(socket) {
       console.log(allsituations);
       io.emit('collectsituations', allsituations);
     });
-  /** 
+
+  socket.on('wantrisks', function() {
+      var allrisks = [];
+      for (var i in data.groupNames) {
+       allrisks = allrisks.concat(data.groupRisks[data.groupNames[i]]);
+      }
+      console.log(allrisks);
+      io.emit('collectrisks', allrisks);
+    });
+ 
+ /** 
     Relevant to exercise 2: heteronomy autonomy  
   **/
    socket.on('thoughts', function(thoughts) {
@@ -406,6 +434,19 @@ io.on('connection', function(socket) {
               io.of(data.groupNames[index]).emit('showgroupsituations', data.groupSituations[data.groupNames[index]]);
             });
  
+          //collecting risks for each group
+          socket.on('grouprisks', function(risks) {
+            data.addGroupRisks(data.groupNames[index], risks);
+            //sending risks within each group
+            io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
+          });
+        
+          //updating server data if students removes a situation input and notify group
+          socket.on('removerisk', function(id) {
+              data.groupRisks[data.groupNames[index]].splice(id,1); 
+              io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
+            });
+        
           //sending summary to grooups
           socket.on('wantsummary', function() {
             console.log('summartt');
