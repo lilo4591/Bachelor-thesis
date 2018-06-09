@@ -104,6 +104,9 @@ const Start = Vue.component('Start', {
       if (exerciseNum === 2) {
         router.push('/exercise2');
       }
+      if (exerciseNum == 3) {
+        router.push('/exercise3argumentations');
+      }
     }.bind(this));
      
   }
@@ -125,7 +128,6 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
       showing: 'showgroupsituations',
       remove: 'removesituation',
       example: 'Deciding which company to buy hardware from', 
-      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
       text: 'situations that has no moral implication' 
 
     }
@@ -149,7 +151,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   <div id= "page">
       {{name}}
       <h2>This exercise is about ethical awareness</h2>
-      <p>{{explanation}}</p>
+      <p> The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication at all</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
@@ -184,7 +186,6 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
       showing: 'showgroupsituations',
       remove: 'removesituation',
       example: 'Deciding which company to buy hardware from', 
-      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
       text: 'situations that has no moral implication' 
 
    }
@@ -240,7 +241,6 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
       showing: 'showgroupsituations',
       remove: 'removesituation',
       example: 'Deciding which company to buy hardware from', 
-      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
       text: 'situations that has no moral implication' 
     
     }
@@ -272,7 +272,6 @@ const Exercise1Love = Vue.component('Exercise1Love', {
       showing: 'showgrouprisks',
       remove: 'removerisk',
       example:'Love makes you act irrational',
-      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
       text: 'risks with love'
     }
      
@@ -296,7 +295,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
   <div id= "page">
       {{name}}
       <h2>This exercise is about ethical awareness</h2>
-      <p>{{explanation}}</p>
+      <p>This part of the exercise is to <b> identify risks</b> with a morally correct principle: <b>Love.</b></p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
@@ -330,7 +329,6 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
       showing: 'showgrouprisks',
       remove: 'removerisk',
       example:'Love makes you act irrational',
-      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
       text: 'risks with love'
       
    }
@@ -386,7 +384,6 @@ const LoveFullClass = Vue.component('LoveFullClass', {
       showing: 'showgrouprisks',
       remove: 'removerisk',
       example:'Love makes you act irrational',
-      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
       text: 'risks with love'
      
     }
@@ -419,7 +416,6 @@ const Exercise1War = Vue.component('Exercise1War', {
       showing: 'showgroupposs', 
       remove: 'removeposs',
       example:'War is a way to solve a conflict',
-      explanation: 'This part of the exercise is to identify <b>possibilities</b> with a morally correct principle: <b>War</b>.',
       text: 'possibilies with war'
       
    }
@@ -444,7 +440,7 @@ const Exercise1War = Vue.component('Exercise1War', {
   <div id= "page">
       {{name}}
       <h2>This exercise is about ethical awareness</h2>
-      <p>{{explanation}}</p>
+      <p> This part of the exercise is to <b>identify possibilities</b> with a morally incorrect principle: <b>War</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
@@ -478,7 +474,6 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
       showing: 'showgroupposs', 
       remove: 'removeposs',
       example:'War is a way to solve a conflict',
-      explanation: 'This part of the exercise is to identify <b>possibilities</b> with a morally correct principle: <b>War</b>.',
       text: 'possibilies with war'
      
    }
@@ -1484,6 +1479,76 @@ const StudentVote = Vue.component('StudentVote', {
   });
 
 
+const Exercise3Argumentations = Vue.component('Exercise3Argumentations', {
+ data: function() {
+    return {
+      name: "Summary",
+      dilemma: "",
+      
+      solution: "",
+      solutions: [],
+           
+      principle: "",
+      principles: [],
+   
+      concreteValue: "",
+      concreteValues: [],
+      
+      actionAlternative: "",
+      actionAlternatives: [],
+
+      submitted: false
+  }
+ },
+  methods: {
+  
+    addinput(type) {
+      if (type == "solution") {
+        this.solutions.push({solution: this.solution});
+        //groupsocket.emit('solution', [{ solution : this.solution }]);
+        this.solution = '';
+      }
+     
+    }
+  },
+  template: `
+  <div> <h1>Argumentation exercise</h1>
+    <div class="wrapping">
+      <div class="box i">i</div>
+        <div class="box solutions">
+          Solutions <form @submit.prevent="addinput('solution')">
+              <input type="text" placeholder="Enter solution alternative..." v-model="solution">
+              </form>
+          <div class="box solu" v-for="(data, index) in solutions" :key='index'>
+            {{ data.solution }}
+          </div>
+          <div class="box solu">ff</div>
+          <div class="box solu">ff</div>
+        </div>
+      <div class="box k">k
+        <div class="box stake">Stakeholder</div>
+        <div class="box stake">Stakeholder</div>
+      </div>
+      <div class="box argumentations">
+        argumentations
+        <div class="box m">for m</div>
+        <div class="box m">for m</div>
+        <div class="box m">for m</div>
+        <div class="box n">agaist n</div>
+        <div class="box n">agaist n</div>
+        <div class="box n">agaist n</div>
+      </div>
+
+    </div> 
+ </div>
+  
+  `
+  });
+
+
+
+
+
 const router = new VueRouter({
   routes:[
     {
@@ -1627,6 +1692,11 @@ const router = new VueRouter({
     { //vote on the inital dilemma input if auto or hetero?
       path:'/studentvote',
       component:StudentVote
+    },
+    {
+      path:'/exercise3argumentations',
+      component: Exercise3Argumentations
+    
     }
      
  ]

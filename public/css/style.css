@@ -271,4 +271,62 @@ i {
   grid-row: 2;
 }
 
+/*gris system exercise 3*/
+
+.wrapping {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(4, [col] 150px ) ;
+  grid-template-rows: repeat(2, [row] auto  );
+  background-color: #fff;
+  color: #444;
+}
+
+
+.i {
+  grid-column: col / span 1;
+  grid-row: row;
+}
+
+.solutions {
+   
+  grid-column: col 2 / span 5;
+  grid-row: row 1;
+  display: grid;
+  grid-gap: 10px;
+}
+
+.solu {
+  grid-column: auto;
+  grid-row: 2;
+}
+
+.k {
+  grid-column: col / span 1;
+  grid-row: row 2;
+  display: grid;
+  grid-gap: 10px;
+  padding: 10px;
+}
+
+.stake {
+  grid-column: auto;
+  grid-row: 2;
+}
+.argumentations {
+  grid-column: col 2 / span 5;
+  grid-row: row 2;
+  display: grid;
+  grid-gap: 10px;
+}
+
+.m {
+  grid-column: auto;
+  grid-row: 2;
+}
+
+.n {
+  grid-column: auto;
+  grid-row: 3;
+}
 
