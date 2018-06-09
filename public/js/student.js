@@ -10,40 +10,6 @@ var socket = io();
 Vue.prototype.$input = [];
 //global dilemma to not having to passit trough routes
 Vue.prototype.$dilemma = "";
-//global variable for exercise 2 provocative data
-Vue.prototype.$provocativealldata = 
-  [ {
-      name: "Provocative situations", 
-      thoughttype:'situation', 
-      collect: 'groupsituations', 
-      showing: 'showgroupsituations',
-      remove: 'removesituation',
-      example: 'Deciding which company to buy hardware from', 
-      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
-      text: 'situations that has no moral implication' 
-    },
-    {
-      name: "Provocative risks", 
-      thoughttype: 'risk', 
-      collect: 'grouprisks', 
-      showing: 'showgrouprisks',
-      remove: 'removerisk',
-      example:'Love makes you act irrational',
-      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
-      text: 'risks with love'
-    },
-    {
-      name: "Provocative possibillities", 
-      thoughttype:'possibility', 
-      collect: 'grouppossibilities', 
-      showing: 'showgrouppossibilities', 
-      remove: 'removepossibility',
-      example:'War is a way to solve a conflict',
-      explanation: 'This part of the exercise is to identify <b>possibilities</b> with a morally correct principle: <b>War</b>.',
-      text: 'possibilies with war'
-    }
-  ]
-
 Vue.use(VuePoll);
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
@@ -133,7 +99,7 @@ const Start = Vue.component('Start', {
 
     socket.on('redirect', function(exerciseNum) {
       if (exerciseNum === 1) {
-        router.push({ name: 'exercise1', params: {dataindex: 0} });
+        router.push({ name: 'exercise1situations'  });
       }
       if (exerciseNum === 2) {
         router.push('/exercise2');
@@ -145,46 +111,26 @@ const Start = Vue.component('Start', {
 });
 
 
-const Exercise1 = Vue.component('Exercise1', {
+const Exercise1Situations = Vue.component('Exercise1Situations', {
   data: function() {
     return {
-      name: "Provocative, situations",
       studentId: null,
       sessiontoken: null,
       thought: '',
       thoughts: [],
 
-      dataindex: null,
-      thoughttype: null,
-      collect: null,
-      example: null,
-      explanation: null,
+      name: "Provocative situations", 
+      thoughttype:'situation', 
+      collect: 'groupsituations', 
+      showing: 'showgroupsituations',
+      remove: 'removesituation',
+      example: 'Deciding which company to buy hardware from', 
+      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
+      text: 'situations that has no moral implication' 
 
-      //dataindex 0 = provocative situation
-      //dataindex 1 = provocaive risks
-      //dataindex 2 = provocative possibilies
     }
   },
-  created: function() {
-    if (this.$route.params.dataindex != undefined) {
-      this.dataindex = this.$route.params.dataindex;
-      this.name = this.$provocativealldata[this.dataindex].name;
-      this.collect = this.$provocativealldata[this.dataindex].collect;
-      this.thoughttype = this.$provocativealldata[this.dataindex].thoughttype;
-      this.example = this.$provocativealldata[this.dataindex].example;
-      this.explanation = this.$provocativealldata[this.dataindex].explanation;
-    }
-    //todo if didnt come by route set to index 0    
-    else {
-      this.dataindex = 0;
-      this.name = this.$provocativealldata[this.dataindex].name;
-      this.collect = this.$provocativealldata[this.dataindex].collect;
-      this.thoughttype = this.$provocativealldata[this.dataindex].thoughttype;
-      this.example = this.$provocativealldata[this.dataindex].example;
-      this.explanation = this.$provocativealldata[this.dataindex].explanation;
- 
-    } 
-  },
+
   methods: {
     addThought() { 
       this.thoughts.push({thought: this.thought});
@@ -218,7 +164,7 @@ const Exercise1 = Vue.component('Exercise1', {
         </ul>
       </div>  
       <div v-on:click="collectSituations()"> 
-        <router-link :to="{name: 'exercise1p2', params: {dataindex: this.dataindex} }">
+        <router-link :to="{name: 'showgroupsituations' }">
           Submit {{thoughttype}} to group
         </router-link>
       </div>
@@ -227,31 +173,170 @@ const Exercise1 = Vue.component('Exercise1', {
 });
 
 //group by group
-const Exercise1p2 = Vue.component('Exercise1p2', {
+const ShowGroupSituations = Vue.component('ShowGroupSituations', {
  data: function() {
     return {
       situations: null,
-      
-      dataindex: null,
-      name: null,
-      thoughttype: null,
-      showing: null,
-      remove: null,
 
-      text: null
-  }
+      name: "Provocative situations", 
+      thoughttype:'situation', 
+      collect: 'groupsituations', 
+      showing: 'showgroupsituations',
+      remove: 'removesituation',
+      example: 'Deciding which company to buy hardware from', 
+      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
+      text: 'situations that has no moral implication' 
+
+   }
  },
   created: function() {
     //TODO come here without route..
-    console.log(this.$route.params.dataindex);
-    if (this.$route.params.dataindex != undefined) {
-      this.dataindex = this.$route.params.dataindex;
-      this.name = this.$provocativealldata[this.dataindex].name;
-      this.thoughttype = this.$provocativealldata[this.dataindex].thoughttype;
-      this.showing = this.$provocativealldata[this.dataindex].showing;
-      this.remove = this.$provocativealldata[this.dataindex].remove;
-      this.text = this.$provocativealldata[this.dataindex].text;
+    console.log(this.showing);
+    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+    groupsocket.on(this.showing, function(data) {
+      this.situations = data;
+    }.bind(this));
+
+    socket.on('redirectcomponent', function(component) {
+        router.push({name: component });
+    }.bind(this));
+
+     },
+  methods: {
+    removeThought(id) {
+      this.situations.splice(id,1);
+      groupsocket.emit(this.remove, id);  
+  },
+ 
+  },  
+   template: `
+  <div>
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Discuss your groups list of {{text}}
+    <br>Discuss and revise the list</p>
+      <div class="holder">
+        <p>These are your group's {{text}} </p>
+        <ul>
+          <li v-for="(data, index) in situations" :key='index'> 
+            {{data.thought}}
+            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>
+    <router-link :to="{ name: 'exercise1situations' } ">
+      Go Back 
+    </router-link>
+  </div>
+  `
+});
+
+const SituationsFullClass = Vue.component('SituationsFullClass', {
+  data: function() {
+    return {
+      name: "Ethical awareness, situations part 1.2",
+    
+      thoughttype:'situation', 
+      collect: 'groupsituations', 
+      showing: 'showgroupsituations',
+      remove: 'removesituation',
+      example: 'Deciding which company to buy hardware from', 
+      explanation: 'The first part of this exercise is to come up with real life situations which has no moral implication at all',
+      text: 'situations that has no moral implication' 
+    
     }
+  },
+ 
+  template: `
+  <div> 
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
+    When you the teacher tells you it is time for the next step in this exercise press continue..<br>
+    You can not add more {{thoughttype}}s now.</p>
+    <router-link :to="{name: 'exercise1love' }">
+      Continue
+    </router-link>
+  </div>`
+});
+
+const Exercise1Love = Vue.component('Exercise1Love', {
+  data: function() {
+    return {
+      studentId: null,
+      sessiontoken: null,
+      thought: '',
+      thoughts: [],
+      
+      name: "Provocative risks", 
+      thoughttype: 'risk', 
+      collect: 'grouprisks', 
+      showing: 'showgrouprisks',
+      remove: 'removerisk',
+      example:'Love makes you act irrational',
+      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
+      text: 'risks with love'
+    }
+     
+  },
+
+  methods: {
+    addThought() { 
+      this.thoughts.push({thought: this.thought});
+      this.thought = '';
+    },
+    removeThought(id) {
+      this.thoughts.splice(id,1);
+    },
+    collectSituations() {
+      //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
+      groupsocket.emit(this.collect, this.thoughts);
+      this.thoughts = [];
+    }
+  },
+  template: `
+  <div id= "page">
+      {{name}}
+      <h2>This exercise is about ethical awareness</h2>
+      <p>{{explanation}}</p>
+      <div class="holder">
+        <form @submit.prevent="addThought">
+          <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
+        </form> 
+        <p>These are your {{thoughttype}}s</p>
+        <ul>
+          <li>Example {{thoughttype}}: {{example}}.</li>
+          <li v-for="(data, index) in thoughts" :key='index'> 
+            {{data.thought}}
+            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>  
+      <div v-on:click="collectSituations()"> 
+        <router-link :to="{name: 'showgrouplove'}">
+          Submit {{thoughttype}} to group
+        </router-link>
+      </div>
+    </div>
+  `
+});
+
+//group by group
+const ShowGroupLove = Vue.component('ShowGroupLove', {
+ data: function() {
+    return {
+      situations: null,
+      name: "Provocative risks", 
+      thoughttype: 'risk', 
+      collect: 'grouprisks', 
+      showing: 'showgrouprisks',
+      remove: 'removerisk',
+      example:'Love makes you act irrational',
+      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
+      text: 'risks with love'
+      
+   }
+ },
+  created: function() {
+    //TODO come here without route..
     console.log(this.showing);
     //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
     groupsocket.on(this.showing, function(data) {
@@ -270,7 +355,6 @@ const Exercise1p2 = Vue.component('Exercise1p2', {
   },
  
   },  
-  //TODO delete on love risks doesnt work
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
@@ -285,23 +369,27 @@ const Exercise1p2 = Vue.component('Exercise1p2', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise1', params: {dataindex: this.dataindex}} ">
+    <router-link :to="{ name: 'exercise1love' }">
       Go Back 
     </router-link>
   </div>
   `
 });
 
-const FullClass = Vue.component('FullClass', {
+const LoveFullClass = Vue.component('LoveFullClass', {
   data: function() {
     return {
-      name: "Ethical awareness part 1.2",
-      dataindex: null
+      name: "Ethical awareness, situations part 1.2",
+      name: "Provocative risks", 
+      thoughttype: 'risk', 
+      collect: 'grouprisks', 
+      showing: 'showgrouprisks',
+      remove: 'removerisk',
+      example:'Love makes you act irrational',
+      explanation: 'This part of the exercise is to identify <b>risks</b> with a morally correct principle: <b>Love.</b>',
+      text: 'risks with love'
+     
     }
-  },
-  created: function() {
-    this.dataindex = this.$route.params.dataindex;
-    this.thoughttype= this.$provocativealldata[this.dataindex].thoughttype;
   },
  
   template: `
@@ -310,73 +398,69 @@ const FullClass = Vue.component('FullClass', {
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
-    <router-link :to="{name: 'exercise1', params: {dataindex: (this.dataindex+1)} }">
-    Continue
+    <router-link :to="{name: 'exercise1war' }">
+      Continue
     </router-link>
   </div>`
 });
 
-const RisksFullClass = Vue.component('RisksFullClass', {
-  data: function() {
-    return {
-      name: "Ethical awareness part whatever",
-    }
-  },
-  template: `
-  <div> 
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Please have a look at the bigger screen and discuss your risks.<br>
-    When you the teacher tells you it is time for the next step in this exercise press continue..<br>
-    You can not add more risks now.</p>
-    <router-link to="/lolnotmadeyet">
-    Continue
-    </router-link>
-  </div>`
-});
 
-const Risks = Vue.component('Risk', {
+const Exercise1War = Vue.component('Exercise1War', {
   data: function() {
     return {
-      name: "Provocative, risks",
       studentId: null,
       sessiontoken: null,
       thought: '',
-      thoughts: []
-    }
+      thoughts: [],
+      
+      name: "Provocative possibillities", 
+      thoughttype:'possibility', 
+      collect: 'groupposs', 
+      showing: 'showgroupposs', 
+      remove: 'removeposs',
+      example:'War is a way to solve a conflict',
+      explanation: 'This part of the exercise is to identify <b>possibilities</b> with a morally correct principle: <b>War</b>.',
+      text: 'possibilies with war'
+      
+   }
+     
   },
+
   methods: {
     addThought() { 
-      this.thoughts.push({risk: this.thought});
+      this.thoughts.push({thought: this.thought});
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
     },
-    collectRisks() {
-      groupsocket.emit('grouprisks', this.thoughts);
+    collectSituations() {
+      //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
+      groupsocket.emit(this.collect, this.thoughts);
       this.thoughts = [];
     }
   },
   template: `
   <div id= "page">
+      {{name}}
       <h2>This exercise is about ethical awareness</h2>
-      <p>This part of the exercise is to identify risks with a morally correct principle: Love.</p>
+      <p>{{explanation}}</p>
       <div class="holder">
         <form @submit.prevent="addThought">
-          <input type="text" placeholder="Enter your risks here please..." v-model="thought">
+          <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
-        <p>These are your risks</p>
+        <p>These are your {{thoughttype}}s</p>
         <ul>
-          <li>Example risk: Love makes you do irrational actions.</li>
+          <li>Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
-            {{data.risk}}
+            {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
       </div>  
-      <div v-on:click="collectRisks()"> 
-        <router-link to="/showgrouprisks">
-          Submit risks to group
+      <div v-on:click="collectSituations()"> 
+        <router-link :to="{name: 'showgroupwar'}">
+          Submit {{thoughttype}} to group
         </router-link>
       </div>
     </div>
@@ -384,48 +468,81 @@ const Risks = Vue.component('Risk', {
 });
 
 //group by group
-const ShowGroupRisks = Vue.component('ShowGroupRisks', {
+const ShowGroupWar = Vue.component('ShowGroupWar', {
  data: function() {
     return {
-      name: "Ethical awareness part 1.1: Show groups risks",
-      risks: null
-  }
+      situations: null,
+      name: "Provocative possibillities", 
+      thoughttype:'possibility', 
+      collect: 'groupposs', 
+      showing: 'showgroupposs', 
+      remove: 'removeposs',
+      example:'War is a way to solve a conflict',
+      explanation: 'This part of the exercise is to identify <b>possibilities</b> with a morally correct principle: <b>War</b>.',
+      text: 'possibilies with war'
+     
+   }
  },
   created: function() {
-    groupsocket.on('showgrouprisks', function(data) {
-      this.risks = data;
+    //TODO come here without route..
+    console.log(this.showing);
+    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+    groupsocket.on(this.showing, function(data) {
+      this.situations = data;
     }.bind(this));
 
     socket.on('redirectcomponent', function(component) {
-        router.push(component);
+        router.push({name: component, params: {dataindex: this.dataindex} });
     }.bind(this));
-  },
+
+     },
   methods: {
     removeThought(id) {
-      this.risks.splice(id,1);
-      groupsocket.emit('removerisk', id);  
+      this.situations.splice(id,1);
+      groupsocket.emit(this.remove, id);  
   },
  
   },  
    template: `
   <div>
     <h2>Exercise 2 {{ name }}</h2>
-    <p>Discuss your groups list of risks with love.
+    <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
       <div class="holder">
-        <p>These are your group's risks. </p>
+        <p>These are your group's {{text}} </p>
         <ul>
-          <li v-for="(data, index) in risks" :key='index'> 
-            {{data.risk}}
+          <li v-for="(data, index) in situations" :key='index'> 
+            {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
           </li>
         </ul>
       </div>
-    <router-link to="/risks">
+    <router-link :to="{ name: 'exercise1war' }">
       Go Back 
     </router-link>
   </div>
   `
+});
+
+const WarFullClass = Vue.component('WarFullClass', {
+  data: function() {
+    return {
+      name: "Provocative possibillities", 
+      thoughttype:'possibility', 
+  
+    }
+  },
+ 
+  template: `
+  <div> 
+    <h2>Exercise 2 {{ name }}</h2>
+    <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
+    When you the teacher tells you it is time for the next step in this exercise press continue..<br>
+    You can not add more {{thoughttype}}s now.</p>
+    <router-link :to="{name: 'start' }">
+      Continue
+    </router-link>
+  </div>`
 });
 
 //all students together
@@ -1379,13 +1496,56 @@ const router = new VueRouter({
     },
     {
       path:'/start',
+      name: 'start',
       component:Start
     },
-    {
-      path:'/exercise1',
-      name: 'exercise1',
-      component:Exercise1
+    { //Provocative exercises
+      path:'/exercise1Situations',
+      name: 'exercise1situations',
+      component:Exercise1Situations
     },
+    { //Identify risks with morally correct principles such as love
+      path:'/exercise1love',
+      name: 'exercise1love',
+      component:Exercise1Love
+    },
+    {
+      //identify possibilies with morally incorrect principles such as war
+      path:'/exercise1war',
+      name: 'exercise1war',
+      component:Exercise1War
+    },
+    { //show group situatons
+      path:'/showgroupsituations',
+      component:ShowGroupSituations,
+      name: 'showgroupsituations'
+    },
+    { //show group risks
+      path:'/showgrouplove',
+      component:ShowGroupLove,
+      name: 'showgrouplove'
+    },
+    { //show group possibilies
+      path:'/showgroupwar',
+      component:ShowGroupWar,
+      name: 'showgroupwar'
+    }, 
+    { //
+      path:'/situationsfullclass',
+      component:SituationsFullClass,
+      name: 'situationsfullclass'
+    },
+    { //
+      path:'/warfullclass',
+      component:WarFullClass,
+      name: 'warfullclass'
+    },
+    { //
+      path:'/lovefullclass',
+      component:LoveFullClass,
+      name: 'lovefullclass'
+    },
+     
     { //autonomy heteronomy
       path:'/exercise2',
       component:Exercise2
@@ -1467,33 +1627,8 @@ const router = new VueRouter({
     { //vote on the inital dilemma input if auto or hetero?
       path:'/studentvote',
       component:StudentVote
-    },
-    { //show group situatons
-      path:'/exercise1p2',
-      component:Exercise1p2,
-      name: 'exercise1p2'
-    },
-    { //
-      path:'/fullclass',
-      component:FullClass,
-      name: 'fullclass'
-    },
-    { //
-      path:'/risksfullclass',
-      component:RisksFullClass,
-      name: 'risksfullclass'
-    },
-    { //Identify risks with morally correct principles such as love
-      path:'/risks',
-      component:Risks,
-      name: 'risks'
-    },
-    { //Identify risks with morally correct principles such as love
-      path:'/showgrouprisks',
-      component:ShowGroupRisks,
-      name: 'showgrouprisks'
-    },
-
+    }
+     
  ]
 });
 

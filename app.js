@@ -46,6 +46,7 @@ function Data() {
   //groupname : situations
   this.groupSituations = [];
   this.groupRisks = [];
+  this.groupPoss = [];
   //not needed? -->
   this.situations = [];
 
@@ -227,6 +228,20 @@ Data.prototype.addGroupRisks = function (group, grouprisks) {
   console.log(this.groupRisks[group]);
 };
 
+Data.prototype.addGroupPoss = function (group, groupposs) {
+  
+  if (this.groupPoss.hasOwnProperty(group)) {
+    for (var key in groupposs) {
+      this.groupPoss[group].push(groupposs[key]);
+    }
+  }
+  else {
+    this.groupPoss[group] = groupposs;
+  }
+  console.log("This is group " + group + " situations");
+  console.log(this.groupPoss[group]);
+};
+
 
 var data = new Data();
 
@@ -306,6 +321,16 @@ io.on('connection', function(socket) {
       console.log(allrisks);
       io.emit('collectrisks', allrisks);
     });
+  
+  socket.on('wantposs', function() {
+      var allposs = [];
+      for (var i in data.groupNames) {
+       allposs = allposs.concat(data.groupPoss[data.groupNames[i]]);
+      }
+      console.log(allposs);
+      io.emit('collectposs', allposs);
+    });
+ 
  
  /** 
     Relevant to exercise 2: heteronomy autonomy  
@@ -441,10 +466,24 @@ io.on('connection', function(socket) {
             io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
           });
         
-          //updating server data if students removes a situation input and notify group
+          //updating server data if students removes a risk input and notify group
           socket.on('removerisk', function(id) {
               data.groupRisks[data.groupNames[index]].splice(id,1); 
               io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
+            });
+        
+         //collecting possibilies for each group
+          socket.on('groupposs', function(poss) {
+            data.addGroupPoss(data.groupNames[index], poss);
+            //sending possibilies within each group
+            io.of(data.groupNames[index]).emit('showgroupposs', data.groupPoss[data.groupNames[index]]);
+          });
+        
+ 
+          //updating server data if students removes a possibiliey input and notify group
+          socket.on('removeposs', function(id) {
+              data.groupPoss[data.groupNames[index]].splice(id,1); 
+              io.of(data.groupNames[index]).emit('showgroupposs', data.groupPoss[data.groupNames[index]]);
             });
         
           //sending summary to grooups

@@ -153,7 +153,7 @@ const Provocative1 = Vue.component('provocative1', {
     },
     collectAllSituations() {
       socket.emit("wantsituations");
-      socket.emit("navigateStudentsToComp", "fullclass");
+      socket.emit("navigateStudentsToComp", "situationsfullclass");
     }
   },
   template: `
@@ -205,7 +205,7 @@ const Provocative2love = Vue.component('provocative2love', {
     },
     collectAllRisks() {
       socket.emit("wantrisks");
-      socket.emit("navigateStudentsToComp", "fullclass");
+      socket.emit("navigateStudentsToComp", "lovefullclass");
     }
   },
   //TODO generate loverisks arguments from txtfile or db
@@ -223,12 +223,63 @@ const Provocative2love = Vue.component('provocative2love', {
           </li>
         </ul>
       </div>  
-        <router-link to="/provocative2love">
+        <router-link to="/provocative3war">
           Continue
         </router-link>
     </div>
   `
-});//Teacher showing dilemma and displaying student thoughts
+});
+
+
+const Provocative3War = Vue.component('provocative3war', {
+  data: function() {
+    return {
+      thought: '',
+      thoughts: [],
+    }
+  },
+  created: function() {
+    socket.on('collectposs', function(poss) {
+      this.thoughts = poss;
+  }.bind(this));
+  },
+  methods: {
+   removeThought(id) {
+      this.thoughts.splice(id,1);
+    },
+    navigateStudentsTo(exerciseNum) {
+      socket.emit("navigateStudentsTo",exerciseNum);
+    },
+    collectAll() {
+      socket.emit("wantposs");
+      socket.emit("navigateStudentsToComp", "warfullclass");
+    }
+  },
+  //TODO generate arguments from txtfile or db
+  template: `
+  <div id= "page">
+      <h2>Ethical awareness exercise</h2>      
+      <p>This exercise is about identifing possibilities with war.</p>
+      <div class="holder">
+      <button class="button" v-on:click="collectAll">Show group's possibilites</button>
+        <p>Possibilies with war</p>
+        <ul>
+          <li v-for="(data, index) in thoughts" :key='index'> 
+            {{data.thought}}
+            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
+          </li>
+        </ul>
+      </div>  
+        <router-link to="/provocative3war">
+          Continue
+        </router-link>
+    </div>
+  `
+});
+
+
+
+//Teacher showing dilemma and displaying student thoughts
 //TODO: should the theacher route the students here to first input dilemma? 
 //instead ofcontinuing
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
@@ -629,6 +680,10 @@ const router = new VueRouter({
       component:Provocative2love
     },
     {
+      path:'/provocative3war',
+      component:Provocative3War
+    },
+     {
       path:'/autonomyheteronomy1',
       component:autonomyHeteronomy1
     },
