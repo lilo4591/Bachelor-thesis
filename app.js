@@ -113,8 +113,8 @@ Data.prototype.addStudentToGroupObj = function(student, group) {
   }
 }
 
-Data.prototype.setSession = function(min, max) {
-  this.session = Math.floor(Math.random() * (max - min) )+ min;
+Data.prototype.setSession = function(session) {
+  this.session = session;
 };
 
 Data.prototype.setNumGroups = function (groupSize) {
@@ -246,8 +246,6 @@ Data.prototype.addGroupPoss = function (group, groupposs) {
 var data = new Data();
 
 var server = app.listen(app.get('port'), function () {
-  data.setSession(1111,9999);
-  console.log("The token for this session is: " + data.session);
   console.log('Server listening on port ' + app.get('port'));
 });
 
@@ -277,7 +275,10 @@ var studentconnection = studentsio.on('connection', socket => {
 });
 
 io.on('connection', function(socket) {
-  io.emit('session', data.session); 
+  socket.on('teachergeneratesession', function(session) {
+    console.log('teacher generated sessiontoken');
+    io.emit('session', session); 
+  });
   console.log("client with socketID:  " + socket.id + " connected");
 
   /**Relevent for teacher to route students to different pages(components)**/

@@ -16,7 +16,11 @@ Vue.use(VuePoll);
 
 const Help = Vue.component('Help', {
   template: `
-  <div> <h1>this is the student help page </h1>
+  <div> <h1>What is this?</h1>
+  <p>This is a workshop with exercises about ethical competence. You will learn different ways to think 
+  and to handle moral issues. It's completely anonymous, you log in with a sessiontoken and a username of your choice.
+  The username will not be visible to your peers. After you log in the teacher will generate groups and you should find the people in the same group as you,
+  to be able to discuss the exercises with them, however when you enter input to the system you will always be anonymous.</p>
         <router-link to="/">Back</router-link>
   </div>`
   });
@@ -25,45 +29,47 @@ const Help = Vue.component('Help', {
 const Login = Vue.component('Login', {
   data: function(){
     return {
-      sessionToken: null,
       tokenInput: null,
-      groupId: null
+      username: null,
     }
   },
   methods: {
     validateToken() {
-      return this.tokenInput === this.sessionToken;
+      if((this.tokenInput == this.$session) && (this.username != null)) {
+        router.push('/start');
+      }
+      else {
+        window.alert("Some of the information was not correct or not filled in, please try again");
+      }
+      
+
     }
   },
 
+ created: function() {
+   
+    studentsocket.on('connectionmessage', message => {
+      console.log(message);
+    });
+
+    },
   //TODO validate sessiontoken and route, otherwise show error message
   template: `
    <div>
    <nav>
     <router-link to="/help">Help</router-link>
     </nav>
-    <h2>Enter Sessiontoken to join workshop</h2>
-    <form @submit.prevent="validateToken">
-      <input type="number" v-model="tokenInput">
+    <h2>Enter a username for this session</h2>
+    <form>
+      <input type="text" v-model="username" required>
+    <h2>Enter the sessiontoken given by your teacher</h2>
+      <input type="number" v-model="tokenInput" required>
+      {{tokenInput}}
     </form> 
-    <router-link to="/start">
-    Log in
-   </router-link>
+  
+  <button v-on:click="validateToken()" id="smallbutton">Log in</button>
   </div>
-  `,
-
-  created: function() {
-   
-    studentsocket.on('connectionmessage', message => {
-      console.log(message);
-    });
-
-    socket.on('session', function(session) {
-      this.sessionToken = session;
-      console.log(this.sessionToken);
-    }.bind(this));
- }
-
+  `
 });
 
 const Start = Vue.component('Start', {
@@ -104,10 +110,7 @@ const Start = Vue.component('Start', {
       if (exerciseNum === 2) {
         router.push('/exercise2');
       }
-      if (exerciseNum == 3) {
-        router.push('/exercise3argumentations');
-      }
-    }.bind(this));
+   }.bind(this));
      
   }
 
@@ -149,7 +152,6 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   },
   template: `
   <div id= "page">
-      {{name}}
       <h2>This exercise is about ethical awareness</h2>
       <p> The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication at all</b>.</p>
       <div class="holder">
@@ -167,7 +169,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
       </div>  
       <div v-on:click="collectSituations()"> 
         <router-link :to="{name: 'showgroupsituations' }">
-          Submit {{thoughttype}} to group
+          Submit {{thoughttype}}s to group
         </router-link>
       </div>
     </div>
@@ -180,7 +182,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
     return {
       situations: null,
 
-      name: "Provocative situations", 
+      name: "Ethical awareness, Situations", 
       thoughttype:'situation', 
       collect: 'groupsituations', 
       showing: 'showgroupsituations',
@@ -212,7 +214,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
   },  
    template: `
   <div>
-    <h2>Exercise 2 {{ name }}</h2>
+    <h2>{{ name }}</h2>
     <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
       <div class="holder">
@@ -1479,75 +1481,6 @@ const StudentVote = Vue.component('StudentVote', {
   });
 
 
-const Exercise3Argumentations = Vue.component('Exercise3Argumentations', {
- data: function() {
-    return {
-      name: "Summary",
-      dilemma: "",
-      
-      solution: "",
-      solutions: [],
-           
-      principle: "",
-      principles: [],
-   
-      concreteValue: "",
-      concreteValues: [],
-      
-      actionAlternative: "",
-      actionAlternatives: [],
-
-      submitted: false
-  }
- },
-  methods: {
-  
-    addinput(type) {
-      if (type == "solution") {
-        this.solutions.push({solution: this.solution});
-        //groupsocket.emit('solution', [{ solution : this.solution }]);
-        this.solution = '';
-      }
-     
-    }
-  },
-  template: `
-  <div> <h1>Argumentation exercise</h1>
-    <div class="wrapping">
-      <div class="box i">i</div>
-        <div class="box solutions">
-          Solutions <form @submit.prevent="addinput('solution')">
-              <input type="text" placeholder="Enter solution alternative..." v-model="solution">
-              </form>
-          <div class="box solu" v-for="(data, index) in solutions" :key='index'>
-            {{ data.solution }}
-          </div>
-          <div class="box solu">ff</div>
-          <div class="box solu">ff</div>
-        </div>
-      <div class="box k">k
-        <div class="box stake">Stakeholder</div>
-        <div class="box stake">Stakeholder</div>
-      </div>
-      <div class="box argumentations">
-        argumentations
-        <div class="box m">for m</div>
-        <div class="box m">for m</div>
-        <div class="box m">for m</div>
-        <div class="box n">agaist n</div>
-        <div class="box n">agaist n</div>
-        <div class="box n">agaist n</div>
-      </div>
-
-    </div> 
- </div>
-  
-  `
-  });
-
-
-
-
 
 const router = new VueRouter({
   routes:[
@@ -1692,13 +1625,8 @@ const router = new VueRouter({
     { //vote on the inital dilemma input if auto or hetero?
       path:'/studentvote',
       component:StudentVote
-    },
-    {
-      path:'/exercise3argumentations',
-      component: Exercise3Argumentations
-    
     }
-     
+    
  ]
 });
 
@@ -1713,8 +1641,9 @@ const app = new Vue({
     }
    },
   created: function() {
-    socket.on('initToken', function(data){
-      this.token = token;
+    socket.on('session', function(session){
+      Vue.prototype.$session = session;
+      console.log(this.$session);
     }.bind(this));
   }
   });
