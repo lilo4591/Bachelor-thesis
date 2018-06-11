@@ -5,7 +5,6 @@
 'use strict';
 var studentsocket = io('/students');
 var groupsocket; 
-var socket = io();
 //global variable to save input when going to 'explain more'
 Vue.prototype.$input = [];
 //global dilemma to not having to passit trough routes
@@ -37,7 +36,8 @@ const Login = Vue.component('Login', {
     validateToken() {
       if((this.tokenInput == this.$session) && (this.username != null)) {
         router.push('/start');
-      }
+        studentsocket.emit('loggedIn', {"username": this.username} );
+    }
       else {
         window.alert("Some of the information was not correct or not filled in, please try again");
       }
@@ -53,31 +53,27 @@ const Login = Vue.component('Login', {
     });
 
     },
-  //TODO validate sessiontoken and route, otherwise show error message
   template: `
    <div>
-   <nav>
-    <router-link to="/help">Help</router-link>
-    </nav>
-    <h2>Enter a username for this session</h2>
-    <form>
-      <input type="text" v-model="username" required>
-    <h2>Enter the sessiontoken given by your teacher</h2>
-      <input type="number" v-model="tokenInput" required>
-      {{tokenInput}}
-    </form> 
-  
-  <button v-on:click="validateToken()" id="smallbutton">Log in</button>
-  </div>
+      <nav>
+        <router-link to="/help">Help</router-link>
+      </nav>
+        <form>
+          <h2>Enter the sessiontoken given by your teacher</h2>
+          <input type="number" v-model="tokenInput" required>
+          <h2>Enter a username for this session</h2>
+          <input type="text" v-model="username" required>
+       </form> 
+      <button v-on:click="validateToken()" id="smallbutton">Log in</button>
+    </div>
   `
 });
 
 const Start = Vue.component('Start', {
   data: function(){
     return {
-      sessionToken: null,
       studentId: 0,
-      groupName: null,
+      groupName: null
 
     }
   },
@@ -85,33 +81,19 @@ const Start = Vue.component('Start', {
   template: `
    <div>
     <h2>You are logged in</h2>
-    <p v-if="this.groupName != null">The name of your group is <ul><li class="groups">{{ groupName }}</li></ul></p>
+    <p v-if="this.$groupName != null">The name of your group is <ul><li class="groups">{{ this.$groupName }}</li></ul></p>
     <p>This should be the base for all starts of exercises</p>
   </div>
   `,
   created:function() {
-    //TODO sessiontoken here is null, only updated in login component atm
-    //notify namespace students that student logged in
-    studentsocket.emit('loggedIn', {"sessiontoken": this.sessionToken,
-                             "studentId": this.studentId     
-    });
-
-    studentsocket.on('namespace', function (group) {
+/*      studentsocket.on('namespace', function (group) {
       groupsocket = io.connect(group);
       this.groupName = (group);
       console.log(group);
-    }.bind(this));
-
-
-    socket.on('redirect', function(exerciseNum) {
-      if (exerciseNum === 1) {
-        router.push({ name: 'exercise1situations'  });
-      }
-      if (exerciseNum === 2) {
-        router.push('/exercise2');
-      }
-   }.bind(this));
-     
+    }.bind(this));*/
+  
+    this.groupName = this.$groupName;
+  
   }
 
 });
@@ -121,7 +103,6 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   data: function() {
     return {
       studentId: null,
-      sessiontoken: null,
       thought: '',
       thoughts: [],
 
@@ -200,11 +181,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
       this.situations = data;
     }.bind(this));
 
-    socket.on('redirectcomponent', function(component) {
-        router.push({name: component });
-    }.bind(this));
-
-     },
+       },
   methods: {
     removeThought(id) {
       this.situations.splice(id,1);
@@ -250,7 +227,7 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
  
   template: `
   <div> 
-    <h2>Exercise 2 {{ name }}</h2>
+    <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
@@ -264,7 +241,6 @@ const Exercise1Love = Vue.component('Exercise1Love', {
   data: function() {
     return {
       studentId: null,
-      sessiontoken: null,
       thought: '',
       thoughts: [],
       
@@ -325,7 +301,7 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
  data: function() {
     return {
       situations: null,
-      name: "Provocative risks", 
+      name: "Risks with love", 
       thoughttype: 'risk', 
       collect: 'grouprisks', 
       showing: 'showgrouprisks',
@@ -343,11 +319,7 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
       this.situations = data;
     }.bind(this));
 
-    socket.on('redirectcomponent', function(component) {
-        router.push({name: component, params: {dataindex: this.dataindex} });
-    }.bind(this));
-
-     },
+    },
   methods: {
     removeThought(id) {
       this.situations.splice(id,1);
@@ -357,7 +329,7 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
   },  
    template: `
   <div>
-    <h2>Exercise 2 {{ name }}</h2>
+    <h2>{{ name }}</h2>
     <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
       <div class="holder">
@@ -379,8 +351,7 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
 const LoveFullClass = Vue.component('LoveFullClass', {
   data: function() {
     return {
-      name: "Ethical awareness, situations part 1.2",
-      name: "Provocative risks", 
+      name: "Ethical awareness, risks with love",
       thoughttype: 'risk', 
       collect: 'grouprisks', 
       showing: 'showgrouprisks',
@@ -393,7 +364,7 @@ const LoveFullClass = Vue.component('LoveFullClass', {
  
   template: `
   <div> 
-    <h2>Exercise 2 {{ name }}</h2>
+    <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
@@ -408,7 +379,6 @@ const Exercise1War = Vue.component('Exercise1War', {
   data: function() {
     return {
       studentId: null,
-      sessiontoken: null,
       thought: '',
       thoughts: [],
       
@@ -470,7 +440,7 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
  data: function() {
     return {
       situations: null,
-      name: "Provocative possibillities", 
+      name: "Possibillities with war", 
       thoughttype:'possibility', 
       collect: 'groupposs', 
       showing: 'showgroupposs', 
@@ -486,10 +456,6 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
     //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
     groupsocket.on(this.showing, function(data) {
       this.situations = data;
-    }.bind(this));
-
-    socket.on('redirectcomponent', function(component) {
-        router.push({name: component, params: {dataindex: this.dataindex} });
     }.bind(this));
 
      },
@@ -548,7 +514,6 @@ const Exercise2 = Vue.component('Exercise2', {
     return {
       name: "Autonomy and Heteronomy",
       studentId: null,
-      sessiontoken: null,
       thought: '',
       thoughts: []
     }
@@ -562,7 +527,7 @@ const Exercise2 = Vue.component('Exercise2', {
       this.thoughts.splice(id,1);
     },
     collectThoughts() {
-      socket.emit('thoughts', this.thoughts);
+      studentsocket.emit('thoughts', this.thoughts);
       this.thoughts = [];
     }
   },
@@ -597,7 +562,6 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
     return {
       name: "Autonomy and Heteronomy part 2.1",
       studentId: null,
-      sessiontoken: null
     }
   },
 
@@ -624,7 +588,6 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       dilemma: "",
       notsubmitted: true,
       studentId: null,
-      sessiontoken: null
     }
  },
   created: function() {
@@ -702,7 +665,6 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       name: "Autonomy and Heteronomy part 2.3: Reflex thoughts",
       notsubmitted: true,
       studentId: null,
-      sessiontoken: null,
       reflex: "",
       reflexthoughts: [],
       dilemma: "",
@@ -836,7 +798,6 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       name: "Autonomy and Heteronomy part 2.5: Principle fixations",
       notsubmitted: true,
       studentId: null,
-      sessiontoken: null,
       principle: "",
       principles: [],
       dilemma: "",
@@ -970,7 +931,6 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
       name: "Autonomy and Heteronomy part 2.7: Concrete and relevant values",
       notsubmitted: true,
       studentId: null,
-      sessiontoken: null,
       concreteValue: "",
       concreteValues: [],
       dilemma: "",
@@ -1098,7 +1058,6 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
       name: "Autonomy and Heteronomy part 2.9: Action alternatives and relevant values",
       notsubmitted: true,
       studentId: null,
-      sessiontoken: null,
       actionAlternative: "",
       actionAlternatives: [],
       dilemma: "",
@@ -1417,7 +1376,7 @@ const StudentVote = Vue.component('StudentVote', {
    }.bind(this));
    
   //listen for student votes and updating the poll votes accordingly
-  socket.on('vote', function(obj) {
+  studentsocket.on('vote', function(obj) {
     console.log('vote recieved');
     if (obj.answer === "Heteronomy") {
       console.log(obj.answer);
@@ -1431,11 +1390,6 @@ const StudentVote = Vue.component('StudentVote', {
     }
   }.bind(this));
   
-  socket.on('redirectcomponent', function(component) {
-    console.log("redirect componet");  
-        router.push('/start');
-    }.bind(this));
- 
   } ,
   methods: {
     updateShowIndex() {
@@ -1450,10 +1404,10 @@ const StudentVote = Vue.component('StudentVote', {
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
       if (obj.value === 1) {
-        socket.emit('studentvote', {answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
+        studentsocket.emit('studentvote', {answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
         }
       if (obj.value === 2) {
-        socket.emit('studentvote', {answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
+        studentsocket.emit('studentvote', {answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
         }
       }
   },
@@ -1469,8 +1423,6 @@ const StudentVote = Vue.component('StudentVote', {
             {{data.thought}}
           </li>
         </ul>
-        Index: {{index}}
-        i: {{ i }}
         <vue-poll v-bind="listoptions[i].options" @addvote="addVote"/>
         <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
       </div>
@@ -1546,6 +1498,7 @@ const router = new VueRouter({
      
     { //autonomy heteronomy
       path:'/exercise2',
+      name: 'exercise2',
       component:Exercise2
     },
     {
@@ -1634,16 +1587,25 @@ const app = new Vue({
   el: '#student',
   name: 'StudentWorkshop',
   router,
-  socket,
   data () {
     return {
       name: 'StudentWorkshop',
     }
    },
   created: function() {
-    socket.on('session', function(session){
+    studentsocket.on('session', function(session){
       Vue.prototype.$session = session;
       console.log(this.$session);
+    }.bind(this));
+  
+    studentsocket.on('redirectcomponent', function(component) {
+        router.push({name: component });
+    }.bind(this));
+
+    studentsocket.on('namespace', function (group) {
+      groupsocket = io.connect(group);
+      Vue.prototype.$groupName = (group);
+      console.log(group);
     }.bind(this));
   }
   });

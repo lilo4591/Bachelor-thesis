@@ -35,7 +35,6 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
   generateSession(min, max) {
     Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
     this.session = this.$session;
-    console.log(this.$session);
     console.log(this.session);
     socket.emit('teachergeneratesession', this.session);
    }
@@ -64,8 +63,6 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       groupObject: null,
     };
   },
-  //TODO in case on no students connected print appropiate
-  //TODO redo group generating
    template: `
  
     <div id="app">
@@ -74,7 +71,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       <h2>Log in to localhost:3000/student with sessiontoken {{ token }} </h2>
       <ul>
         <li v-for="(data, index) in students" :key='index'>
-          Student number {{students[index]}} has connected</li>
+          {{students[index]}} has connected</li>
       </ul>
       <form @submit.prevent="generateGroups(numEachGroup)">
         Enter number of student in each group<br>
@@ -100,9 +97,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
-      //TODO bugz!! sessiontoken not shown when going to startworkshop, only when a studentpage loads
-      socket.on("StudentLoggedIn", function(studentNumber) {
-        this.addStudent(studentNumber);
+      socket.on("StudentLoggedIn", function(studentUsername) {
+        this.addStudent(studentUsername);
         console.log(this.students);
       }.bind(this));    
       socket.on('groupInfo', function(data) {
@@ -111,8 +107,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     },
 
  methods: {    
-    addStudent(studentNumber) { 
-      this.students.push(studentNumber);
+    addStudent(studentUsername) { 
+      this.students.push(studentUsername);
     },
     generateGroups(n) {
     socket.emit('generateGroups', n);
@@ -134,11 +130,11 @@ const workshopExercises = Vue.component('WorkshopExercises', {
  
     <div id="app">
         <router-link to="/provocative1">
-        <button class="workshopbutton" v-on:click="navigateStudentsTo(1)"> {{this.exerciseOptions[0]}}</button>
+        <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise1situations')"> {{this.exerciseOptions[0]}}</button>
         </router-link>
     
         <router-link to="/autonomyheteronomy1">
-        <button class="workshopbutton" v-on:click="navigateStudentsTo(2)"> {{this.exerciseOptions[1]}}</button>
+        <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise2')"> {{this.exerciseOptions[1]}}</button>
         </router-link>
  
     <br><router-link to="/startworkshop">Back</router-link>
@@ -146,8 +142,8 @@ const workshopExercises = Vue.component('WorkshopExercises', {
   
   ` ,
   methods: { 
-    navigateStudentsTo(exerciseNum) {
-      socket.emit("navigateStudentsTo",exerciseNum);
+    navigateStudentsTo(exercisecomp) {
+      socket.emit("navigateStudentsToComp", exercisecomp);
     }
   }
 });
@@ -173,9 +169,6 @@ const Provocative1 = Vue.component('provocative1', {
     removeThought(id) {
       this.thoughts.splice(id,1);
     },
-    navigateStudentsTo(exerciseNum) {
-      socket.emit("navigateStudentsTo",exerciseNum);
-    },
     collectAllSituations() {
       socket.emit("wantsituations");
       socket.emit("navigateStudentsToComp", "situationsfullclass");
@@ -184,7 +177,7 @@ const Provocative1 = Vue.component('provocative1', {
   template: `
   <div id= "page">
       <h2>Ethical awareness exercise</h2>      
-      <p>The first part of this exercise is to come up with real life situations which has no moral implication at all.</p>
+      <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
       <div class="holder">
       <button class="button" v-on:click="collectAllSituations">Show group's situations</button>
         <p>These are situations from all groups</p>
@@ -225,9 +218,6 @@ const Provocative2love = Vue.component('provocative2love', {
     removeThought(id) {
       this.thoughts.splice(id,1);
     },
-    navigateStudentsTo(exerciseNum) {
-      socket.emit("navigateStudentsTo",exerciseNum);
-    },
     collectAllRisks() {
       socket.emit("wantrisks");
       socket.emit("navigateStudentsToComp", "lovefullclass");
@@ -237,7 +227,7 @@ const Provocative2love = Vue.component('provocative2love', {
   template: `
   <div id= "page">
       <h2>Ethical awareness exercise</h2>      
-      <p>This exercise is about identifing risks with Love.</p>
+      <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
       <div class="holder">
       <button class="button" v-on:click="collectAllRisks">Show group's risks</button>
         <p>Risks with love</p>
@@ -270,21 +260,18 @@ const Provocative3War = Vue.component('provocative3war', {
   },
   methods: {
    removeThought(id) {
-      this.thoughts.splice(id,1);
+    this.thoughts.splice(id,1);
     },
-    navigateStudentsTo(exerciseNum) {
-      socket.emit("navigateStudentsTo",exerciseNum);
-    },
-    collectAll() {
-      socket.emit("wantposs");
-      socket.emit("navigateStudentsToComp", "warfullclass");
+   collectAll() {
+    socket.emit("wantposs");
+    socket.emit("navigateStudentsToComp", "warfullclass");
     }
   },
   //TODO generate arguments from txtfile or db
   template: `
   <div id= "page">
       <h2>Ethical awareness exercise</h2>      
-      <p>This exercise is about identifing possibilities with war.</p>
+      <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
       <div class="holder">
       <button class="button" v-on:click="collectAll">Show group's possibilites</button>
         <p>Possibilies with war</p>
@@ -295,18 +282,30 @@ const Provocative3War = Vue.component('provocative3war', {
           </li>
         </ul>
       </div>  
-        <router-link to="/provocative3war">
+        <router-link to="/provocativeconclusion">
           Continue
         </router-link>
     </div>
   `
 });
 
+const ProvocativeConclusion = Vue.component('provocativeConclusion', {
 
+
+template:
+
+`
+<div id="app">
+  <h2>To Conclude</h2>
+  <p>By managing to come up with several risks and possibilites with these examples
+    one realizes that many things that you take for granted can be questioned.</p>
+  <router-link to="/workshopexercises">
+    Continue
+  </router-link>
+</div>`
+});
 
 //Teacher showing dilemma and displaying student thoughts
-//TODO: should the theacher route the students here to first input dilemma? 
-//instead ofcontinuing
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   data: function() {
     return {
@@ -329,15 +328,12 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
-    },
-    navigateStudentsTo(exerciseNum) {
-      socket.emit("navigateStudentsTo",exerciseNum);
     }
-
+   
   },
+  //TODO: add dilemma here
   template: `
-  <div id= "page"><!-- TODO Show first dilemma here-->
-      <!-- prevent: prevents from page reloading -->
+  <div id= "page">
       <h2>Dilemma goes here</h2>
       <div class="holder">
         <p>These are your thoughts</p>
@@ -451,7 +447,8 @@ var analysis = Vue.component('analysis', {
   
   },
    created: function() {
-    socket.on('showanalysis', function(data) {
+   /*
+     socket.on('showanalysis', function(data) {
       var contains = false;
       var index;
       //console.log("new analys " + data.group);
@@ -475,7 +472,8 @@ var analysis = Vue.component('analysis', {
       }
 
     }.bind(this));  
-   },
+  */
+  },
 
   template:`
   <div id="app">
@@ -649,13 +647,10 @@ const Vote = Vue.component('Vote', {
       
     },
     navigateStudentsToStart() {
-      console.log("navcomp");
-      socket.emit('navigateStudentsToComp', "/start");
+      socket.emit('navigateStudentsToComp', "start");
     }
   },
   //TODO add initial dilemma here
-  //TODO sync with student votes
-  //TODO no voting possibilty on teacher side only student side
   template: `
   <div> 
     <h1>Inital dilemma</h1>
@@ -708,7 +703,12 @@ const router = new VueRouter({
       path:'/provocative3war',
       component:Provocative3War
     },
-     {
+    {
+      //conslusion on the provocative exercise
+      path:'/provocativeconclusion',
+      component:ProvocativeConclusion
+    },
+    {
       path:'/autonomyheteronomy1',
       component:autonomyHeteronomy1
     },
@@ -767,8 +767,30 @@ const app = new Vue({
     }
   },
   created: function() {
-    socket.on('session', function(session){
-      this.token = session;
-    }.bind(this));
+  socket.on('showanalysis', function(data) {
+      var contains = false;
+      var index;
+      //console.log("new analys " + data.group);
+      for (var i in this.$analys) {
+        //if this groups analysis already existis
+        //console.log("existing analys in index " + i + this.$analys[i].group);
+        if (data.group === this.$analys[i].group) {
+          //console.log('match');
+          contains = true;
+          index = i;
+        }
+      }
+      if (contains){
+        //replace old analysis with new
+        this.$analys.splice(index,1);
+        this.$analys.push(data);
+      }
+      else {
+        //just add the new analysis
+        this.$analys.push(data); 
+      }
+
+    }.bind(this));  
+ 
   }
 }); 

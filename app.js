@@ -36,8 +36,8 @@ app.get('/teacher-admin', function (req, res) {
 
 //global data 
 function Data() {
+  // studentname: , id: (socket)
   this.students = [];
-  this.currentStudentNumber = 0;
   this.groups = [];
   this.groupNames = [];
   this.session = null;
@@ -47,8 +47,6 @@ function Data() {
   this.groupSituations = [];
   this.groupRisks = [];
   this.groupPoss = [];
-  //not needed? -->
-  this.situations = [];
 
   //exercise2 heteronomy autonomy
   this.thoughts = [];
@@ -59,7 +57,7 @@ function Data() {
   this.concreteValues = [];
   this.actionAlternatives = [];
 
-  //list of groupbj:{name, no of students, studentid(studentsocketconnection)}
+  //list of groupbj:{name(of group), no of students, studentid(studentsocketconnection)}
   this.groupObj = [];
 
 }
@@ -68,15 +66,21 @@ Data.prototype.getgroupSize = function () {
   return this.groupSize;
 }
 
-Data.prototype.getStudentNumber = function () {
-  this.currentStudentNumber += 1;
-  return this.currentStudentNumber;
+Data.prototype.addStudent = function (username, socketid) {
+  this.students.push({studentname: username, id: socketid });
+  console.log(this.students);
 };
 
-Data.prototype.addStudent = function () {
-  var student = this.getStudentNumber();
-  this.students.push(student);
+//deletes a student which has disconnected
+Data.prototype.removeStudent = function (socketid) {
+  for (var i in this.students) {
+      if (this.students[i].id == socketid) {
+        console.log(this.students[i].studentname + " was deleted from server");
+        this.students.splice(i,1);
+      }
+    }
 };
+
 
 Data.prototype.getAllStudents = function () {
   return this.students;
@@ -98,7 +102,7 @@ Data.prototype.addSituation = function (situation) {
 
 //testing obj group
 Data.prototype.addGroupObj = function (group) {
-  var GROUP = {name: null, noOfStudents: 0, studentsId: []};
+  var GROUP = {name: null, noOfStudents: 0, students: []};
   GROUP.name = group;
   this.groupObj.push(GROUP); 
 
@@ -108,7 +112,7 @@ Data.prototype.addStudentToGroupObj = function(student, group) {
   for (var i in this.groupObj) {
     if (this.groupObj[i].name == group) {
       this.groupObj[i].noOfStudents += 1;
-      this.groupObj[i].studentsId.push(student);
+      this.groupObj[i].students.push(student);
     }
   }
 }
@@ -259,52 +263,85 @@ var studentconnection = studentsio.on('connection', socket => {
   socket.emit('connectionmessage', "student connected on namespace students");
 
   //listen for when students log in
-  socket.on('loggedIn', function() {
+  socket.on('loggedIn', function(info) {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
     //add student to global namespace and update currentstudent number
-    data.addStudent();
+    data.addStudent(info.username, socket.id);
+    
+    //checks if student username already exists in a group(student has already been logged in)
+    if (data.groupObj != []) {
+      for (var i = 0; i < data.groupObj.length; i++) {
+        for (var n = 0; n < data.groupObj[i].students.length; n++) {
+          if (data.groupObj[i].students[n].studentname == info.username) {
+            console.log("will send namespace here");
+            studentsio.to(socket.id).emit('namespace', data.groupObj[i].name);
+          }
+        }
+      }
+    }
+
     //notify teacher that a student has logged in
-    io.emit("StudentLoggedIn", data.currentStudentNumber);
+    teacherconnection.emit("StudentLoggedIn", info.username);
   });
    //listening for Student to want to display the inital dilemma thoughts
     socket.on('initialThoughtsStudent', function(message) {
       console.log(message);
       socket.emit('displayInitialThoughts', data.thoughts);
     });
+
+  socket.on('disconnect', function() {
+    console.log("studentnamespace with socketID: " + socket.id + " disconnected");
+    data.removeStudent(socket.id);
+    var studentconnections = Array.from(Object.keys(studentconnection.connected));
+  });
+  
+  /** 
+    Relevant to exercise 2: heteronomy autonomy  
+  **/
+   socket.on('thoughts', function(thoughts) {
+
+    console.log("server collecting thoughts");
+    for ( var i = 0, l = thoughts.length; i < l; i++) {
+      data.addThought(thoughts[i]);
+    }
+    teacherconnection.emit('displayThoughts', data.thoughts); 
+  });
  
+  socket.on('studentvote', function(obj) {
+    console.log("a student haz voted");
+    //sending to all students except sender
+    socket.broadcast.emit('vote', obj);
+    //and also to teacher
+    teacherconnection.emit('vote',obj);
+  });  
+  
 });
 
-io.on('connection', function(socket) {
+var teacherconnection = io.on('connection', function(socket) {
   socket.on('teachergeneratesession', function(session) {
     console.log('teacher generated sessiontoken');
-    io.emit('session', session); 
+    studentconnection.emit('session', session); 
   });
   console.log("client with socketID:  " + socket.id + " connected");
 
-  /**Relevent for teacher to route students to different pages(components)**/
-  socket.on('navigateStudentsTo', function(exerciseNum) {
-    //route to first exercise
-    io.emit('redirect', exerciseNum)
+  socket.on('disconnect', function() {
+    console.log("client with socketID: " + socket.id + " disconnected");
+    var allclientconnections = Array.from(Object.keys(teacherconnection.connected));
   });
+
+  /**Relevent for teacher to route students to different pages(components)**/
+  
   socket.on('navigateStudentsToComp', function(component) {
     //route students to component
     console.log("tocomp");
-    socket.broadcast.emit('redirectcomponent', component)
+    studentconnection.emit('redirectcomponent', component)
   });
   /**End of teacher route student**/
 
   /** 
     Relevant to exercise 1: Provocative
   **/
-   socket.on('situations', function(situations) {
-
-    console.log("server collecting situations");
-    for ( var i = 0, l = situations.length; i < l; i++) {
-      data.addSituation(situations[i]);
-    }
-    io.emit('displaySituation', data.situations); 
-  });
-  
+    
     socket.on('wantsituations', function() {
       var allsituations = [];
       for (var i in data.groupNames) {
@@ -332,27 +369,6 @@ io.on('connection', function(socket) {
       io.emit('collectposs', allposs);
     });
  
- 
- /** 
-    Relevant to exercise 2: heteronomy autonomy  
-  **/
-   socket.on('thoughts', function(thoughts) {
-
-    console.log("server collecting thoughts");
-    for ( var i = 0, l = thoughts.length; i < l; i++) {
-      data.addThought(thoughts[i]);
-    }
-    io.emit('displayThoughts', data.thoughts); 
-  });
-  
-  socket.on('studentvote', function(obj) {
-    console.log("a student haz voted");
-    //sending to all clients except sender
-    socket.broadcast.emit('vote', obj);
-  });  
- 
-  /** end of exercise 2: heteronoy autonomy**/
-
   /**
     * Teacher generating groups depending on size of connected students
     **/
@@ -367,19 +383,21 @@ io.on('connection', function(socket) {
       //groupobj to print to teacher
       data.addGroupObj(group);
     }
-    var allstudents = Array.from(Object.keys(studentconnection.connected));
+    //var allstudents = Array.from(Object.keys(studentconnection.connected));
 
+    var allstudents = data.students;
     var g = 0;
     var currentGroup = data.groupNames[g];
     var count = 0; 
-    var len = Array.from(Object.keys(studentsio.connected)).length;
+    var len = allstudents.length;
+    //var len = Array.from(Object.keys(studentsio.connected)).length;
     //send a random group to each connected student
       //uneven nr of students or uneven number of groups
       if (len % groupSize == 1)  {
         //put student in group
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
         data.addStudentToGroupObj(allstudents[index], currentGroup);
-        studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
+        studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
         len = len - 1;
@@ -388,7 +406,7 @@ io.on('connection', function(socket) {
         if (count < groupSize) {
         var index = Math.floor(getRandomArbitrary(0,allstudents.length));
         data.addStudentToGroupObj(allstudents[index], currentGroup);
-        studentconnection.to(allstudents[index]).emit('namespace', currentGroup);
+        studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
         //delete used student
         allstudents.splice(index,1);
         count = count + 1;
@@ -400,6 +418,7 @@ io.on('connection', function(socket) {
         i = i - 1;
       }
     }
+    //console.log(data.groupObj[0].students[0]);
     //sending groupname,size and ids to teacherpage to print
     socket.emit('groupInfo', {'groupObject': data.groupObj});
     
@@ -415,6 +434,13 @@ io.on('connection', function(socket) {
     for (i=0, len= data.groupNames.length; i < len ; i++) {
       groupconnection.push(io.of(data.groupNames[i]).on('connection', function(index) {
         return function (socket) { 
+          
+          //listening for studens disconnecting from grous
+          socket.on('disconnect', function() {
+            console.log("Student with socketID: " + socket.id + " disconnected" + " from group" + data.groupNames[index]);
+          });
+  
+          
           console.log("A student joined group " + data.groupNames[index]);
           socket.on('dilemma', function(info) {
             data.addDilemma(data.groupNames[index], info.dilemma);
