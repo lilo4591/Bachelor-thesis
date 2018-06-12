@@ -30,12 +30,15 @@ const Login = Vue.component('Login', {
     return {
       tokenInput: null,
       username: null,
+      //parameter to route to if disconnected from group
     }
   },
   methods: {
     validateToken() {
       if((this.tokenInput == this.$session) && (this.username != null)) {
-        router.push('/start');
+        if (this.pathfrom == null){
+          router.push('/start');
+        }
         studentsocket.emit('loggedIn', {"username": this.username} );
     }
       else {
@@ -51,6 +54,14 @@ const Login = Vue.component('Login', {
     studentsocket.on('connectionmessage', message => {
       console.log(message);
     });
+    studentsocket.emit('wantsession');
+    
+    studentsocket.on('session', function(session){
+      Vue.prototype.$session = session;
+      console.log(this.$session);
+    }.bind(this));
+       
+  
 
     },
   template: `
@@ -69,6 +80,7 @@ const Login = Vue.component('Login', {
   `
 });
 
+
 const Start = Vue.component('Start', {
   data: function(){
     return {
@@ -77,23 +89,25 @@ const Start = Vue.component('Start', {
 
     }
   },
-//TODO: base for all exercise, should not say you are logged in at all routes here maybe only first om ens det
   template: `
    <div>
-    <h2>You are logged in</h2>
-    <p v-if="this.$groupName != null">The name of your group is <ul><li class="groups">{{ this.$groupName }}</li></ul></p>
-    <p>This should be the base for all starts of exercises</p>
+    <h2>Lets go!</h2>
+    <p v-if="this.groupName == null">Waiting for a group to be assigned to you...<p/>
+    <p v-if="this.groupName != null">The name of your group is <ul><li class="groups">{{ this.groupName }}</li></ul></p>
+    <p v-if="this.groupName != null">Waiting for an exercise to start!</p>
   </div>
   `,
   created:function() {
-/*      studentsocket.on('namespace', function (group) {
+    studentsocket.on('namespace', function (group) {
       groupsocket = io.connect(group);
-      this.groupName = (group);
+      Vue.prototype.$groupName = (group);
+      this.groupName = this.$groupName;
       console.log(group);
-    }.bind(this));*/
-  
-    this.groupName = this.$groupName;
-  
+    }.bind(this));
+    if (this.$route.params.pathfrom != null)       
+      this.pathfrom = this.$route.params;
+      router.push({name: this.pathfrom});
+     
   }
 
 });
@@ -116,7 +130,16 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
 
     }
   },
+  created: function() {
+   studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise1situations');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+  },
   methods: {
     addThought() { 
       this.thoughts.push({thought: this.thought});
@@ -174,13 +197,22 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
    }
  },
   created: function() {
-    //TODO come here without route..
-    console.log(this.showing);
-    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-    groupsocket.on(this.showing, function(data) {
-      this.situations = data;
-    }.bind(this));
+    
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/showgroupsituations');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+    else {
+      console.log(this.showing);
+      //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+      groupsocket.on(this.showing, function(data) {
+      this.situations = data;
+      }.bind(this));
+    }
        },
   methods: {
     removeThought(id) {
@@ -224,6 +256,17 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
     
     }
   },
+  created: function() {
+  
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/situationsfullclass');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, Please log in again with the same username to join your group");
+      router.push('/');
+    } 
+   },
  
   template: `
   <div> 
@@ -254,7 +297,18 @@ const Exercise1Love = Vue.component('Exercise1Love', {
     }
      
   },
+  created: function () {
+ 
+      studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise1love');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group. Please log in again with the same username to join your group");
+      router.push('/');
+    } 
+  
+  },
   methods: {
     addThought() { 
       this.thoughts.push({thought: this.thought});
@@ -312,13 +366,21 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
    }
  },
   created: function() {
-    //TODO come here without route..
-    console.log(this.showing);
-    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-    groupsocket.on(this.showing, function(data) {
-      this.situations = data;
-    }.bind(this));
 
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/showgrouplove');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+    else {
+      //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+      groupsocket.on(this.showing, function(data) {
+        this.situations = data;
+      }.bind(this));
+    }
     },
   methods: {
     removeThought(id) {
@@ -361,7 +423,17 @@ const LoveFullClass = Vue.component('LoveFullClass', {
      
     }
   },
- 
+  created: function () {
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/lovefullclass');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+  
+  }, 
   template: `
   <div> 
     <h2>{{ name }}</h2>
@@ -393,7 +465,16 @@ const Exercise1War = Vue.component('Exercise1War', {
    }
      
   },
+  created: function() {
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise1war');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+  },
   methods: {
     addThought() { 
       this.thoughts.push({thought: this.thought});
@@ -451,13 +532,20 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
    }
  },
   created: function() {
-    //TODO come here without route..
-    console.log(this.showing);
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/showgroupwar');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+    else {
     //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
     groupsocket.on(this.showing, function(data) {
       this.situations = data;
     }.bind(this));
-
+    }
      },
   methods: {
     removeThought(id) {
@@ -495,7 +583,17 @@ const WarFullClass = Vue.component('WarFullClass', {
   
     }
   },
- 
+  created: function() {
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/warfullclass');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+  
+  }, 
   template: `
   <div> 
     <h2>Exercise 2 {{ name }}</h2>
@@ -531,6 +629,18 @@ const Exercise2 = Vue.component('Exercise2', {
       this.thoughts = [];
     }
   },
+
+  created: function() {
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+   
+  },
   template: `
   <div id= "page"><!-- TODO Show first dilemma here-->
       <!-- prevent: prevents from page reloading -->
@@ -564,7 +674,17 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
       studentId: null,
     }
   },
+  created: function () {
+     studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p1');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+  
+  },
   template: `
   <div> 
     <h2>Exercise 2 {{ name }}</h2>
@@ -591,18 +711,29 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     }
  },
   created: function() {
-    groupsocket.on('showdilemma', function(data) {
-      this.dilemma = data.dilemma;
-      this.notsubmitted = data.notsubmitted;
-      Vue.prototype.$dilemma = data.dilemma;
-    }.bind(this));
 
-    groupsocket.on('editdilemma', function(data) {
-      this.dilemma = data.dilemma;
-      this.notsubmitted = data.notsubmitted;
-      //update global variable since dilemma changed
-      Vue.prototype.$dilemma = data.dilemma;
-    }.bind(this));
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p2');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+    else {
+      groupsocket.on('showdilemma', function(data) {
+        this.dilemma = data.dilemma;
+        this.notsubmitted = data.notsubmitted;
+        Vue.prototype.$dilemma = data.dilemma;
+      }.bind(this));
+
+      groupsocket.on('editdilemma', function(data) {
+        this.dilemma = data.dilemma;
+        this.notsubmitted = data.notsubmitted;
+        //update global variable since dilemma changed
+        Vue.prototype.$dilemma = data.dilemma;
+      }.bind(this));
+    }
  },
   methods: {
     
@@ -642,7 +773,16 @@ const ReflexHelp = Vue.component('ReflexHelp', {
       dilemma: "",
     }
   },
+  created: function() {
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p3');
+    });
 
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }
+  },
   template: `
   <div>
     <h1>Instructions explanation</h1>
@@ -672,10 +812,16 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
  },
   created: function() {
     //this.dilemma = this.$route.params.dilemma;
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p3');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
     this.dilemma = this.$dilemma;
     this.reflexthoughts = this.$input;
-    console.log("global: " + this.$dilemma);
-    console.log("instance: " + this.dilemma);
  },
   methods: {
     addReflexThought() { 
@@ -736,10 +882,23 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
   }
  },
   created: function() {
-    groupsocket.on('showreflexthoughts', function(data) {
-      this.reflexthoughts = data;
-    }.bind(this));
-    this.dilemma = this.$dilemma;
+ 
+    studentsocket.on('wantcurrentlocation', function() {
+      // route to previous route if disconnected
+      studentsocket.emit('currentlocation', '/exercise2p3');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+    else {
+      groupsocket.on('showreflexthoughts', function(data) {
+        this.reflexthoughts = data;
+      }.bind(this));
+    
+      this.dilemma = this.$dilemma; 
+    }
   },
    
    template: `
@@ -774,8 +933,18 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
       dilemma: ""
     }
   },  
+  created: function() {
+   studentsocket.on('wantcurrentlocation', function() {
+      // route to previous route if disconnected
+      studentsocket.emit('currentlocation', '/exercise2p5');
+    });
 
-  template: `
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+  },
+    template: `
   <div>
     <h1>Instructions explanation</h1>
       <p> This question is about the big principles which one believes or fixations by something, for example 
@@ -804,6 +973,14 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
   }
  },
   created: function() {
+   studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p5');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
     this.dilemma = this.$dilemma;
     this.principles = this.$input;
  },
@@ -867,11 +1044,21 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
   }
  },
   created: function() {
-    //set global input to [] to not save state when going back
-    groupsocket.on('showprinciples', function(data) {
-      this.principles = data;
-    }.bind(this));
-    this.dilemma = this.$dilemma;
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p5');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+    else 
+    {  //set global input to [] to not save state when going back
+      groupsocket.on('showprinciples', function(data) {
+        this.principles = data;
+      }.bind(this));
+      this.dilemma = this.$dilemma;
+    }
   },
    
    template: `
@@ -905,7 +1092,18 @@ const ValueHelp = Vue.component('ValueHelp', {
       name: "Autonomy and Heteronomy part 2.7: Instructions explanation",
       dilemma: ""
     }
-  },  
+  },
+  created: function() {
+  
+  studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p7');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+  },
 
   template: `
   <div>
@@ -937,6 +1135,16 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
   }
  },
   created: function() {
+  
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p7');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }   
+    
     //set dilemma to global dilemma
     this.dilemma = this.$dilemma;
     //set global variable to this input instance
@@ -1000,10 +1208,20 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
   }
  },
   created: function() {
+  studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p7');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+    else {
     groupsocket.on('showconcretevalues', function(data) {
       this.concreteValues = data;
     }.bind(this));
     this.dilemma = this.$dilemma;
+    }
   },
    
    template: `
@@ -1036,6 +1254,17 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
       name: "Autonomy and Heteronomy part 2.9: Instructions explanation",
     }
   },  
+  created: function() {
+  
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p9');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+  },
 
   template: `
   <div>
@@ -1064,6 +1293,16 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
   }
  },
   created: function() {
+  
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p9');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+  
     this.dilemma = this.$dilemma;
     this.actionAlternatives = this.$input;
   },
@@ -1120,16 +1359,29 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
 const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
  data: function() {
     return {
-      name: "Autonomy and Heteronomy part 2.8: Show groups action alternatives and values",
+      name: "Autonomy and Heteronomy part 2.9: Show groups action alternatives and values",
       dilemma: "",
       actionAlternatives: null
   }
  },
   created: function() {
-    groupsocket.on('showactionalternatives', function(data) {
-      this.actionAlternatives = data;
-    }.bind(this));
-    this.dilemma = this.$dilemma;
+   
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/exercise2p9');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    } 
+    else {
+  
+      groupsocket.on('showactionalternatives', function(data) {
+        this.actionAlternatives = data;
+      }.bind(this));
+      this.dilemma = this.$dilemma;
+  }
+      
   },
    
    template: `
@@ -1180,40 +1432,51 @@ const Summary = Vue.component('Summary', {
  },
 
  created: function() {
-    //notify that we want the input from the questions
-    groupsocket.emit('wantsummary', function() {
-      //console.log("want summary");
-    });
-    groupsocket.on('summarydata', function(data) { 
-      this.actionAlternatives = data.actionAlternatives;
-      this.concreteValues = data.concreteValues;
-      this.principles = data.principles;
-      this.reflexthoughts = data.reflexThoughts;
-    }.bind(this)); 
-    //so that changes on input will be seen by allgroup members
-    groupsocket.on('showreflexthoughts', function(data) {
-      this.reflexthoughts = data; 
-    }.bind(this));
-    
-    groupsocket.on('showprinciples', function(data) {
-      this.principles = data;
-    }.bind(this));
-    
-    groupsocket.on('showconcretevalues', function(data) {
-      this.concreteValues = data;
-    }.bind(this));
-   
-    groupsocket.on('showactionalternatives', function(data) {
-      this.actionAlternatives = data;
-    }.bind(this));
-
-    groupsocket.on('analysissubmitted', function(message) {
-      this.submitted = true;
-    }.bind(this));
-
  
-    this.dilemma = this.$dilemma;
-  },
+   studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/summary');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+   else {
+     //notify that we want the input from the questions
+     groupsocket.emit('wantsummary', function() {
+       //console.log("want summary");
+     });
+     groupsocket.on('summarydata', function(data) { 
+       this.actionAlternatives = data.actionAlternatives;
+       this.concreteValues = data.concreteValues;
+       this.principles = data.principles;
+       this.reflexthoughts = data.reflexThoughts;
+     }.bind(this)); 
+     //so that changes on input will be seen by allgroup members
+     groupsocket.on('showreflexthoughts', function(data) {
+       this.reflexthoughts = data; 
+     }.bind(this));
+
+     groupsocket.on('showprinciples', function(data) {
+       this.principles = data;
+     }.bind(this));
+
+     groupsocket.on('showconcretevalues', function(data) {
+       this.concreteValues = data;
+     }.bind(this));
+
+     groupsocket.on('showactionalternatives', function(data) {
+       this.actionAlternatives = data;
+     }.bind(this));
+
+     groupsocket.on('analysissubmitted', function(message) {
+       this.submitted = true;
+     }.bind(this));
+
+
+     this.dilemma = this.$dilemma;
+   } 
+ },
   methods: {
   
     removeAlternative(index, type) {
@@ -1352,13 +1615,22 @@ const StudentVote = Vue.component('StudentVote', {
     }
   },
   created: function() {
-    console.log("studentvote created");
-    studentsocket.emit('initialThoughtsStudent', 'want inital thoughts student');
-    studentsocket.on('displayInitialThoughts', function(thoughts) {
-     this.thoughts = thoughts;
-      //initialize component with as many poll objs as there are thoughts
-      for (var n = 0; n < thoughts.length; n++) {
-        console.log("loop step: " + n);
+   
+    studentsocket.on('wantcurrentlocation', function() {
+      studentsocket.emit('currentlocation', '/studentvote');
+    });
+
+    if (groupsocket == undefined) {
+      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+      router.push('/');
+    }  
+    else {
+      studentsocket.emit('initialThoughtsStudent', 'want inital thoughts student');
+      studentsocket.on('displayInitialThoughts', function(thoughts) {
+        this.thoughts = thoughts;
+        //initialize component with as many poll objs as there are thoughts
+        for (var n = 0; n < thoughts.length; n++) {
+          console.log("loop step: " + n);
           this.listoptions.push(
             {options: {
               customId: n+1,
@@ -1371,25 +1643,25 @@ const StudentVote = Vue.component('StudentVote', {
             }
             }  
           );      
-    console.log("customId: " + this.listoptions[n].options.customId);
-      }
-   }.bind(this));
-   
-  //listen for student votes and updating the poll votes accordingly
-  studentsocket.on('vote', function(obj) {
-    console.log('vote recieved');
-    if (obj.answer === "Heteronomy") {
-      console.log(obj.answer);
-      this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
-      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+          console.log("customId: " + this.listoptions[n].options.customId);
+        }
+      }.bind(this));
+
+      //listen for student votes and updating the poll votes accordingly
+      studentsocket.on('vote', function(obj) {
+        console.log('vote recieved');
+        if (obj.answer === "Heteronomy") {
+          console.log(obj.answer);
+          this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+        }
+        else if (obj.answer === "Autonomy") {
+          console.log(obj.answer);
+          this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+        }
+      }.bind(this));
     }
-    else if (obj.answer === "Autonomy") {
-      console.log(obj.answer);
-      this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
-      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
-    }
-  }.bind(this));
-  
   } ,
   methods: {
     updateShowIndex() {
@@ -1593,19 +1865,24 @@ const app = new Vue({
     }
    },
   created: function() {
+    
     studentsocket.on('session', function(session){
       Vue.prototype.$session = session;
       console.log(this.$session);
     }.bind(this));
-  
+
+    //specific to redirect after reconnection
+    studentsocket.on('redirect', function(path) {
+      router.push(path);
+    }.bind(this));
+   
+    studentsocket.on('showdilemmareconnect', function(dilemma) {
+        console.log('showdilemmareconnect');
+        Vue.prototype.$dilemma = dilemma;
+      }.bind(this));
+ 
     studentsocket.on('redirectcomponent', function(component) {
         router.push({name: component });
-    }.bind(this));
-
-    studentsocket.on('namespace', function (group) {
-      groupsocket = io.connect(group);
-      Vue.prototype.$groupName = (group);
-      console.log(group);
     }.bind(this));
   }
   });

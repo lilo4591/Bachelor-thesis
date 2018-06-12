@@ -262,10 +262,13 @@ var studentconnection = studentsio.on('connection', socket => {
   console.log("studentNamespace with socketID: " + socket.id + " connected");
   socket.emit('connectionmessage', "student connected on namespace students");
 
+  socket.on('wantsession', function() {
+    socket.emit('session', data.session);
+  });
   //listen for when students log in
   socket.on('loggedIn', function(info) {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
-    //add student to global namespace and update currentstudent number
+    //add student to global namespace
     data.addStudent(info.username, socket.id);
     
     //checks if student username already exists in a group(student has already been logged in)
@@ -273,13 +276,24 @@ var studentconnection = studentsio.on('connection', socket => {
       for (var i = 0; i < data.groupObj.length; i++) {
         for (var n = 0; n < data.groupObj[i].students.length; n++) {
           if (data.groupObj[i].students[n].studentname == info.username) {
-            console.log("will send namespace here");
+            //put student in the same group as it disconnected from
             studentsio.to(socket.id).emit('namespace', data.groupObj[i].name);
-          }
+            //ask the other students where they are
+            socket.emit('wantcurrentlocation');
+            //send student to same page as them
+            socket.on('currentlocation', function(location) {
+              console.log('currentlocation' + location);
+              studentsio.to(socket.id).emit('redirect', location);
+              });
+               //also send the group dilemma if such exists
+              if (data.dilemmas[data.groupObj[i].name] != 'undefined') {
+                studentsio.to(socket.id).emit('showdilemmareconnect', data.dilemmas[data.groupObj[i].name]);
+                console.log("Emitting dilemma:" + data.dilemmas[data.groupObj[i].name]);
+              }
+           }
         }
       }
     }
-
     //notify teacher that a student has logged in
     teacherconnection.emit("StudentLoggedIn", info.username);
   });
@@ -320,6 +334,7 @@ var studentconnection = studentsio.on('connection', socket => {
 var teacherconnection = io.on('connection', function(socket) {
   socket.on('teachergeneratesession', function(session) {
     console.log('teacher generated sessiontoken');
+    data.setSession(session)
     studentconnection.emit('session', session); 
   });
   console.log("client with socketID:  " + socket.id + " connected");
