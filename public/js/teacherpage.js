@@ -2,6 +2,16 @@ var socket = io();
 
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
+//TODO: read dilemma from file or db to be able to change it.
+Vue.prototype.$staticdilemma = 
+"A student are conducting her master thesis at the university. " +
+  "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
+  "To test this algorithm the student implements a system that uses the algorithm to hack into different companies systems. " +
+  "The algorithm manages to find a few vulnerability on the different companies systems and this is added to the report. " +
+  "Her professor is both impressed with her ability also concerned. " +
+  "One of the companies security team notice that they have been attacked and can track the attack back to the student and are planning to press charges. " +
+  "But the student however didn't do any damage to the companies system and claims that she did them a favor, because now they can make their systems more secure."
+
 Vue.use(VuePoll);
 
 const Help = Vue.component('Help', {
@@ -122,23 +132,33 @@ const workshopExercises = Vue.component('WorkshopExercises', {
     return {
       name: 'workshopExercises',
       exerciseOptions: [
-        "Exercise 1", "Exercise 2", "Exercise 3", "Exercise 4"
+        "Exercise 1: Let's go!", "Exercise 2: Let's go!", "Exercise 3", "Exercise 4"
       ]
     };
   },
    template: `
- 
-    <div id="app">
-        <router-link to="/provocative1">
-        <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise1situations')"> {{this.exerciseOptions[0]}}</button>
-        </router-link>
-    
-        <router-link to="/autonomyheteronomy1">
-        <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise2')"> {{this.exerciseOptions[1]}}</button>
-        </router-link>
- 
-    <br><router-link to="/startworkshop">Back</router-link>
-    </div> 
+    <div> 
+      <div id="contain">
+          <div id ="left">
+            <h2>Exercise 1: <br> Ethical awareness</h2>
+            <p>This is an exercise focusing on questioning the unquestionable.</p>
+
+            <router-link to="/provocative1">
+              <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise1situations')"> {{this.exerciseOptions[0]}}</button>
+            </router-link>
+          </div>
+
+          <div id="right">
+            <h2>Exercise 2: <br>Autonomy and Heteronomy</h2>
+            <p>This exercise will train your ability to recognice the two different ways to think.</p>
+            <router-link to="/autonomyheteronomy1">
+              <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise2')"> {{this.exerciseOptions[1]}}</button>
+            </router-link>
+          </div>
+
+      </div>
+      <router-link tag="button" class="smallbutton" to="/startworkshop"> << Back</router-link></button>
+    </div>
   
   ` ,
   methods: { 
@@ -309,6 +329,7 @@ template:
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   data: function() {
     return {
+      staticdilemma: this.$staticdilemma,
       thought: '',
       thoughts: [
         {"thought": "Example: I think this is wrong because of current laws.." }
@@ -334,7 +355,8 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   //TODO: add dilemma here
   template: `
   <div id= "page">
-      <h2>Dilemma goes here</h2>
+      <h2>Starting with an example dilemma</h2>
+      <p>{{staticdilemma}}</p>
       <div class="holder">
         <p>These are your thoughts</p>
         <ul>
@@ -578,6 +600,7 @@ const Vote = Vue.component('Vote', {
     return {
       thought: '',
       thoughts: null,
+      staticdilemma: this.$staticdilemma,
       i: 0,
       showNextButton: true,
       listoptions: [ {options: {
@@ -654,6 +677,7 @@ const Vote = Vue.component('Vote', {
   template: `
   <div> 
     <h1>Inital dilemma</h1>
+    <p>{{ staticdilemma }}</p>
     <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">

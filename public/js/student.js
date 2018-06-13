@@ -9,6 +9,16 @@ var groupsocket;
 Vue.prototype.$input = [];
 //global dilemma to not having to passit trough routes
 Vue.prototype.$dilemma = "";
+//TODO: read dilemma from file or db to be able to change it.
+Vue.prototype.$staticdilemma = 
+"A student are conducting her master thesis at the university. " +
+  "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
+  "To test this algorithm the student implements a system that uses the algorithm to hack into different companies systems. " +
+  "The algorithm manages to find a few vulnerability on the different companies systems and this is added to the report. " +
+  "Her professor is both impressed with her ability also concerned. " +
+  "One of the companies security team notice that they have been attacked and can track the attack back to the student and are planning to press charges. " +
+  "But the student however didn't do any damage to the companies system and claims that she did them a favor, because now they can make their systems more secure."
+
 Vue.use(VuePoll);
 
 //TODO keep sessiontoken and studentID troughout the whole workshop
@@ -70,12 +80,12 @@ const Login = Vue.component('Login', {
         <router-link to="/help">Help</router-link>
       </nav>
         <form>
-          <h2>Enter the sessiontoken given by your teacher</h2>
-          <input type="number" v-model="tokenInput" required>
-          <h2>Enter a username for this session</h2>
-          <input type="text" v-model="username" required>
+          <h3>Enter the sessiontoken given by your teacher</h3>
+          <input type="number" v-model="tokenInput" placeholder="Sessiontoken" required>
+          <h3>Enter a username of your choice</h3>
+          <input type="text" v-model="username" placeholder="Username"required>
        </form> 
-      <button v-on:click="validateToken()" id="smallbutton">Log in</button>
+      <button v-on:click="validateToken()" class="smallbutton">Log in</button>
     </div>
   `
 });
@@ -612,6 +622,7 @@ const Exercise2 = Vue.component('Exercise2', {
     return {
       name: "Autonomy and Heteronomy",
       studentId: null,
+      staticdilemma: this.$staticdilemma,
       thought: '',
       thoughts: []
     }
@@ -642,11 +653,10 @@ const Exercise2 = Vue.component('Exercise2', {
    
   },
   template: `
-  <div id= "page"><!-- TODO Show first dilemma here-->
-      <!-- prevent: prevents from page reloading -->
+  <div id= "page">
       <h3>This exercise is about {{ name }} </h3>
       <div class="holder">
-        <p>Description of dilemma goes here</p>
+        <p>{{staticdilemma}}</p>
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
         </form> 
@@ -754,10 +764,10 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
           </textarea>
-          <button id="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
+          <button class="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
         </div>
         <div v-if="notsubmitted===false"><div class="text"> {{ dilemma }}</div> 
-          <button id="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
+          <button class="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
         <router-link :to="{ name: 'exercise2p3' }">
         Continue
@@ -1585,7 +1595,7 @@ const Summary = Vue.component('Summary', {
           </div>
         </div>
     </div>
-    <button v-if="submitted==false" id="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
+    <button v-if="submitted==false" class="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
     <br><router-link v-if="submitted==true" to="/studentvote">Next</router-link>
   </div>
     `
@@ -1598,6 +1608,7 @@ const StudentVote = Vue.component('StudentVote', {
     return {
       thought: '',
       thoughts: [],
+      staticdilemma: this.$staticdilemma,
       i: 0,
       showNextButton: true,
       listoptions: [ 
@@ -1687,6 +1698,7 @@ const StudentVote = Vue.component('StudentVote', {
   template: `
   <div> 
     <h1>Inital dilemma</h1>
+    <p>{{staticdilemma}}</p>
     <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
@@ -1696,7 +1708,7 @@ const StudentVote = Vue.component('StudentVote', {
           </li>
         </ul>
         <vue-poll v-bind="listoptions[i].options" @addvote="addVote"/>
-        <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
+        <button class="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
       </div>
     
     </div>
