@@ -27,7 +27,14 @@ h2 {
   text-align:center; 
 }
 
-.subheader { font-size: 26px; font-weight: 300; color: #5b97f0; margin: 0 0 24px; font-family: 'Montserrat', sans-serif;}
+.subheader { 
+  font-size: 26px; 
+  font-weight: 300; 
+  color: #5b97f0;   
+  margin: 0 0 24px; 
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 5px;
+}
 
 html {
   display: table;
@@ -96,7 +103,6 @@ button:before,button:after{
   height:2px;
   width:0;
   background: #3cb0fd;
-  /*background: #1AAB8A;*/
   transition:400ms ease all;
 }
 button:after{
@@ -109,6 +115,26 @@ button:hover:before,button:hover:after{
   width:100%;
   transition:800ms ease all;
 }
+
+button.navbutton:hover {
+  background:#fff;
+  color: #323333;
+}
+button.navbutton:before,button.navbutton:after {
+  background: #323333;
+}
+
+.smallbutton {
+   width: 30%;
+}
+
+.navbutton {
+  width: 20%;
+  background-color: #323333;
+  font-size: 20px;
+  height: 40px;
+}
+
 
 input {
   text-align: center;
@@ -176,34 +202,63 @@ i {
   cursor:pointer;
 }
 
+#textleft {
+  color: gray;
+  text-align: left;
+}
+/*Forr navigation back symbol*/
+#left {
+  float:left;
+}
+
+/*For routenavigate button to the right*/
+#right {
+  float:right;
+}
+
+
+
 .container {
   box-shadow: 0px 0px 40px lightgray;
 }
 
-
-.smallbutton {
-   width: 30%;
-   position: relative; 
+#contain { 
+  width: 100%;
+  display: grid;
+  grid-template-columns: 49% 49%;
+  grid-gap: 10px;
 }
 
-#contain{width:100%}
-#left {
-  position: relative;
-  float: left;
-  width: 49%;
-  margin-right: 2px;
+
+.containheader1 {
+  grid-row: 1;
+  grid-column; 1;
 }
 
-#right {
-  float: right;
-  width: 49%; 
-  margin-left: 2px;
+.containtext1 {
+  grid-row: 2;
+  grid-column: 1;
 }
 
-#center{
-  margin: 0 auto;
+.containnav1 {
+  grid-row: 3;
+  grid-column; 1;
 }
 
+.containheader2 {
+  grid-row: 1;
+  grid-column; 2;
+}
+
+.containtext2 {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.containnav2 {
+  grid-row: 3;
+  grid-column; 2;
+}
 
 #boldtext {
   font-weight: bold;
@@ -232,7 +287,7 @@ i {
 }
 
 #teacher {
-  width: 800px;
+  width: 1000px;
 }
 
  

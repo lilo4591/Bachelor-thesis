@@ -100,8 +100,13 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         <button class="button"> Start workshop </button>
         </router-link>
         <br>
-        <router-link to="/">Back</router-link>
       </div>
+        <router-link tag="button" class="navbutton" to="/">
+          <i id="left" class="material-icons">
+            arrow_back
+          </i>
+          Go Back
+        </router-link>
     </div>
   
   
@@ -139,25 +144,37 @@ const workshopExercises = Vue.component('WorkshopExercises', {
    template: `
     <div> 
       <div id="contain">
-          <div id ="left">
+          <div class="containheader1">
             <h2>Exercise 1: <br> Ethical awareness</h2>
+          </div>  
+          <div class="containtext1">  
             <p>This is an exercise focusing on questioning the unquestionable.</p>
-
+          </div>
+          <div class="containnav1">
             <router-link to="/provocative1">
               <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise1situations')"> {{this.exerciseOptions[0]}}</button>
             </router-link>
           </div>
 
-          <div id="right">
-            <h2>Exercise 2: <br>Autonomy and Heteronomy</h2>
+          <div class="containheader2">
+          <h2>Exercise 2: <br>Autonomy and Heteronomy</h2>
+          </div>
+          <div class="containtext2">
             <p>This exercise will train your ability to recognice the two different ways to think.</p>
+          </div>
+          <div class="containnav2">
             <router-link to="/autonomyheteronomy1">
               <button class="workshopbutton" v-on:click="navigateStudentsTo('exercise2')"> {{this.exerciseOptions[1]}}</button>
             </router-link>
           </div>
 
       </div>
-      <router-link tag="button" class="smallbutton" to="/startworkshop"> << Back</router-link></button>
+      <router-link tag="button" class="navbutton" to="/startworkshop">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
     </div>
   
   ` ,
@@ -208,8 +225,17 @@ const Provocative1 = Vue.component('provocative1', {
           </li>
         </ul>
       </div>  
-        <router-link to="/provocative2love">
-          Continue
+      <router-link tag="button" class="navbutton" to="/workshopexercises">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+     <router-link id="right" class="navbutton" tag="button" to="/provocative2love">
+        <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
         </router-link>
     </div>
   `
@@ -258,8 +284,17 @@ const Provocative2love = Vue.component('provocative2love', {
           </li>
         </ul>
       </div>  
-        <router-link to="/provocative3war">
-          Continue
+      <router-link tag="button" class="navbutton" to="/provocative1">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+   <router-link id="right" class="navbutton" tag="button" to="/provocative3war">
+        <i class="material-icons">
+          arrow_forward
+        </i>
+           Continue
         </router-link>
     </div>
   `
@@ -302,8 +337,17 @@ const Provocative3War = Vue.component('provocative3war', {
           </li>
         </ul>
       </div>  
-        <router-link to="/provocativeconclusion">
-          Continue
+      <router-link tag="button" class="navbutton" to="/provocative2love">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+ <router-link id="right" class="navbutton" tag="button" to="/provocativeconclusion">
+        <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
         </router-link>
     </div>
   `
@@ -319,8 +363,17 @@ template:
   <h2>To Conclude</h2>
   <p>By managing to come up with several risks and possibilites with these examples
     one realizes that many things that you take for granted can be questioned.</p>
-  <router-link to="/workshopexercises">
-    Continue
+  <router-link tag="button" class="navbutton" to="/provocative3war">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+ <router-link id="right" class="navbutton" tag="button" to="/workshopexercises">
+     <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
   </router-link>
 </div>`
 });
@@ -365,7 +418,18 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
           </li>
         </ul>
       </div> 
-      <router-link to="/autonomyheteronomy2">Continue</router-link>
+      <router-link tag="button" class="navbutton" to="/workshopexercises">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+      <router-link id="right" class="navbutton" tag="button" to="/autonomyheteronomy2">
+        <i class="material-icons">
+          arrow_forward
+        </i>
+           Continue
+      </router-link>
     </div>
   `
 });
@@ -388,7 +452,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
     <p v-if="displayreflex===false">Formulate your own dilemma in your groups</p>
   
       <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
-        <button id="smallbutton">
+        <button class="smallbutton">
         Start!
         </button>
       </div>
@@ -396,8 +460,17 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
           <p>Write down your instinctive thoughts about this dilemma.<br>
             This is Individuall, but discuss with your group.</p>
         </div>
-    <router-link to="/autonomyHeteronomy3" v-if="displayreflex">
-      Continue
+    <router-link tag="button" class="navbutton" to="/autonomyheteronomy1">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+ <router-link id="right" class="navbutton" tag="button" to="/autonomyHeteronomy3" v-if="displayreflex">
+       <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
     </router-link>
   </div>
   `
@@ -415,8 +488,17 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   <div id="app"> 
     <p>Write down principlee fixations about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/autonomyHeteronomy4">
-      Continue
+    <router-link tag="button" class="navbutton" to="/autonomyheteronomy2">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+    <router-link id="right" tag="button" class="navbutton" to="/autonomyHeteronomy4">
+       <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
     </router-link>
   </div>
   `
@@ -434,8 +516,17 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
   <div id="app"> 
     <p>Write down concrete values about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/autonomyHeteronomy5">
-      Continue
+    <router-link tag="button" class="navbutton" to="/autonomyheteronomy3">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+    <router-link id="right" tag="button" class="navbutton" to="/autonomyHeteronomy5">
+       <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
     </router-link>
   </div>
   `
@@ -454,8 +545,17 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
   <div id="app"> 
     <p>Write down what can be done about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
-    <router-link to="/analysis">
-      Continue
+      <router-link tag="button" class="navbutton" to="/autonomyheteronomy4">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+  <router-link id="right" tag="button" class="navbutton" to="/analysis">
+       <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue
     </router-link>
   </div>
   `
@@ -519,8 +619,17 @@ var analysis = Vue.component('analysis', {
 
     </nav>
 
-    <router-link to="/vote">
-      Continue 
+    <router-link tag="button" class="navbutton" to="/autonomyheteronomy5">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+    <router-link id="right" tag="button" class="navbutton" to="/vote">
+       <i class="material-icons">
+          arrow_forward
+        </i>
+        Continue 
     </router-link>
   </div>
     `
@@ -587,7 +696,10 @@ const showAnalysis = Vue.component('showAnalysis', {
           </div>
         </div>
     </div>
-    <router-link to="/analysis">
+    <router-link class="navbutton" tag="button" to="/analysis">
+     <i id="left" class="material-icons">
+        arrow_back
+      </i>
       Go back
     </router-link>
   </div>
@@ -687,12 +799,21 @@ const Vote = Vue.component('Vote', {
           </li>
         </ul>
         <vue-poll v-bind="listoptions[index].options" @addvote="addVote"/>
-        <button id="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
+        <button class="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
       </div>
     </div>
-    <div v-on:click="navigateStudentsToStart()">
-      <router-link to="/workshopexercises">Exit exercise</router-link>
-    </div>
+       <router-link tag="button" class="navbutton" to="/analysis">
+        <i id="left" class="material-icons">
+          arrow_back
+        </i>
+        Go Back
+      </router-link>
+      <router-link id="right" class="navbutton" tag="button" v-on:click.native="navigateStudentsToStart()" to="/workshopexercises">
+        <i class="material-icons">
+          arrow_forward
+        </i>
+         Continue
+         </router-link>
   </div>`
   });
 

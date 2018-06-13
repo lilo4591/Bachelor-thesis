@@ -21,7 +21,6 @@ Vue.prototype.$staticdilemma =
 
 Vue.use(VuePoll);
 
-//TODO keep sessiontoken and studentID troughout the whole workshop
 
 const Help = Vue.component('Help', {
   template: `
@@ -30,7 +29,12 @@ const Help = Vue.component('Help', {
   and to handle moral issues. It's completely anonymous, you log in with a sessiontoken and a username of your choice.
   The username will not be visible to your peers. After you log in the teacher will generate groups and you should find the people in the same group as you,
   to be able to discuss the exercises with them, however when you enter input to the system you will always be anonymous.</p>
-        <router-link to="/">Back</router-link>
+        <router-link tag="button" class="navbutton" to="/">
+          <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back
+        </router-link>
   </div>`
   });
 
@@ -46,11 +50,13 @@ const Login = Vue.component('Login', {
   methods: {
     validateToken() {
       if((this.tokenInput == this.$session) && (this.username != null)) {
-        if (this.pathfrom == null){
+       // if (this.pathfrom == null){
           router.push('/start');
-        }
+       // }
         studentsocket.emit('loggedIn', {"username": this.username} );
-    }
+        Vue.prototype.$username = this.username;
+      
+      }
       else {
         window.alert("Some of the information was not correct or not filled in, please try again");
       }
@@ -80,7 +86,7 @@ const Login = Vue.component('Login', {
         <router-link to="/help">Help</router-link>
       </nav>
         <form>
-          <h3>Enter the sessiontoken given by your teacher</h3>
+          <h3>Enter Sessiontoken</h3>
           <input type="number" v-model="tokenInput" placeholder="Sessiontoken" required>
           <h3>Enter a username of your choice</h3>
           <input type="text" v-model="username" placeholder="Username"required>
@@ -114,10 +120,11 @@ const Start = Vue.component('Start', {
       this.groupName = this.$groupName;
       console.log(group);
     }.bind(this));
-    if (this.$route.params.pathfrom != null)       
+    this.groupName = this.$groupName;
+    /*if (this.$route.params.pathfrom != null)       
       this.pathfrom = this.$route.params;
       router.push({name: this.pathfrom});
-     
+     */
   }
 
 });
@@ -129,6 +136,8 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
       studentId: null,
       thought: '',
       thoughts: [],
+      groupName: this.$groupName,
+      username: this.$username,
 
       name: "Provocative situations", 
       thoughttype:'situation', 
@@ -166,6 +175,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   },
   template: `
   <div id= "page">
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <h2>This exercise is about ethical awareness</h2>
       <p> The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication at all</b>.</p>
       <div class="holder">
@@ -182,7 +192,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
         </ul>
       </div>  
       <div v-on:click="collectSituations()"> 
-        <router-link :to="{name: 'showgroupsituations' }">
+        <router-link tag="button" :to="{name: 'showgroupsituations' }">
           Submit {{thoughttype}}s to group
         </router-link>
       </div>
@@ -195,6 +205,8 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
  data: function() {
     return {
       situations: null,
+      groupName: this.$groupName,
+      username: this.$username,
 
       name: "Ethical awareness, Situations", 
       thoughttype:'situation', 
@@ -233,6 +245,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
   },  
    template: `
   <div>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>{{ name }}</h2>
     <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
@@ -245,8 +258,11 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise1situations' } ">
-      Go Back 
+    <router-link tag="button" class="navbutton ":to="{ name: 'exercise1situations' } ">
+       <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back 
     </router-link>
   </div>
   `
@@ -256,6 +272,8 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
   data: function() {
     return {
       name: "Ethical awareness, situations part 1.2",
+      groupName: this.$groupName,
+      username: this.$username,
     
       thoughttype:'situation', 
       collect: 'groupsituations', 
@@ -280,12 +298,16 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
  
   template: `
   <div> 
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
-    <router-link :to="{name: 'exercise1love' }">
-      Continue
+    <router-link id="right" class="navbutton" tag="button" :to="{name: 'exercise1love' }">
+     <i class="material-icons">
+          arrow_forward
+        </i>
+       Continue
     </router-link>
   </div>`
 });
@@ -296,7 +318,9 @@ const Exercise1Love = Vue.component('Exercise1Love', {
       studentId: null,
       thought: '',
       thoughts: [],
-      
+      groupName: this.$groupName,
+      username: this.$username,
+            
       name: "Provocative risks", 
       thoughttype: 'risk', 
       collect: 'grouprisks', 
@@ -335,7 +359,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
   },
   template: `
   <div id= "page">
-      {{name}}
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <h2>This exercise is about ethical awareness</h2>
       <p>This part of the exercise is to <b> identify risks</b> with a morally correct principle: <b>Love.</b></p>
       <div class="holder">
@@ -352,7 +376,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
         </ul>
       </div>  
       <div v-on:click="collectSituations()"> 
-        <router-link :to="{name: 'showgrouplove'}">
+        <router-link tag="button" :to="{name: 'showgrouplove'}">
           Submit {{thoughttype}} to group
         </router-link>
       </div>
@@ -364,6 +388,8 @@ const Exercise1Love = Vue.component('Exercise1Love', {
 const ShowGroupLove = Vue.component('ShowGroupLove', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       situations: null,
       name: "Risks with love", 
       thoughttype: 'risk', 
@@ -401,6 +427,7 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
   },  
    template: `
   <div>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>{{ name }}</h2>
     <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
@@ -413,8 +440,11 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise1love' }">
-      Go Back 
+    <router-link tag="button" class="navbutton" :to="{ name: 'exercise1love' }">
+       <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back 
     </router-link>
   </div>
   `
@@ -423,6 +453,8 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
 const LoveFullClass = Vue.component('LoveFullClass', {
   data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Ethical awareness, risks with love",
       thoughttype: 'risk', 
       collect: 'grouprisks', 
@@ -446,11 +478,15 @@ const LoveFullClass = Vue.component('LoveFullClass', {
   }, 
   template: `
   <div> 
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
-    <router-link :to="{name: 'exercise1war' }">
+    <router-link id="right" class="navbutton" tag="button" :to="{name: 'exercise1war' }">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>`
@@ -460,6 +496,8 @@ const LoveFullClass = Vue.component('LoveFullClass', {
 const Exercise1War = Vue.component('Exercise1War', {
   data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       studentId: null,
       thought: '',
       thoughts: [],
@@ -501,7 +539,7 @@ const Exercise1War = Vue.component('Exercise1War', {
   },
   template: `
   <div id= "page">
-      {{name}}
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <h2>This exercise is about ethical awareness</h2>
       <p> This part of the exercise is to <b>identify possibilities</b> with a morally incorrect principle: <b>War</b>.</p>
       <div class="holder">
@@ -518,7 +556,7 @@ const Exercise1War = Vue.component('Exercise1War', {
         </ul>
       </div>  
       <div v-on:click="collectSituations()"> 
-        <router-link :to="{name: 'showgroupwar'}">
+        <router-link tag="button" :to="{name: 'showgroupwar'}">
           Submit {{thoughttype}} to group
         </router-link>
       </div>
@@ -530,6 +568,8 @@ const Exercise1War = Vue.component('Exercise1War', {
 const ShowGroupWar = Vue.component('ShowGroupWar', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       situations: null,
       name: "Possibillities with war", 
       thoughttype:'possibility', 
@@ -566,7 +606,8 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
   },  
    template: `
   <div>
-    <h2>Exercise 2 {{ name }}</h2>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <h2>{{ name }}</h2>
     <p>Discuss your groups list of {{text}}
     <br>Discuss and revise the list</p>
       <div class="holder">
@@ -578,8 +619,11 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise1war' }">
-      Go Back 
+    <router-link class="navbutton" tag="button" :to="{ name: 'exercise1war' }">
+       <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back 
     </router-link>
   </div>
   `
@@ -588,6 +632,8 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
 const WarFullClass = Vue.component('WarFullClass', {
   data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Provocative possibillities", 
       thoughttype:'possibility', 
   
@@ -606,11 +652,15 @@ const WarFullClass = Vue.component('WarFullClass', {
   }, 
   template: `
   <div> 
-    <h2>Exercise 2 {{ name }}</h2>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
-    <router-link :to="{name: 'start' }">
+    <router-link id="right" class="navbutton" tag="button" :to="{name: 'start' }">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>`
@@ -622,6 +672,8 @@ const Exercise2 = Vue.component('Exercise2', {
     return {
       name: "Autonomy and Heteronomy",
       studentId: null,
+      groupName: this.$groupName,
+      username: this.$username,
       staticdilemma: this.$staticdilemma,
       thought: '',
       thoughts: []
@@ -654,6 +706,7 @@ const Exercise2 = Vue.component('Exercise2', {
   },
   template: `
   <div id= "page">
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <h3>This exercise is about {{ name }} </h3>
       <div class="holder">
         <p>{{staticdilemma}}</p>
@@ -669,7 +722,7 @@ const Exercise2 = Vue.component('Exercise2', {
         </ul>
       </div>
       <div v-on:click="collectThoughts()"> 
-    <router-link to="/exercise2p1">
+    <router-link tag="button" to="/exercise2p1">
     Submit Thoughts
     </router-link>
     </div>
@@ -680,6 +733,8 @@ const Exercise2 = Vue.component('Exercise2', {
 const Exercise2p1 = Vue.component('Exercise2p1', {
   data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.1",
       studentId: null,
     }
@@ -697,16 +752,22 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
   },
   template: `
   <div> 
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your thougts.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     To add more thoughts press go back</p>
-    <router-link to="/exercise2">
-    Go back
+    <router-link tag="button" class="navbutton" to="/exercise2">
+     <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go back
     </router-link> 
-    /
-    <router-link to="/exercise2p2">
-    Continue
+    <router-link id="right" class="navbutton" tag="button" to="/exercise2p2">
+      <i class="material-icons">
+          arrow_forward
+        </i>
+      Continue
     </router-link>
   </div>`
 });
@@ -714,6 +775,8 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
 const Exercise2p2 = Vue.component('Exercise2p2', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.2",
       dilemma: "",
       notsubmitted: true,
@@ -759,6 +822,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
    
    template: `
   <div id="student">
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <p>Discuss in your group and formulate your own dilemma relevant to your occupation.</p>
         <div v-if="notsubmitted">
@@ -769,8 +833,11 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted===false"><div class="text"> {{ dilemma }}</div> 
           <button class="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
-        <router-link :to="{ name: 'exercise2p3' }">
-        Continue
+        <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p3' }">
+          <i class="material-icons">
+            arrow_forward
+          </i>
+          Continue
         </router-link>
   </div>
   `
@@ -795,15 +862,18 @@ const ReflexHelp = Vue.component('ReflexHelp', {
   },
   template: `
   <div>
-    <h1>Instructions explanation</h1>
+    <h2>Instructions explanation</h2>
       <p> This question is about the reflex thoughts that occur, for example 
         <ul><li>This is someone elses responsibility and does not apply to me, so I'll ignore it</li></ul>
         Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
         Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link :to="{ name: 'exercise2p3'}">
-        Back
+      <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p3'}">
+         <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back
       </router-link>
   </div>`
   });
@@ -812,6 +882,8 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
   //TODO: This is individual
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.3: Reflex thoughts",
       notsubmitted: true,
       studentId: null,
@@ -850,6 +922,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
    
    template: `
   <div>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'reflexhelp'}">
@@ -874,7 +947,10 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
         </ul>
       </div>
       <div v-on:click="collectReflexThoughts()">
-    <router-link :to="{ name: 'exercise2p4'}">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p4'}">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
     </div>
@@ -886,6 +962,8 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
 const Exercise2p4 = Vue.component('Exercise2p4', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.4: Show groups reflex thoughts",
       dilemma: "",
       reflexthoughts: null
@@ -913,6 +991,7 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
    
    template: `
   <div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <p>Group thoughts
     <br>What is the first thing you think about? </p>
@@ -926,10 +1005,16 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p3'} ">
-      Go Back /
+    <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p3'} ">
+       <i id="left" class="material-icons">
+           arrow_back
+          </i>
+       Go Back 
     </router-link>
-    <router-link :to="{ name: 'exercise2p5'} ">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p5'} ">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>
@@ -956,7 +1041,7 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
   },
     template: `
   <div>
-    <h1>Instructions explanation</h1>
+    <h2>Instructions explanation</h2>
       <p> This question is about the big principles which one believes or fixations by something, for example 
         <ul><li>Our company's reputation is very important!</li></ul>
         These principles are the reason for the moral dilemma since you can't follow them all.
@@ -964,8 +1049,11 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
         Think about principle fixations of other perspectives, you don't need to agree with all.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link :to="{ name: 'exercise2p5'} ">
-        Back
+      <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p5'} ">
+         <i id="left" class="material-icons">
+           arrow_back
+          </i>
+        Go Back
       </router-link>
   </div>`
   });
@@ -974,6 +1062,8 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
 const Exercise2p5 = Vue.component('Exercise2p5', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.5: Principle fixations",
       notsubmitted: true,
       studentId: null,
@@ -1011,6 +1101,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
    
    template: `
   <div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'principlehelp'} " >
@@ -1036,7 +1127,10 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
         </ul>
       </div>
       <div v-on:click="collectPrinciples()">
-    <router-link :to="{ name: 'exercise2p6' }">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p6' }">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
     </div>
@@ -1048,6 +1142,8 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
 const Exercise2p6 = Vue.component('Exercise2p6', {
  data: function() {
     return {
+      groupName: this.$groupName,
+      username: this.$username,
       name: "Autonomy and Heteronomy part 2.6: Show groups principles",
       dilemma: "",
       principles: null
@@ -1073,6 +1169,7 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
    
    template: `
   <div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <p>Group thoughts
     <br>If you fixate by a principle will make you bild to the others </p>
@@ -1086,10 +1183,16 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p5'} ">
-      Go Back /
+    <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p5'} ">
+      <i id="left" class="material-icons">
+           arrow_back
+          </i>
+         Go Back 
     </router-link>
-    <router-link :to="{ name: 'exercise2p7'} ">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p7'} ">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>
@@ -1117,7 +1220,7 @@ const ValueHelp = Vue.component('ValueHelp', {
 
   template: `
   <div>
-    <h1>Instructions explanation</h1>
+    <h2>Instructions explanation</h2>
       <p> This question is about the interests and concrete values of the concerned parties, for example 
         <ul><li>Do we want to implement this customer's demand?</li></ul>
         There is a risk to leave out relevant arguments here, to eliminate that risk try to first
@@ -1125,8 +1228,11 @@ const ValueHelp = Vue.component('ValueHelp', {
         but always question your conclusions. Discuss in group what values, interests duties feelings etc these parties have.
         Be critical and prepared to go back and revise your conclusions.
       </p>
-      <router-link :to="{ name: 'exercise2p7' } ">
-        Back
+      <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p7' } ">
+         <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back
       </router-link>
   </div>`
   });
@@ -1136,6 +1242,8 @@ const ValueHelp = Vue.component('ValueHelp', {
 const Exercise2p7 = Vue.component('Exercise2p7', {
  data: function() {
     return {
+      username: this.$username,
+      groupName: this.$groupName,
       name: "Autonomy and Heteronomy part 2.7: Concrete and relevant values",
       notsubmitted: true,
       studentId: null,
@@ -1177,6 +1285,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
    
    template: `
   <div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'valuehelp'} ">
@@ -1201,7 +1310,10 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
         </ul>
       </div>
       <div v-on:click="collectConcreteValues()">
-    <router-link :to="{ name: 'exercise2p8showvalues'}">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p8showvalues'}">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
     </div>
@@ -1212,6 +1324,8 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
 const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
  data: function() {
     return {
+      username: this.$username,
+      groupName: this.$groupName,
       name: "Autonomy and Heteronomy part 2.8: Show groups stakeholder values",
       dilemma: "",
       concreteValues: null
@@ -1248,10 +1362,16 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p7'} ">
-      Go Back /
+    <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p7'} ">
+      <i id="left" class="material-icons">
+           arrow_back
+          </i>
+         Go Back 
     </router-link>
-    <router-link :to="{ name: 'exercise2p9'} ">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p9'} ">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>
@@ -1278,14 +1398,17 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
 
   template: `
   <div>
-    <h1>Instructions explanation</h1>
+    <h2>Instructions explanation</h2>
       <p> This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example
         <ul><li>actionoption first, with this action how are we going to make it financially?</li></ul>
         Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
         There is always a risk to miss a good action alternative, so be prepared to go back and revise the list of action alternatives.
       </p>
-      <router-link :to="{ name: 'exercise2p9'} ">
-        Back
+      <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p9'} ">
+         <i id="left" class="material-icons">
+           arrow_back
+          </i>
+          Go Back
       </router-link>
   </div>`
   });
@@ -1295,6 +1418,8 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.9: Action alternatives and relevant values",
+      username: this.$username,
+      groupName: this.$groupName,
       notsubmitted: true,
       studentId: null,
       actionAlternative: "",
@@ -1334,6 +1459,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
    
    template: `
   <div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'actionoptionhelp'} ">
@@ -1358,7 +1484,10 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
         </ul>
       </div>
       <div v-on:click="collectActionAlternatives()">
-    <router-link :to="{ name: 'exercise2p9showalter'}">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p9showalter'}">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
     </div>
@@ -1370,6 +1499,8 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.9: Show groups action alternatives and values",
+      username: this.$username,
+      groupName: this.$groupName,
       dilemma: "",
       actionAlternatives: null
   }
@@ -1408,10 +1539,16 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
           </li>
         </ul>
       </div>
-    <router-link :to="{ name: 'exercise2p9'} ">
-      Go Back /
+    <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p9'} ">
+      <i id="left" class="material-icons">
+           arrow_back
+          </i>
+         Go Back 
     </router-link>
-    <router-link :to="{ name: 'summary'} ">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'summary'} ">
+      <i class="material-icons">
+          arrow_forward
+        </i>
       Continue
     </router-link>
   </div>
@@ -1422,6 +1559,8 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
 const Summary = Vue.component('Summary', {
  data: function() {
     return {
+      username: this.$username,
+      groupName: this.$groupName,
       name: "Summary",
       dilemma: "",
       
@@ -1606,6 +1745,8 @@ const Summary = Vue.component('Summary', {
 const StudentVote = Vue.component('StudentVote', {
   data: function() {
     return {
+      username: this.$username,
+      groupName: this.$groupName,
       thought: '',
       thoughts: [],
       staticdilemma: this.$staticdilemma,
@@ -1694,10 +1835,9 @@ const StudentVote = Vue.component('StudentVote', {
         }
       }
   },
-  //TODO add initial dilemma here
   template: `
   <div> 
-    <h1>Inital dilemma</h1>
+    <h2>Inital dilemma</h2>
     <p>{{staticdilemma}}</p>
     <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
@@ -1712,7 +1852,12 @@ const StudentVote = Vue.component('StudentVote', {
       </div>
     
     </div>
-    <router-link to="/summary">Go back</router-link> 
+    <router-link class="navbutton" tag="button" to="/summary">
+      <i id="left" class="material-icons">
+        arrow_back
+      </i>
+      Go back
+    </router-link> 
   </div>`
   });
 
