@@ -377,7 +377,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
       </div>  
       <div v-on:click="collectSituations()"> 
         <router-link tag="button" :to="{name: 'showgrouplove'}">
-          Submit {{thoughttype}} to group
+          Submit {{thoughttype}}s to group
         </router-link>
       </div>
     </div>
@@ -502,13 +502,13 @@ const Exercise1War = Vue.component('Exercise1War', {
       thought: '',
       thoughts: [],
       
-      name: "Provocative possibillities", 
+      name: "Provocative possibilities", 
       thoughttype:'possibility', 
       collect: 'groupposs', 
       showing: 'showgroupposs', 
       remove: 'removeposs',
       example:'War is a way to solve a conflict',
-      text: 'possibilies with war'
+      text: 'possibilities with war'
       
    }
      
@@ -557,7 +557,7 @@ const Exercise1War = Vue.component('Exercise1War', {
       </div>  
       <div v-on:click="collectSituations()"> 
         <router-link tag="button" :to="{name: 'showgroupwar'}">
-          Submit {{thoughttype}} to group
+          Submit possibilities to group
         </router-link>
       </div>
     </div>
@@ -571,13 +571,13 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
       groupName: this.$groupName,
       username: this.$username,
       situations: null,
-      name: "Possibillities with war", 
+      name: "Possibilities with war", 
       thoughttype:'possibility', 
       collect: 'groupposs', 
       showing: 'showgroupposs', 
       remove: 'removeposs',
       example:'War is a way to solve a conflict',
-      text: 'possibilies with war'
+      text: 'possibilties with war'
      
    }
  },
@@ -634,7 +634,7 @@ const WarFullClass = Vue.component('WarFullClass', {
     return {
       groupName: this.$groupName,
       username: this.$username,
-      name: "Provocative possibillities", 
+      name: "Provocative possibilities", 
       thoughttype:'possibility', 
   
     }
@@ -1683,10 +1683,10 @@ const Summary = Vue.component('Summary', {
     This is your groups dilemma: <br>
     {{dilemma}} <br>
     <div class="wrapper" v-if="submitted==false">
-      <div class="box a"><h2>A. Heteronomy</h2></div>
-        <div class="box b"><h2>B. Autonomy</h2></div>
+      <div class="box a"><h2>Heteronomy</h2></div>
+        <div class="box b"><h2>Autonomy</h2></div>
         <div class="box c">
-          <div class="box g"><h3>G. Reflex thoughts</h3>
+          <div class="box g"><h3>Reflex thoughts</h3>
             <form @submit.prevent="addinput('reflex')">
               <input type="text" placeholder="Enter additional reflex thoughts..." v-model="reflex">
             </form> 
@@ -1697,7 +1697,7 @@ const Summary = Vue.component('Summary', {
               </li>
             </ul>
           </div>
-          <div class="box h"><h3>H. Dogmatic fixations</h3> 
+          <div class="box h"><h3>Dogmatic fixations</h3> 
             <form @submit.prevent="addinput('principle')">
               <input type="text" placeholder="Enter additional principle thoughts..." v-model="principle">
             </form> 
@@ -1710,7 +1710,7 @@ const Summary = Vue.component('Summary', {
           </div>
         </div>
         <div class="box d">
-          <div class="box e"><h3>E. Concrete Values</h3>
+          <div class="box e"><h3>Concrete Values</h3>
           <form @submit.prevent="addinput('concretevalue')">
               <input type="text" placeholder="Enter additional value thoughts..." v-model="concreteValue">
             </form> 
@@ -1721,7 +1721,7 @@ const Summary = Vue.component('Summary', {
               </li>
             </ul> 
           </div>
-          <div class="box f"><h3>F. Action alternatives and Values</h3>
+          <div class="box f"><h3>Action alternatives and Values</h3>
             <form @submit.prevent="addinput('actionalternative')">
               <input type="text" placeholder="Enter additional action alternatives..." v-model="actionAlternative">
             </form> 

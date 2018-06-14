@@ -84,7 +84,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       </ul>
       <form @submit.prevent="generateGroups(numEachGroup)">
         Enter number of student in each group<br>
-        <input type="number" min="0" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
+        <input type="number" min="1" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
         <br>
         <button v-if="this.groupObject==null" type="submit" class="button" >Generate groups</button>
       </form>
@@ -125,7 +125,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
-    socket.emit('generateGroups', n);
+    socket.emit('generateGroups', {groupSize: n});
     console.log("start generate: " + n); 
     }
  }
@@ -142,8 +142,11 @@ const workshopExercises = Vue.component('WorkshopExercises', {
     };
   },
    template: `
-    <div> 
+    <div>
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+      <nav>
+        <router-link to="/settings">Clear Input</router-link>
+      </nav>
       <div id="contain">
           <div class="containheader1">
             <h2>Exercise 1: <br> Ethical awareness</h2>
@@ -184,6 +187,40 @@ const workshopExercises = Vue.component('WorkshopExercises', {
       socket.emit("navigateStudentsToComp", exercisecomp);
     }
   }
+});
+
+const Settings = Vue.component('Settings', {
+ 
+  data: function() {
+    return {
+      responseShow: false,
+      response: "All exercise input deleted.",
+       session: this.$session,
+    }
+  },
+  methods: {
+  clearAllInput() {
+      socket.emit('clearallinput', 'message');
+      this.responseShow = true;
+    }
+  },
+  template: `
+  <div>
+   <h2>You can do stuff here</h2>
+   <p>This will delete all input the participants has added to the workshop.</p>
+   <button id="right" class="smallbutton" v-on:click="clearAllInput()">
+      Clear all input
+    </button>
+   <p id="textleft" v-if="responseShow">{{response}}</p>
+    <router-link tag="button" class="navbutton" to="/workshopexercises">
+      <i id="left" class="material-icons">
+        arrow_back
+      </i>
+      Go Back
+    </router-link>
+  </div>
+`
+  
 });
 
 const Provocative1 = Vue.component('provocative1', {
@@ -257,7 +294,7 @@ const Provocative2love = Vue.component('provocative2love', {
   },
   created: function() {
     socket.on('collectrisks', function(risks) {
-      if (risk != null) {
+      if (risks != null) {
         this.thoughts = risks;
         console.log(risks);
       }
@@ -480,7 +517,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
         </button>
       </div>
         <div v-if="displayreflex">
-          <p>Write down your instinctive thoughts about this dilemma.<br>
+          <p>Write down your <b>instinctive thoughts</b> about this dilemma.<br>
             This is Individuall, but discuss with your group.</p>
         </div>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy1">
@@ -511,7 +548,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <p>Write down principlee fixations about this dilemma.<br>
+    <p>Write down <b>principle fixations about</b> this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy2">
         <i id="left" class="material-icons">
@@ -541,7 +578,7 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <p>Write down concrete values about this dilemma.<br>
+    <p>Write down <b>concrete values</b> about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy3">
         <i id="left" class="material-icons">
@@ -572,7 +609,7 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <p>Write down what can be done about this dilemma.<br>
+    <p>Write down what <b>can be done</b> about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
       <router-link tag="button" class="navbutton" to="/autonomyheteronomy4">
         <i id="left" class="material-icons">
@@ -929,7 +966,13 @@ const router = new VueRouter({
       //voting on the inital dilemma input, autonomy or heteronomy?
       path:'/vote',
       component:Vote
+    },
+    {
+      //delete input from server
+      path:'/settings',
+      component:Settings
     }
+ 
  
  
   ]
