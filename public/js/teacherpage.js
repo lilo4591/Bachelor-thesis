@@ -68,7 +68,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       name: 'Startworkshop',
       student: '',
       students: [],
-      token: this.$session,
+      session: this.$session,
       numEachGroup: null,
       groupObject: null,
     };
@@ -76,9 +76,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
    template: `
  
     <div id="app">
-     Component: {{name}}
-      
-      <h2>Log in to localhost:3000/student with sessiontoken {{ token }} </h2>
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+      <h2>Log in to localhost:3000/student with sessiontoken {{ session }} </h2>
       <ul>
         <li v-for="(data, index) in students" :key='index'>
           {{students[index]}} has connected</li>
@@ -135,6 +134,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
 const workshopExercises = Vue.component('WorkshopExercises', {
   data: function() {
     return {
+      session: this.$session,
       name: 'workshopExercises',
       exerciseOptions: [
         "Exercise 1: Let's go!", "Exercise 2: Let's go!", "Exercise 3", "Exercise 4"
@@ -143,6 +143,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
   },
    template: `
     <div> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <div id="contain">
           <div class="containheader1">
             <h2>Exercise 1: <br> Ethical awareness</h2>
@@ -188,14 +189,17 @@ const workshopExercises = Vue.component('WorkshopExercises', {
 const Provocative1 = Vue.component('provocative1', {
   data: function() {
     return {
+      session: this.$session,
       thought: '',
       thoughts: []
     }
   },
   created: function() {
     socket.on('collectsituations', function(situations) {
-      this.thoughts = situations;
-      console.log(situations);
+      if (situations != null) {
+        this.thoughts = situations;
+        console.log(situations);
+      }
   }.bind(this));
   },
   methods: {
@@ -213,6 +217,7 @@ const Provocative1 = Vue.component('provocative1', {
   },
   template: `
   <div id= "page">
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
       <div class="holder">
@@ -245,15 +250,17 @@ const Provocative1 = Vue.component('provocative1', {
 const Provocative2love = Vue.component('provocative2love', {
   data: function() {
     return {
+      session: this.$session,
       thought: '',
       thoughts: [],
-      uppgift: 'collectrisks'
     }
   },
   created: function() {
-    socket.on(this.uppgift, function(risks) {
-      this.thoughts = risks;
-      console.log(risks);
+    socket.on('collectrisks', function(risks) {
+      if (risk != null) {
+        this.thoughts = risks;
+        console.log(risks);
+      }
   }.bind(this));
   },
   methods: {
@@ -272,6 +279,7 @@ const Provocative2love = Vue.component('provocative2love', {
   //TODO generate loverisks arguments from txtfile or db
   template: `
   <div id= "page">
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
       <div class="holder">
@@ -304,13 +312,17 @@ const Provocative2love = Vue.component('provocative2love', {
 const Provocative3War = Vue.component('provocative3war', {
   data: function() {
     return {
+      session: this.$session,
+      groupObject: null,
       thought: '',
       thoughts: [],
     }
   },
   created: function() {
     socket.on('collectposs', function(poss) {
-      this.thoughts = poss;
+      if (poss != null) {
+        this.thoughts = poss;
+      }
   }.bind(this));
   },
   methods: {
@@ -325,6 +337,7 @@ const Provocative3War = Vue.component('provocative3war', {
   //TODO generate arguments from txtfile or db
   template: `
   <div id= "page">
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
       <div class="holder">
@@ -354,12 +367,18 @@ const Provocative3War = Vue.component('provocative3war', {
 });
 
 const ProvocativeConclusion = Vue.component('provocativeConclusion', {
+  data: function() {
+    return {
+      session: this.$session,
+    };
+  },
 
 
 template:
 
 `
 <div id="app">
+  <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
   <h2>To Conclude</h2>
   <p>By managing to come up with several risks and possibilites with these examples
     one realizes that many things that you take for granted can be questioned.</p>
@@ -382,6 +401,7 @@ template:
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   data: function() {
     return {
+      session: this.$session,
       staticdilemma: this.$staticdilemma,
       thought: '',
       thoughts: [
@@ -408,6 +428,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   //TODO: add dilemma here
   template: `
   <div id= "page">
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Starting with an example dilemma</h2>
       <p>{{staticdilemma}}</p>
       <div class="holder">
@@ -438,6 +459,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
 const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   data: function() {
     return {
+      session: this.$session,
       name: "autonomyHeteronomy2",
       displayreflex: false
     }
@@ -449,6 +471,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   }, 
  template: `
   <div id="app"> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <p v-if="displayreflex===false">Formulate your own dilemma in your groups</p>
   
       <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
@@ -481,11 +504,13 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
 const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
   data: function() {
     return {
+      session: this.$session,
       name: "autonomyHeteronomy3"
     }
   }, 
  template: `
   <div id="app"> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <p>Write down principlee fixations about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy2">
@@ -509,11 +534,13 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
 const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
   data: function() {
     return {
+      session: this.$session,
       name: "autonomyHeteronomy4"
     }
   }, 
  template: `
   <div id="app"> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <p>Write down concrete values about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy3">
@@ -538,11 +565,13 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
 const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
   data: function() {
     return {
+      session: this.$session,
       name: "autonomyHeteronomy5"
     }
   }, 
  template: `
   <div id="app"> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <p>Write down what can be done about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
       <router-link tag="button" class="navbutton" to="/autonomyheteronomy4">
@@ -565,6 +594,7 @@ var analysis = Vue.component('analysis', {
   data: function() {
     return {
       groupsanalys: this.$analys,
+      session: this.$session
     }
   
   },
@@ -599,6 +629,7 @@ var analysis = Vue.component('analysis', {
 
   template:`
   <div id="app">
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <h3>Presentation</h3>
     <p id="boldtext">The goal with this exercise was to learn to differentiate between the different ways of thinking,
       Heteronomy and Autonomy and thus becoming more concious of one owns thoughtprocess and being able to controll it. 
@@ -638,6 +669,7 @@ var analysis = Vue.component('analysis', {
 const showAnalysis = Vue.component('showAnalysis', {
   data:function() {
     return {
+      session: this.$session,
       dilemma: "",
       group: "",
       actionAlternatives: [],
@@ -657,21 +689,23 @@ const showAnalysis = Vue.component('showAnalysis', {
   },
 
   template: `
-  <div> <h2>This is a summary of {{group}}'s analysis</h2>
+  <div> 
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <h2>This is a summary of {{group}}'s analysis</h2>
     This is your groups dilemma: <br>
     {{dilemma}}
     <div class="wrapper">
-      <div class="box a"><h2>A. Heteronomy</h2></div>
-        <div class="box b"><h2>B. Autonomy</h2></div>
+      <div class="box a"><h2>Heteronomy</h2></div>
+        <div class="box b"><h2>Autonomy</h2></div>
         <div class="box c">
-          <div class="box g"><h3>G. Reflex thoughts</h3>
+          <div class="box g"><h3>Reflex thoughts</h3>
             <ul class="summaryList">
               <li v-for="(data, index) in reflexthoughts" :key='index'> 
                 {{data.reflex}}
               </li>
             </ul>
           </div>
-          <div class="box h"><h3>H. Dogmatic fixations</h3> 
+          <div class="box h"><h3>Dogmatic fixations</h3> 
             <ul class="summaryList">
               <li v-for="(data, index) in principles" :key='index'> 
                 {{data.principle}}
@@ -680,14 +714,14 @@ const showAnalysis = Vue.component('showAnalysis', {
           </div>
         </div>
         <div class="box d">
-          <div class="box e"><h3>E. Concrete Values</h3>
+          <div class="box e"><h3>Concrete Values</h3>
             <ul class="summaryList">
               <li v-for="(data, index) in concreteValues" :key='index'> 
                 {{data.concreteValue}}
               </li>
             </ul> 
           </div>
-          <div class="box f"><h3>F. Action alternatives and Values</h3>
+          <div class="box f"><h3>Action alternatives and Values</h3>
             <ul class="summaryList">
               <li v-for="(data, index) in actionAlternatives" :key='index'> 
                 {{data.actionAlternative}}
@@ -710,6 +744,7 @@ const showAnalysis = Vue.component('showAnalysis', {
 const Vote = Vue.component('Vote', {
   data: function() {
     return {
+      session: this.$session,
       thought: '',
       thoughts: null,
       staticdilemma: this.$staticdilemma,
@@ -788,7 +823,8 @@ const Vote = Vue.component('Vote', {
   //TODO add initial dilemma here
   template: `
   <div> 
-    <h1>Inital dilemma</h1>
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <h2>Inital dilemma</h2>
     <p>{{ staticdilemma }}</p>
     <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
@@ -907,7 +943,7 @@ const app = new Vue({
   data () {
     return {
       name: 'Workshop',
-      token: null,
+      session: null,
       thoughts: [],
     }
   },

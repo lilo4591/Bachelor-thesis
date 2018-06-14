@@ -301,11 +301,11 @@ i {
   grid-template-rows: repeat(2, [row] auto  );
   background-color: #fff;
   color: #444;
-
+  width: 1100px;
 }
 
 .box {
-  background-color: #444;
+  background: #5b97f0;
   color: #fff;
   border-radius: 5px;
   padding: 20px;
@@ -313,10 +313,12 @@ i {
 
 }
 
+.box h2 { 
+  color: white;
+}
+
 .box .box {
-  background-color: #EEEEEE;
-  /*background-color: #E0EDF4;
-  background-color: #ccc;*/
+  background-color: #fff;
   color: #444;
 }
 
