@@ -14,7 +14,7 @@ Vue.prototype.$staticdilemma =
 "A student are conducting her master thesis at the university. " +
   "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
   "To test this algorithm the student implements a system that uses the algorithm to hack into different companies systems. " +
-  "The algorithm manages to find a few vulnerability on the different companies systems and this is added to the report. " +
+  "The algorithm manages to find a few vulnerabilities on the different companies systems and this is added to the report. " +
   "Her professor is both impressed with her ability also concerned. " +
   "One of the companies security team notice that they have been attacked and can track the attack back to the student and are planning to press charges. " +
   "But the student however didn't do any damage to the companies system and claims that she did them a favor, because now they can make their systems more secure."
@@ -26,8 +26,8 @@ const Help = Vue.component('Help', {
   template: `
   <div> <h1>What is this?</h1>
   <p>This is a workshop with exercises about ethical competence. You will learn different ways to think 
-  and to handle moral issues. It's completely anonymous, you log in with a sessiontoken and a username of your choice.
-  The username will not be visible to your peers. After you log in the teacher will generate groups and you should find the people in the same group as you,
+  and to handle moral issues. It's completely anonymous, you log in with a sessiontoken and a username of your choice. 
+  After you log in the teacher will generate groups and you should find the people in the same group as you,
   to be able to discuss the exercises with them, however when you enter input to the system you will always be anonymous.</p>
         <router-link tag="button" class="navbutton" to="/">
           <i id="left" class="material-icons">
@@ -176,15 +176,15 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-      <h2>This exercise is about ethical awareness</h2>
-      <p> The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication at all</b>.</p>
+      <h2>Ethical awareness</h2>
+      <p>Try to come up with <b>real life situations</b> which has <b>no moral implications at all</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
         <p>These are your {{thoughttype}}s</p>
         <ul>
-          <li>Example {{thoughttype}}: {{example}}.</li>
+          <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
@@ -208,7 +208,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
       groupName: this.$groupName,
       username: this.$username,
 
-      name: "Ethical awareness, Situations", 
+      name: "Ethical awareness, situations", 
       thoughttype:'situation', 
       collect: 'groupsituations', 
       showing: 'showgroupsituations',
@@ -271,7 +271,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
 const SituationsFullClass = Vue.component('SituationsFullClass', {
   data: function() {
     return {
-      name: "Ethical awareness, situations part 1.2",
+      name: "Ethical awareness, situations",
       groupName: this.$groupName,
       username: this.$username,
     
@@ -360,15 +360,15 @@ const Exercise1Love = Vue.component('Exercise1Love', {
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-      <h2>This exercise is about ethical awareness</h2>
-      <p>This part of the exercise is to <b> identify risks</b> with a morally correct principle: <b>Love.</b></p>
+      <h2>Ethical awareness</h2>
+      <p><b> Identify risks</b> with a morally correct principle: <b>Love.</b></p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
         <p>These are your {{thoughttype}}s</p>
         <ul>
-          <li>Example {{thoughttype}}: {{example}}.</li>
+          <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
@@ -540,15 +540,15 @@ const Exercise1War = Vue.component('Exercise1War', {
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-      <h2>This exercise is about ethical awareness</h2>
-      <p> This part of the exercise is to <b>identify possibilities</b> with a morally incorrect principle: <b>War</b>.</p>
+      <h2>Ethical awareness</h2>
+      <p><b>Identify possibilities</b> with a morally incorrect principle: <b>War</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
         <p>These are your {{thoughttype}}s</p>
         <ul>
-          <li>Example {{thoughttype}}: {{example}}.</li>
+          <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
@@ -653,8 +653,8 @@ const WarFullClass = Vue.component('WarFullClass', {
   template: `
   <div> 
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>{{ name }}</h2>
-    <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
+    <h2>Ethical awareness, possibilites.</h2>
+    <p>Please have a look at the bigger screen and discuss your possibilities.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     You can not add more {{thoughttype}}s now.</p>
     <router-link id="right" class="navbutton" tag="button" :to="{name: 'start' }">
@@ -707,13 +707,13 @@ const Exercise2 = Vue.component('Exercise2', {
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-      <h3>This exercise is about {{ name }} </h3>
+      <p id="boldtext">Adopt this dilemma and try to solve it. Then write down your most important thoughts.</p>
       <div class="holder">
         <p>{{staticdilemma}}</p>
         <form @submit.prevent="addThought">
-          <input type="text" placeholder="Enter your thoughts here plx..." v-model="thought">
+          <input type="text" placeholder="Enter your thoughts here plz..." v-model="thought">
         </form> 
-        <ul><li>Example: I think this is wrong because of current laws..</li></ul>
+        <ul><li class="example">Example: It's illegal, therefor its wrong..</li></ul>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
@@ -753,8 +753,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
   template: `
   <div> 
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Please have a look at the bigger screen and discuss your thougts.<br>
+    <p>Please have a look at the bigger screen and discuss your thoughts.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     To add more thoughts press go back</p>
     <router-link tag="button" class="navbutton" to="/exercise2">
@@ -823,8 +822,8 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
    template: `
   <div id="student">
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Discuss in your group and formulate your own dilemma relevant to your occupation.</p>
+    <p>Discuss in your group and formulate a dilemma together. The dilemma should be one that you are facing
+      now in your proffession, school or in your private life.</p>
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
           </textarea>
@@ -862,7 +861,6 @@ const ReflexHelp = Vue.component('ReflexHelp', {
   },
   template: `
   <div>
-    <h2>Instructions explanation</h2>
       <p> This question is about the reflex thoughts that occur, for example 
         <ul><li>This is someone elses responsibility and does not apply to me, so I'll ignore it</li></ul>
         Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
@@ -923,22 +921,20 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
    template: `
   <div>
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'reflexhelp'}">
         Explain More!
       </router-link>
     </nav>
-    <p>Discuss in your group.
-    <br>What is the first things that comes to your mind?</p> 
+    <p>Discuss in your group but individually write the first things that comes to your mind when you consider this dilemma?</p> 
      Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here plx..." v-model="reflex">
         </form> 
-        <p>These are your reflex thoughts</p>
-        <ul><li>Example thought: If I don't do this someone else will do it!</li></ul>
+        <p>These are your reflex thoughts, press continue to submit to group</p>
+        <ul><li class="example">Example thought: If I don't do this someone else will do it!</li></ul>
         <ul>
           <li v-for="(data, index) in reflexthoughts" :key='index'> 
             {{data.reflex}}
@@ -992,9 +988,8 @@ const Exercise2p4 = Vue.component('Exercise2p4', {
    template: `
   <div>
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Group thoughts
-    <br>What is the first thing you think about? </p>
+    <p>Discuss in your group! What is the first things you think about?<br>
+    These are thoughts that means that you dont want to deal with or take your responsibility for the dilemma.</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -1102,14 +1097,12 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
    template: `
   <div>
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'principlehelp'} " >
         Explain More!
       </router-link>
     </nav>
-     <p>Discuss with your group.
-    Individually write down principles fixations that relates to the dilemma.
+     <p>Discuss in your group but individually write down principles fixations that relates to the dilemma.
     Write all principles you can come up with, independent of the solution you want to come to.</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
@@ -1117,8 +1110,8 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
         <form @submit.prevent="addPrinciple">
           <input type="text" placeholder="Enter your principle here plx..." v-model="principle">
         </form> 
-        <p>These are your principles</p>
-        <ul><li>Example principle: You have to follow the law....</li></ul>
+        <p>These are your principles, press continue to submit them to your group.</p>
+        <ul><li class="example">Example principle: You have to follow the law....</li></ul>
         <ul>
           <li v-for="(data, index) in principles" :key='index'> 
             {{data.principle}}
@@ -1170,8 +1163,7 @@ const Exercise2p6 = Vue.component('Exercise2p6', {
    template: `
   <div>
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Group thoughts
+    <p>Group thoughts on principles, discuss with your group!
     <br>If you fixate by a principle will make you bild to the others </p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
@@ -1220,7 +1212,6 @@ const ValueHelp = Vue.component('ValueHelp', {
 
   template: `
   <div>
-    <h2>Instructions explanation</h2>
       <p> This question is about the interests and concrete values of the concerned parties, for example 
         <ul><li>Do we want to implement this customer's demand?</li></ul>
         There is a risk to leave out relevant arguments here, to eliminate that risk try to first
@@ -1286,23 +1277,22 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
    template: `
   <div>
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'valuehelp'} ">
         Explain More!
       </router-link>
      </nav>
     <p>Discuss with your group.
-    <br>Think about the stakeholders the dilemma concerns and individually write down their values.</p>
+    <br>Think about and define the different parties the dilemma concerns and individually write down what their values and interests are.</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addConcreteValue">
           <input type="text" placeholder="Enter your value here plx..." v-model="concreteValue">
         </form> 
-        <p>These are your stakeholder values</p>
+        <p>These are your stakeholder values, press continue to submit them to your group</p>
         <ul>
-        <li>Example value: Is the collaboration with this customer important.?..</li>
+        <li class="example">Example value: Is the collaboration with this customer important.?..</li>
           <li v-for="(data, index) in concreteValues" :key='index'> 
             {{data.concreteValue}}
             <i class="material-icons" v-on:click="removeConcreteValue(index)">delete</i>
@@ -1350,8 +1340,7 @@ const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
    
    template: `
   <div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Group thoughts</p>
+    <p>Group thoughts on all the concerned parties values and interests</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -1402,7 +1391,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
       <p> This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example
         <ul><li>actionoption first, with this action how are we going to make it financially?</li></ul>
         Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
-        There is always a risk to miss a good action alternative, so be prepared to go back and revise the list of action alternatives.
+        There is always a risk to miss a good action alternative, so be prepared to revise the list of action alternatives later.
       </p>
       <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p9'} ">
          <i id="left" class="material-icons">
@@ -1460,23 +1449,22 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
    template: `
   <div>
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>Exercise 2 {{ name }}</h2>
     <nav>
       <router-link :to="{ name: 'actionoptionhelp'} ">
         Explain More!
       </router-link>
      </nav>
     <p>Discuss with your group.<br>
-    What possible actions could one take and how does that effect the values from the previous question?</p>
+    Individually write down what possible actions could one take and how does that effect the values from the previous question?</p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addActionAlternative()">
           <input type="text" placeholder="Enter your action alternative here plx..." v-model="actionAlternative">
         </form> 
-        <p>These are your action alternatives and their effects</p>
+        <p>These are your action alternatives and their effects, press continue to submit them to your group.</p>
         <ul>
-        <li>Example: state an action alternative, how will this affect our reputation?</li>
+        <li class="example">Example: state an action alternative, how will this affect our reputation?</li>
           <li v-for="(data, index) in actionAlternatives" :key='index'> 
             {{data.actionAlternative}}
             <i class="material-icons" v-on:click="removeActionAlternative(index)">delete</i>
@@ -1527,8 +1515,8 @@ const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
    
    template: `
   <div>
-    <h2>Exercise 2 {{ name }}</h2>
-    <p>Group thoughts</p>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <p>Group thoughts on action alternatives. These are all action alternatives that your group find relevant. </p>
       Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -1677,7 +1665,9 @@ const Summary = Vue.component('Summary', {
     }
   },
   template: `
-  <div> <h2>This is a summary of your group's analysis</h2>
+  <div> 
+  <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+  <h2>This is a summary of your group's analysis</h2>
   <p v-if="submitted==false">You may change your analysis</p>
     <p v-if="submitted">Your analysis is now submitted, wait for your turn to present it!</p>
     This is your groups dilemma: <br>
@@ -1735,7 +1725,13 @@ const Summary = Vue.component('Summary', {
         </div>
     </div>
     <button v-if="submitted==false" class="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
-    <br><router-link v-if="submitted==true" to="/studentvote">Next</router-link>
+    <br>
+    <router-link tag="button" class="navbutton" v-if="submitted==true" to="/studentvote">
+    <i class="material-icons">
+          arrow_forward
+        </i>
+      Next
+    </router-link>
   </div>
     `
 
@@ -1837,9 +1833,10 @@ const StudentVote = Vue.component('StudentVote', {
   },
   template: `
   <div> 
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Inital dilemma</h2>
+    <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <p>{{staticdilemma}}</p>
-    <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
         <ul>

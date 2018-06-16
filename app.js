@@ -54,7 +54,7 @@ function Data() {
   //generated arguments for love risks
   this.generatedRisks = [ {thought: 'You miss the chance of someone elses love'}, {thought: 'Love can cause mental illness'}];
   //generated arguments for war possibilies
-  this.generatedPoss = [{thought: 'War can liberated oppressed people'}, 
+  this.generatedPoss = [{thought: 'War can liberate oppressed people'}, 
                         {thought: 'War can build strong state capacity'}, 
                         {thought: 'War defines the future of a civilization'}, 
                         {thought: 'War can unite a nation'}];
@@ -322,12 +322,7 @@ var studentconnection = studentsio.on('connection', socket => {
   /** 
     Relevant to exercise 2: heteronomy autonomy  
   **/
-    //listening for teacher to want to display the inital dilemma thoughts
-  socket.on('initialThoughts', function(message) {
-      socket.emit('displayInitialThoughts', data.thoughts);
-    });
-
-  socket.on('thoughts', function(thoughts) {
+   socket.on('thoughts', function(thoughts) {
 
     for ( var i = 0, l = thoughts.length; i < l; i++) {
       data.addThought(thoughts[i]);
@@ -376,15 +371,22 @@ var teacherconnection = io.on('connection', function(socket) {
     socket.on('wantsituations', function() {
       var allsituations = [];
       for (var i in data.groupNames) {
-       allsituations = allsituations.concat(data.groupSituations[data.groupNames[i]]);
+        if (data.groupSituations[data.groupNames[i]] != null) {
+          console.log("collecting situations from " + data.groupNames[i]);
+          allsituations = allsituations.concat(data.groupSituations[data.groupNames[i]]);
+        }
       }
+      console.log("all situations" + allsituations);
       io.emit('collectsituations', allsituations);
     });
 
   socket.on('wantrisks', function() {
       var allrisks = [];
       for (var i in data.groupNames) {
-       allrisks = allrisks.concat(data.groupRisks[data.groupNames[i]]);
+        if (data.groupRisks[data.groupNames[i]] != null) {
+          console.log("collecting risks from " + data.groupNames[i]);
+          allrisks = allrisks.concat(data.groupRisks[data.groupNames[i]]);
+        }
       }
       allrisks = data.generatedRisks.concat(allrisks);
       io.emit('collectrisks', allrisks);
@@ -393,12 +395,23 @@ var teacherconnection = io.on('connection', function(socket) {
   socket.on('wantposs', function() {
       var allposs = [];
       for (var i in data.groupNames) {
-       allposs = allposs.concat(data.groupPoss[data.groupNames[i]]);
+       if (data.groupPoss[data.groupNames[i]] != null) {
+          console.log("collecting risks from " + data.groupNames[i]);
+          allposs = allposs.concat(data.groupPoss[data.groupNames[i]]);
+       }
       }
       allposs = data.generatedPoss.concat(allposs);
       io.emit('collectposs', allposs);
     });
  
+  /**
+    Relevant to exercise 2**/
+  //listening for teacher to want to display the inital dilemma thoughts
+    socket.on('initialThoughts', function(message) {
+      console.log(message);
+      socket.emit('displayInitialThoughts', data.thoughts);
+    });
+    
   /**
     * Teacher generating groups depending on size of connected students
     **/

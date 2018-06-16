@@ -30,7 +30,12 @@ const Help = Vue.component('Help', {
     When you decide to start the workshop's exercises the students will be redirected to the first page of the exercise.
     From there the students can click their way through that exercise. The systems assumes some knowledge about the exercises from the teacher.
     </p>
-    <router-link to="/">Back</router-link>
+    <router-link tag="button" class="navbutton" to="/">
+     <i id="left" class="material-icons">
+          arrow_back
+        </i>
+      Go Back
+    </router-link>
   </div>`
   });
 
@@ -257,8 +262,8 @@ const Provocative1 = Vue.component('provocative1', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
+      <button class="button" v-on:click="collectAllSituations">End the discussion and show all group's situations</button>
       <div class="holder">
-      <button class="button" v-on:click="collectAllSituations">Show group's situations</button>
         <p>These are situations from all groups</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -319,8 +324,8 @@ const Provocative2love = Vue.component('provocative2love', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
+      <button class="button" v-on:click="collectAllRisks">End the discussion and show all group's risks</button>
       <div class="holder">
-      <button class="button" v-on:click="collectAllRisks">Show group's risks</button>
         <p>Risks with love</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -377,8 +382,8 @@ const Provocative3War = Vue.component('provocative3war', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
+      <button class="button" v-on:click="collectAll">End the discussion and show all group's possibilites</button>
       <div class="holder">
-      <button class="button" v-on:click="collectAll">Show group's possibilites</button>
         <p>Possibilies with war</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -441,9 +446,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
       session: this.$session,
       staticdilemma: this.$staticdilemma,
       thought: '',
-      thoughts: [
-        {"thought": "Example: I think this is wrong because of current laws.." }
-      ]
+      thoughts: []
     }
   },
   created: function() {
@@ -467,6 +470,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
       <h2>Starting with an example dilemma</h2>
+      <p id="boldtext">Adopt this dilemma and try to solve it. Then write your down most important thoughts.</p>
       <p>{{staticdilemma}}</p>
       <div class="holder">
         <p>These are your thoughts</p>
@@ -802,7 +806,7 @@ const Vote = Vue.component('Vote', {
     }
   },
   created: function() {
-    socket.emit('initialThoughts', 'want inital thoughts');
+    socket.emit('initialThoughts', 'want inital thoughts teacher');
     socket.on('displayInitialThoughts', function(thoughts) {
      this.thoughts = thoughts;
     //initialize component with as many poll objs as there are thoughts
@@ -857,7 +861,6 @@ const Vote = Vue.component('Vote', {
       socket.emit('navigateStudentsToComp', "start");
     }
   },
-  //TODO add initial dilemma here
   template: `
   <div> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
