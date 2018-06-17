@@ -82,7 +82,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
  
     <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-      <h2>Log in to localhost:3000/student with sessiontoken {{ session }} </h2>
+      <h2>Log in to 192.168.1.4:3000/student with sessiontoken {{ session }} </h2>
       <ul>
         <li v-for="(data, index) in students" :key='index'>
           {{students[index]}} has connected</li>
@@ -116,7 +116,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
-      socket.on("StudentLoggedIn", function(studentUsername) {
+    //TODO check username already exists  
+    socket.on("StudentLoggedIn", function(studentUsername) {
         this.addStudent(studentUsername);
         console.log(this.students);
       }.bind(this));    

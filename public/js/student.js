@@ -1668,8 +1668,12 @@ const Summary = Vue.component('Summary', {
   <div> 
   <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
   <h2>This is a summary of your group's analysis</h2>
-  <p v-if="submitted==false">You may change your analysis</p>
-    <p v-if="submitted">Your analysis is now submitted, wait for your turn to present it!</p>
+  <p>The goal of this exercise is to differentiate between two ways to think heteronomy and autonomy
+  when we face a moral problem. 
+  <br><br><b>Heteronomy</b>:<br> automatic, dogmatic, constrained, intincts and reflexes, authoritarian thoughts. 
+  <br><b>Autonomy</b>:<br> critical searching, systematic thinking, supervision, holistic.</p>
+  <p v-if="submitted==false">You may now revise your analysis</p>
+    <ul v-if="submitted"><li>Your analysis is now submitted, wait for your turn to present it!</li></ul>
     This is your groups dilemma: <br>
     {{dilemma}} <br>
     <div class="wrapper" v-if="submitted==false">
@@ -1835,7 +1839,7 @@ const StudentVote = Vue.component('StudentVote', {
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <h2>Inital dilemma</h2>
-    <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+    <p class="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <p>{{staticdilemma}}</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
