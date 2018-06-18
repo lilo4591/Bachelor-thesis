@@ -82,7 +82,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
  
     <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-      <h2>Log in to 192.168.1.4:3000/student with sessiontoken {{ session }} </h2>
+      <h2>Log in to 192.168.1.5:3000/student with sessiontoken {{ session }} </h2>
       <ul>
         <li v-for="(data, index) in students" :key='index'>
           {{students[index]}} has connected</li>
@@ -741,6 +741,7 @@ const showAnalysis = Vue.component('showAnalysis', {
         <div class="box b"><h2>Autonomy</h2></div>
         <div class="box c">
           <div class="box g"><h3>Reflex thoughts</h3>
+          (Dominated by an automatic thought.)
             <ul class="summaryList">
               <li v-for="(data, index) in reflexthoughts" :key='index'> 
                 {{data.reflex}}
@@ -748,6 +749,7 @@ const showAnalysis = Vue.component('showAnalysis', {
             </ul>
           </div>
           <div class="box h"><h3>Dogmatic fixations</h3> 
+          (Fixating by a big and important principle.)
             <ul class="summaryList">
               <li v-for="(data, index) in principles" :key='index'> 
                 {{data.principle}}
@@ -757,6 +759,7 @@ const showAnalysis = Vue.component('showAnalysis', {
         </div>
         <div class="box d">
           <div class="box e"><h3>Concrete Values</h3>
+          (Who does the dilemma concerns and what are their interests?)
             <ul class="summaryList">
               <li v-for="(data, index) in concreteValues" :key='index'> 
                 {{data.concreteValue}}
@@ -764,6 +767,7 @@ const showAnalysis = Vue.component('showAnalysis', {
             </ul> 
           </div>
           <div class="box f"><h3>Action alternatives and Values</h3>
+          (What can be done and how does that affect everyones interests?)
             <ul class="summaryList">
               <li v-for="(data, index) in actionAlternatives" :key='index'> 
                 {{data.actionAlternative}}
@@ -866,8 +870,8 @@ const Vote = Vue.component('Vote', {
   <div> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <h2>Inital dilemma</h2>
+    <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <p>{{ staticdilemma }}</p>
-    <p>With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
         <ul>
