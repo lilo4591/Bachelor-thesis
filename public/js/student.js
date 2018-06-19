@@ -53,7 +53,7 @@ const Login = Vue.component('Login', {
        // if (this.pathfrom == null){
           router.push('/start');
        // }
-        studentsocket.emit('loggedIn', {"username": this.username} );
+        studentsocket.emit('loggedIn', {"username": this.username, "session": this.tokenInput} );
         Vue.prototype.$username = this.username;
       
       }

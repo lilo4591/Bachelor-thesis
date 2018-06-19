@@ -1,4 +1,5 @@
 var socket = io();
+Vue.prototype.$sessions = [];
 
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
@@ -45,26 +46,55 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
       session: null,
     };
   },
-  methods: {
-  
-  generateSession(min, max) {
-    Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
-    this.session = this.$session;
-    console.log(this.session);
-    socket.emit('teachergeneratesession', this.session);
-   }
-  },
   template:`
         <div id="app">
         <nav>
           <router-link to="/help">Help</router-link>
         </nav>
-        <router-link to="/startworkshop">
-          <button class="button" v-on:click="generateSession(1111,9999)">Start Workshop</button>
+        <router-link to="/sessions">
+          <button class="button">Start Workshop</button>
           </router-link><br>
           <button class= "button">Edit Workshop</button> 
         </div>
     `
+});
+
+const Sessions = Vue.component('Sessions', {
+data: function() {
+    return {
+      session: null,
+      sessions: this.$sessions,
+      sessionId: null,
+    };
+  },
+
+  created: function()  {
+   socket.emit('wantallsessions');
+  
+  },
+  methods: {
+  generateSession(min, max) {
+    Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
+    this.session = this.$session;
+    console.log(this.session);
+    socket.emit('teachergeneratesession', this.session);
+    socket.emit('wantallsessions');
+   }
+  },
+  template:`
+        <div id="app">
+        <p>Start an existing workshop or start new</p>
+          <nav>
+           <router-link to="/startworkshop" v-for="(sessionId, index) in sessions" :key='index'>
+            {{sessionId}}
+           </router-link>
+           </nav>
+          <router-link to="/startworkshop">
+            <button class="button" v-on:click="generateSession(1111,9999)">Start a new workshop</button>
+          </router-link>
+        </div>
+    `
+
 });
 
 const StartWorkshop = Vue.component('StartWorkshop', {
@@ -105,7 +135,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         </router-link>
         <br>
       </div>
-        <router-link tag="button" class="navbutton" to="/">
+        <router-link tag="button" class="navbutton" to="/sessions">
           <i id="left" class="material-icons">
             arrow_back
           </i>
@@ -979,8 +1009,13 @@ const router = new VueRouter({
       //delete input from server
       path:'/settings',
       component:Settings
+    },
+    {
+      //decide which session to start with
+      path:'/sessions',
+      component:Sessions
     }
- 
+  
  
  
   ]
@@ -999,7 +1034,12 @@ const app = new Vue({
     }
   },
   created: function() {
-  socket.on('showanalysis', function(data) {
+   socket.emit('wantallsessions');
+    socket.on('allsessions', function(sessions) {
+      Vue.prototype.$sessions = sessions;
+      console.log('vue sessionscomp: ' + this.$sessions);
+    });
+      socket.on('showanalysis', function(data) {
       var contains = false;
       var index;
       //console.log("new analys " + data.group);
