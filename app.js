@@ -78,8 +78,8 @@ function Data() {
 }
 Data.prototype.addActiveSession= function(sessionId) {
   this.activeSessionsNames.push(sessionId);
-  this.activeSessions[sessionId] = {groups: [], thoughts: [], students: []};
-  console.log(this.activeSessions);
+  this.activeSessions[sessionId] = {session: sessionId, groups: [], thoughts: [], students: []};
+  console.log("active sessions" + this.activeSessions);
 
 };
 
@@ -292,7 +292,7 @@ var studentconnection = studentsio.on('connection', socket => {
   socket.emit('connectionmessage', "student connected on namespace students");
 
   socket.on('wantsession', function () {
-    socket.emit('session', data.session);
+    socket.emit('session', data.activeSessionsNames);
   });
   //listen for when students log in
   socket.on('loggedIn', function (info) {
@@ -300,6 +300,7 @@ var studentconnection = studentsio.on('connection', socket => {
     //add student to global namespace
     data.addStudent(info.username, socket.id, info.session);
 
+    //TODO: fix this part for the sessions
     //checks if student username already exists in a group(student has already been logged in)
     if (data.groupObj != []) {
       for (var i = 0; i < data.groupObj.length; i++) {
@@ -324,7 +325,7 @@ var studentconnection = studentsio.on('connection', socket => {
       }
     }
     //notify teacher that a student has logged in
-    teacherconnection.emit("StudentLoggedIn", info.username);
+    teacherconnection.emit("StudentLoggedIn", {username: info.username, session: info.session});
   });
   //listening for Student to want to display the inital dilemma thoughts
   socket.on('initialThoughtsStudent', function (message) {
@@ -365,7 +366,8 @@ var teacherconnection = io.on('connection', function (socket) {
     studentconnection.emit('session', session);
   });
   console.log("client with socketID:  " + socket.id + " connected");
-
+ 
+  //To display sessions on the teacherpage
   socket.on('wantallsessions', function() {
     console.log("data. ", data.activeSessionsNames);
     socket.emit('allsessions', data.activeSessionsNames);

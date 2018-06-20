@@ -49,11 +49,12 @@ const Login = Vue.component('Login', {
   },
   methods: {
     validateToken() {
-      if((this.tokenInput == this.$session) && (this.username != null)) {
-       // if (this.pathfrom == null){
-          router.push('/start');
-       // }
+      console.log(this.$sessions);
+      if  (this.$sessions.includes(Number(this.tokenInput)) == true && (this.username != null)) {
+        router.push('/start');
         studentsocket.emit('loggedIn', {"username": this.username, "session": this.tokenInput} );
+        Vue.prototype.activeSession = Number(this.tokenInput);
+        console.log("this session is " + this.tokenInput);
         Vue.prototype.$username = this.username;
       
       }
@@ -72,9 +73,9 @@ const Login = Vue.component('Login', {
     });
     studentsocket.emit('wantsession');
     
-    studentsocket.on('session', function(session){
-      Vue.prototype.$session = session;
-      console.log(this.$session);
+    studentsocket.on('session', function(sessions){
+      Vue.prototype.$sessions = sessions;
+      console.log(this.$sessions);
     }.bind(this));
        
   
@@ -815,6 +816,10 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     notifyGroupEdit(bool, dilemma) {
       this.notsubmitted = bool;
       groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
+    },
+    editdilemmatest() {
+      groupsocket.emit('dilemmatest', this.dilemma);
+
     }
    },
    
@@ -824,7 +829,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     <p>Discuss in your group and formulate a dilemma together. The dilemma should be one that you are facing
       now in your proffession, school or in your private life.</p>
         <div v-if="notsubmitted">
-          <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-model="dilemma">
+          <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:key-up="editdilemmatest" v-model="dilemma">
           </textarea>
           <button class="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
         </div>
@@ -2022,9 +2027,10 @@ const app = new Vue({
    },
   created: function() {
     
-    studentsocket.on('session', function(session){
-      Vue.prototype.$session = session;
-      console.log(this.$session);
+    studentsocket.on('session', function(sessions){
+      //list of all active sessions
+      Vue.prototype.$sessions = sessions;
+      console.log(this.$sessions);
     }.bind(this));
 
     //specific to redirect after reconnection

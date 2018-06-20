@@ -1,5 +1,4 @@
 var socket = io();
-Vue.prototype.$sessions = [];
 
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
@@ -147,9 +146,12 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   `,
   created: function() {
     //TODO check username already exists  
-    socket.on("StudentLoggedIn", function(studentUsername) {
-        this.addStudent(studentUsername);
-        console.log(this.students);
+    socket.on("StudentLoggedIn", function(info) {
+      if (info.session == this.$session) {  
+          this.addStudent(info.username);
+          console.log(this.students);
+          console.log("student logged in the same workshop" + info.session);
+      }
       }.bind(this));    
       socket.on('groupInfo', function(data) {
         this.groupObject = data.groupObject;
