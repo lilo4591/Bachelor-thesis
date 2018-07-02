@@ -154,6 +154,8 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       }
       }.bind(this));    
       socket.on('groupInfo', function(data) {
+        console.log("groupinfo");
+        console.log(JSON.stringify(data.groupObject));
         this.groupObject = data.groupObject;
       }.bind(this));
     },
@@ -163,7 +165,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
-    socket.emit('generateGroups', {groupSize: n});
+    socket.emit('generateGroups', {groupSize: n, session: this.session});
     console.log("start generate: " + n); 
     }
  }
@@ -286,7 +288,7 @@ const Provocative1 = Vue.component('provocative1', {
       this.thoughts.splice(id,1);
     },
     collectAllSituations() {
-      socket.emit("wantsituations");
+      socket.emit("wantsituations", this.$sesssion);
       socket.emit("navigateStudentsToComp", "situationsfullclass");
     }
   },

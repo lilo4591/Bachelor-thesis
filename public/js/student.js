@@ -50,7 +50,7 @@ const Login = Vue.component('Login', {
   methods: {
     validateToken() {
       console.log(this.$sessions);
-      if  (this.$sessions.includes(Number(this.tokenInput)) == true && (this.username != null)) {
+      if  (Array.from(this.$sessions).includes(Number(this.tokenInput)) == true && (this.username != null)) {
         router.push('/start');
         studentsocket.emit('loggedIn', {"username": this.username, "session": this.tokenInput} );
         Vue.prototype.activeSession = Number(this.tokenInput);
@@ -73,7 +73,7 @@ const Login = Vue.component('Login', {
     });
     studentsocket.emit('wantsession');
     
-    studentsocket.on('session', function(sessions){
+    studentsocket.on('activeSessionsNames', function(sessions){
       Vue.prototype.$sessions = sessions;
       console.log(this.$sessions);
     }.bind(this));
@@ -2027,7 +2027,7 @@ const app = new Vue({
    },
   created: function() {
     
-    studentsocket.on('session', function(sessions){
+    studentsocket.on('activeSessionsNames', function(sessions){
       //list of all active sessions
       Vue.prototype.$sessions = sessions;
       console.log(this.$sessions);
