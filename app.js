@@ -121,14 +121,20 @@ Data.prototype.removeStudent = function (socketid) {
     }
   }
 //new
-  for (var n in this.activeSessions) { 
-    for (var i in this.activeSessions[n].students) {
-      if (this.activeSessions[n].students[i].id == socketid) {
-      console.log("Student " + this.activeSessions[n].students[i].studentname + " was deleted from server");
-      this.activeSessions[n].students.splice(i, 1);
+//delete the id from group but keep the name of the student
+  for (let key in this.activeSessions) {
+    console.log("hej");
+    console.log("groups: "  + key);
+    for (var i in this.activeSessions[key].groups) {
+      for (var n in this.activeSessions[key].groups[i].students) {
+        console.log("student in group: " + this.activeSessions[key].groups[i].name + "with info: " + JSON.stringify(this.activeSessions[key].groups[i].students[n]));
+        if (this.activeSessions[key].groups[i].students[n].id == socketid) {
+          this.activeSessions[key].groups[i].students[n].id = null;
+          console.log("student deleted was: " + this.activeSessions[key].groups[i].students[n].studentname);
+        }
+      }
     }
   }
-}
 };
 
 
@@ -320,16 +326,19 @@ var studentconnection = studentsio.on('connection', socket => {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
     //add student to global namespace
     data.addStudent(info.username, socket.id, info.session);
+    console.log("active sessions now just logged in " + JSON.stringify(data.activeSessions));
 
-    //TODO: fix this part for the sessions
     //checks if student username already exists in a group(student has already been logged in)
-    if (data.groupObj != []) {
-      for (var i = 0; i < data.groupObj.length; i++) {
-        for (var n = 0; n < data.groupObj[i].students.length; n++) {
-          if (data.groupObj[i].students[n].studentname == info.username) {
-            console.log("students in server data atm " + data.students);
+    if (data.activeSessions[info.session].groups != []) {
+      for (var i = 0; i < data.activeSessions[info.session].groups.length; i++) {
+        for (var n = 0; n < data.activeSessions[info.session].groups[i].students.length; n++) {
+          var studentname = data.activeSessions[info.session].groups[i].students[n].studentname;
+          var id = data.activeSessions[info.session].groups[i].students[n].id;
+          if (studentname == info.username && id == null) {
+            console.log("students in server data atm " + JSON.stringify(data.activeSessions[info.session].groups));
             //put student in the same group as it disconnected from
-            studentsio.to(socket.id).emit('namespace', data.groupObj[i].name);
+            data.activeSessions[info.session].groups[i].students[n].id = socket.id;
+            studentsio.to(socket.id).emit('namespace', data.activeSessions[info.session].groups[i].name);
             //ask the other students where they are
             socket.emit('wantcurrentlocation');
             //send student to same page as them
@@ -337,6 +346,7 @@ var studentconnection = studentsio.on('connection', socket => {
               studentsio.to(socket.id).emit('redirect', location);
             });
             //also send the group dilemma if such exists
+            //TODO: fix this part for the sessions
             if (data.dilemmas[data.groupObj[i].name] != undefined) {
               studentsio.to(socket.id).emit('showdilemmareconnect', data.dilemmas[data.groupObj[i].name]);
               console.log("Emitting dilemma:" + data.dilemmas[data.groupObj[i].name]);
