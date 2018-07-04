@@ -53,7 +53,7 @@ const Login = Vue.component('Login', {
       if  (Array.from(this.$sessions).includes(Number(this.tokenInput)) == true && (this.username != null)) {
         router.push('/start');
         studentsocket.emit('loggedIn', {"username": this.username, "session": this.tokenInput} );
-        Vue.prototype.activeSession = Number(this.tokenInput);
+        Vue.prototype.$activeSession = Number(this.tokenInput);
         console.log("this session is " + this.tokenInput);
         Vue.prototype.$username = this.username;
       
@@ -170,7 +170,8 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
     },
     collectSituations() {
       //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      groupsocket.emit(this.collect, this.thoughts);
+      console.log("orkar inte: " + this.$activeSession);
+      groupsocket.emit(this.collect, {situations: this.thoughts, session: this.$activeSession});
       this.thoughts = [];
     }
   },
@@ -232,7 +233,9 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
     else {
       //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
       groupsocket.on(this.showing, function(data) {
-      this.situations = data;
+      if (data.session == this.$activeSession) {
+        this.situations = data.situations;
+      }
       }.bind(this));
     }
        },

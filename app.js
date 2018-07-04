@@ -78,6 +78,7 @@ function Data() {
 }
 Data.prototype.addActiveSession= function(sessionId) {
   this.activeSessionsNames.push(sessionId);
+  //TODO look up when students outside group should be empty or not
   this.activeSessions[sessionId] = {session: sessionId, groupNum: null, groups: [], groupNames: [], thoughts: [], students: []};
   //console.log("active sessions" + this.activeSessions);
 
@@ -153,7 +154,8 @@ Data.prototype.addGroupName = function (group, session) {
   this.activeSessions[session].groupNames.push(group);
 };
 
-Data.prototype.addSituation = function (situation) {
+Data.prototype.addSituation = function (situation, session) {
+  //old
   this.situations.push(situation);
 };
 
@@ -161,12 +163,20 @@ Data.prototype.addSituation = function (situation) {
 
 //testing obj group
 Data.prototype.addGroupObj = function (group, session) {
-  var GROUP = { name: null, noOfStudents: 0, students: [] };
+  var GROUP = { name: null, noOfStudents: 0, students: [], groupSituations: []};
   GROUP.name = group;
   //old
   this.groupObj.push(GROUP);
   //new
   this.activeSessions[session].groups.push(GROUP);
+}
+
+Data.prototype.getGroupSituations = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupSituations;
+    }
+
 }
 
 Data.prototype.addStudentToGroupObj = function (student, group, session) {
@@ -266,15 +276,13 @@ function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-Data.prototype.addGroupSituations = function (group, groupsituations) {
-
-  if (this.groupSituations.hasOwnProperty(group)) {
-    for (var key in groupsituations) {
-      this.groupSituations[group].push(groupsituations[key]);
-    }
-  }
-  else {
-    this.groupSituations[group] = groupsituations;
+Data.prototype.addGroupSituations = function (group, groupsituations, session) {
+  //new
+   //todo go trough list of groups and add situations in right group
+    for (var i in this.activeSessions[session].groups) {
+      if (this.activeSessions[session].groups[i].name == group) {
+        this.activeSessions[session].groups[i].groupSituations.push(groupsituations);
+      }
   }
 };
 
@@ -578,10 +586,13 @@ function groupsmessages(index) {
       io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
     });
     //collecting situations for each group
-    socket.on('groupsituations', function (situations) {
-      data.addGroupSituations(data.groupNames[index], situations);
+    socket.on('groupsituations', function (info) {
+      console.log("showgroupsituations session: " + info.session);
+      data.addGroupSituations(data.activeSessions[info.session].groupNames[index], info.situations, info.session);
       //sending situations within each group
-      io.of(data.groupNames[index]).emit('showgroupsituations', data.groupSituations[data.groupNames[index]]);
+      var groupsitu = data.getGroupSituations(data.activeSessions[info.session].groupNames[index], info.session);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations : groupsitu, session : info.session });
+    
     });
 
     //updating server data if students removes a situation input and notify group
