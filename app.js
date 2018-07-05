@@ -163,7 +163,16 @@ Data.prototype.addSituation = function (situation, session) {
 
 //testing obj group
 Data.prototype.addGroupObj = function (group, session) {
-  var GROUP = { name: null, noOfStudents: 0, students: [], groupSituations: []};
+  var GROUP = { 
+    name: null, 
+    noOfStudents: 0, 
+    students: [], 
+    //exercise 1
+    groupSituations: [], 
+    groupRisks: [], 
+    groupPoss: []
+    //exercise 2
+  };
   GROUP.name = group;
   //old
   this.groupObj.push(GROUP);
@@ -176,9 +185,39 @@ Data.prototype.getGroupSituations = function (group, session) {
     if (this.activeSessions[session].groups[i].name == group) {
       return this.activeSessions[session].groups[i].groupSituations;
     }
-
 }
 
+Data.prototype.deleteGroupSitRiskPoss = function (group, session, id, type) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      if (type == "situation") {
+        this.activeSessions[session].groups[i].groupSituations.splice(id,1);
+        return this.activeSessions[session].groups[i].groupSituations;
+      }
+      if (type == "risk") {
+        this.activeSessions[session].groups[i].groupRisks.splice(id,1);
+        return this.activeSessions[session].groups[i].groupRisks;
+      }
+      if (type == "poss") {
+        this.activeSessions[session].groups[i].groupPoss.splice(id,1);
+        return this.activeSessions[session].groups[i].groupPoss;
+      }
+}
+}
+
+Data.prototype.getGroupRisks = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupRisks;
+    }
+}
+
+Data.prototype.getGroupPoss = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupPoss;
+    }
+}
 Data.prototype.addStudentToGroupObj = function (student, group, session) {
   //old
   /*
@@ -278,7 +317,6 @@ function getRandomArbitrary(min, max) {
 
 Data.prototype.addGroupSituations = function (group, groupsituations, session) {
   //new
-   //todo go trough list of groups and add situations in right group
     for (var i in this.activeSessions[session].groups) {
       if (this.activeSessions[session].groups[i].name == group) {
         console.log("addgroupsituations data prtot: " + i + " and group: " + group);
@@ -287,8 +325,16 @@ Data.prototype.addGroupSituations = function (group, groupsituations, session) {
   }
 };
 
-Data.prototype.addGroupRisks = function (group, grouprisks) {
-
+Data.prototype.addGroupRisks = function (group, grouprisks, session) {
+//new
+  for (var i in this.activeSessions[session].groups) {
+      if (this.activeSessions[session].groups[i].name == group) {
+        console.log("addgrouprisks data prtot: " + i + " and group: " + group);
+        this.activeSessions[session].groups[i].groupRisks = this.activeSessions[session].groups[i].groupRisks.concat(grouprisks);
+      }
+  }
+  //old 
+  /*
   if (this.groupRisks.hasOwnProperty(group)) {
     for (var key in grouprisks) {
       this.groupRisks[group].push(grouprisks[key]);
@@ -296,19 +342,29 @@ Data.prototype.addGroupRisks = function (group, grouprisks) {
   }
   else {
     this.groupRisks[group] = grouprisks;
-  }
+  }*/
 };
 
-Data.prototype.addGroupPoss = function (group, groupposs) {
+Data.prototype.addGroupPoss = function (group, groupposs, session) {
+//new
+  for (var i in this.activeSessions[session].groups) {
+      if (this.activeSessions[session].groups[i].name == group) {
+        console.log("addgroupposs data prtot: " + i + " and group: " + group);
+        this.activeSessions[session].groups[i].groupPoss = this.activeSessions[session].groups[i].groupPoss.concat(groupposs);
+      }
+  
+  }
 
-  if (this.groupPoss.hasOwnProperty(group)) {
+
+//old
+/*  if (this.groupPoss.hasOwnProperty(group)) {
     for (var key in groupposs) {
       this.groupPoss[group].push(groupposs[key]);
     }
   }
   else {
     this.groupPoss[group] = groupposs;
-  }
+  }*/
 };
 
 
@@ -425,50 +481,48 @@ var teacherconnection = io.on('connection', function (socket) {
 
   /**Relevent for teacher to route students to different pages(components)**/
 
-  socket.on('navigateStudentsToComp', function (component) {
+  socket.on('navigateStudentsToComp', function (info) {
     //route students to component
-    studentconnection.emit('redirectcomponent', component)
+    //TODO emit only to info.session groups
+    studentconnection.emit('redirectcomponent', info)
   });
   /**End of teacher route student**/
 
   /** 
     Relevant to exercise 1: Provocative
   **/
-
+  
+ //new
   socket.on('wantsituations', function (session) {
     var allsituations = [];
-    for (var i in data.groupNames) {
-      if (data.groupSituations[data.groupNames[i]] != null) {
-        console.log("collecting situations from " + data.groupNames[i]);
-        allsituations = allsituations.concat(data.groupSituations[data.groupNames[i]]);
-      }
+    for (var i in data.activeSessions[session].groups) {
+      console.log("collecting situations from " + data.activeSessions[session].groups[i].name);
+      allsituations = allsituations.concat(data.activeSessions[session].groups[i].groupSituations);
     }
     console.log("all situations" + JSON.stringify(allsituations));
-    io.emit('collectsituations', allsituations);
+    io.emit('collectsituations', {'situations' : allsituations , 'session' : session});
   });
 
-  socket.on('wantrisks', function () {
+ //new
+  socket.on('wantrisks', function (session) {
     var allrisks = [];
-    for (var i in data.groupNames) {
-      if (data.groupRisks[data.groupNames[i]] != null) {
-        console.log("collecting risks from " + data.groupNames[i]);
-        allrisks = allrisks.concat(data.groupRisks[data.groupNames[i]]);
-      }
+    for (var i in data.activeSessions[session].groups) {
+      console.log("collecting risks from " + data.activeSessions[session].groups[i].name);
+      allrisks = allrisks.concat(data.activeSessions[session].groups[i].groupRisks);
     }
     allrisks = data.generatedRisks.concat(allrisks);
-    io.emit('collectrisks', allrisks);
+    io.emit('collectrisks', {'risks': allrisks, 'session' : session});
   });
-
-  socket.on('wantposs', function () {
+  //new
+  //TODO make this one function
+  socket.on('wantposs', function (session) {
     var allposs = [];
-    for (var i in data.groupNames) {
-      if (data.groupPoss[data.groupNames[i]] != null) {
-        console.log("collecting risks from " + data.groupNames[i]);
-        allposs = allposs.concat(data.groupPoss[data.groupNames[i]]);
-      }
+    for (var i in data.activeSessions[session].groups) {
+      console.log("collecting poss from " + data.activeSessions[session].groups[i].name);
+      allposs = allposs.concat(data.activeSessions[session].groups[i].groupPoss);
     }
     allposs = data.generatedPoss.concat(allposs);
-    io.emit('collectposs', allposs);
+    io.emit('collectposs', { 'poss' : allposs, 'session' : session });
   });
 
   /**
@@ -590,49 +644,56 @@ function groupsmessages(index) {
       //sending action alternatives within each group
       io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
     });
+    //updated
     //collecting situations for each group
     socket.on('groupsituations', function (info) {
-      console.log("showgroupsituations session: " + info.session);
       data.addGroupSituations(data.activeSessions[info.session].groupNames[index], info.situations, info.session);
       //sending situations within each group
       var groupsitu = data.getGroupSituations(data.activeSessions[info.session].groupNames[index], info.session);
-      console.log("groupsituation before sending: " + JSON.stringify(groupsitu));
-      console.log("index in groupsitusations: " + index);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations : groupsitu, session : info.session });
     
     });
-
+    //updated
     //updating server data if students removes a situation input and notify group
-    socket.on('removesituation', function (id) {
-      data.groupSituations[data.groupNames[index]].splice(id, 1);
-      io.of(data.groupNames[index]).emit('showgroupsituations', data.groupSituations[data.groupNames[index]]);
+    socket.on('removesituation', function (info) {
+      var groupsitu = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "situation");
+      //data.activeSessions[info.session].groupSituations[data.activeSessions[info.session].groupNames[index]].splice(info.id, 1);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', {'session' : info.session ,'situations' :groupsitu});
     });
 
     //collecting risks for each group
-    socket.on('grouprisks', function (risks) {
-      data.addGroupRisks(data.groupNames[index], risks);
+    socket.on('grouprisks', function (info) {
+      console.log('in grouprisks ' + JSON.stringify(info) );
+      data.addGroupRisks(data.activeSessions[info.session].groupNames[index], info.risks, info.session);
+      var groupRisks = data.getGroupRisks(data.activeSessions[info.session].groupNames[index], info.session);
+      console.log('in grouprisks  after get ' + JSON.stringify(groupRisks) );
       //sending risks within each group
-      io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', {'session' : info.session ,'risks' :groupRisks});
     });
 
+    //new
     //updating server data if students removes a risk input and notify group
-    socket.on('removerisk', function (id) {
-      data.groupRisks[data.groupNames[index]].splice(id, 1);
-      io.of(data.groupNames[index]).emit('showgrouprisks', data.groupRisks[data.groupNames[index]]);
+    socket.on('removerisk', function (info) {
+      var groupRisks = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "risk");
+      //data.groupRisks[data.groupNames[index]].splice(id, 1);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', {'session' : info.session ,'risks' :groupRisks});
     });
 
     //collecting possibilies for each group
-    socket.on('groupposs', function (poss) {
-      data.addGroupPoss(data.groupNames[index], poss);
+    socket.on('groupposs', function (info) {
+      data.addGroupPoss(data.activeSessions[info.session].groupNames[index], info.poss, info.session);
+      var groupPoss = data.getGroupPoss(data.activeSessions[info.session].groupNames[index], info.session);
       //sending possibilies within each group
-      io.of(data.groupNames[index]).emit('showgroupposs', data.groupPoss[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', {'session' : info.session ,'poss' :groupPoss});
     });
 
 
+    //new
     //updating server data if students removes a possibiliey input and notify group
-    socket.on('removeposs', function (id) {
-      data.groupPoss[data.groupNames[index]].splice(id, 1);
-      io.of(data.groupNames[index]).emit('showgroupposs', data.groupPoss[data.groupNames[index]]);
+    socket.on('removeposs', function (info) {
+      var groupPoss = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "poss");
+     // data.groupPoss[data.groupNames[index]].splice(id, 1);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', {'session' : info.session ,'poss' :groupPoss});
     });
 
     //sending summary to grooups

@@ -233,7 +233,8 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
     else {
       //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
       groupsocket.on(this.showing, function(data) {
-      if (data.session == this.$activeSession) {
+      console.log('showgroupsit: ' + data.session);
+        if (data.session == this.$activeSession) {
         this.situations = data.situations;
       }
       }.bind(this));
@@ -242,7 +243,7 @@ const ShowGroupSituations = Vue.component('ShowGroupSituations', {
   methods: {
     removeThought(id) {
       this.situations.splice(id,1);
-      groupsocket.emit(this.remove, id);  
+      groupsocket.emit(this.remove, {'id': id, 'session' : this.$activeSession});  
   },
  
   },  
@@ -356,7 +357,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
     },
     collectSituations() {
       //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      groupsocket.emit(this.collect, this.thoughts);
+      groupsocket.emit('grouprisks', {'risks' : this.thoughts, 'session': this.$activeSession});
       this.thoughts = [];
     }
   },
@@ -416,15 +417,17 @@ const ShowGroupLove = Vue.component('ShowGroupLove', {
     } 
     else {
       //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-      groupsocket.on(this.showing, function(data) {
-        this.situations = data;
+      groupsocket.on('showgrouprisks', function(data) {
+        if (data.session == this.$activeSession) {
+          this.situations = data.risks;
+        }
       }.bind(this));
     }
     },
   methods: {
     removeThought(id) {
       this.situations.splice(id,1);
-      groupsocket.emit(this.remove, id);  
+      groupsocket.emit('removerisk', {'id' : id, 'session' : this.$activeSession});  
   },
  
   },  
@@ -536,7 +539,7 @@ const Exercise1War = Vue.component('Exercise1War', {
     },
     collectSituations() {
       //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      groupsocket.emit(this.collect, this.thoughts);
+      groupsocket.emit('groupposs', {'poss' : this.thoughts, 'session' : this.$activeSession });
       this.thoughts = [];
     }
   },
@@ -595,15 +598,17 @@ const ShowGroupWar = Vue.component('ShowGroupWar', {
     }
     else {
     //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-    groupsocket.on(this.showing, function(data) {
-      this.situations = data;
+    groupsocket.on('showgroupposs', function(data) {
+      if (data.session == this.$activeSession) {
+        this.situations = data.poss;
+      }
     }.bind(this));
     }
      },
   methods: {
     removeThought(id) {
       this.situations.splice(id,1);
-      groupsocket.emit(this.remove, id);  
+      groupsocket.emit('removeposs', { 'id': id , 'session' : this.$activeSession });  
   },
  
   },  
@@ -2045,8 +2050,10 @@ const app = new Vue({
         Vue.prototype.$dilemma = dilemma;
       }.bind(this));
  
-    studentsocket.on('redirectcomponent', function(component) {
-        router.push({name: component });
+    studentsocket.on('redirectcomponent', function(info) {
+      if (info.session == this.$activeSession)  {
+        router.push({name: info.comp});
+      }
     }.bind(this));
   }
   });

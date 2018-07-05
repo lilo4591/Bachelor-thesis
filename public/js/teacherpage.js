@@ -224,7 +224,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
   ` ,
   methods: { 
     navigateStudentsTo(exercisecomp) {
-      socket.emit("navigateStudentsToComp", exercisecomp);
+      socket.emit("navigateStudentsToComp", {'comp' : exercisecomp, 'session' : this.$session});
     }
   }
 });
@@ -272,10 +272,10 @@ const Provocative1 = Vue.component('provocative1', {
     }
   },
   created: function() {
-    socket.on('collectsituations', function(situations) {
-      if (situations != null) {
-        this.thoughts = situations;
-        console.log(situations);
+    socket.on('collectsituations', function(info) {
+      if (info.situations != null && info.session == this.$session) {
+        this.thoughts = info.situations;
+        console.log(info.situations);
       }
   }.bind(this));
   },
@@ -288,8 +288,8 @@ const Provocative1 = Vue.component('provocative1', {
       this.thoughts.splice(id,1);
     },
     collectAllSituations() {
-      socket.emit("wantsituations", this.$sesssion);
-      socket.emit("navigateStudentsToComp", "situationsfullclass");
+      socket.emit("wantsituations", this.$session);
+      socket.emit("navigateStudentsToComp", {'comp' : "situationsfullclass", 'session': this.$session});
     }
   },
   template: `
@@ -333,10 +333,10 @@ const Provocative2love = Vue.component('provocative2love', {
     }
   },
   created: function() {
-    socket.on('collectrisks', function(risks) {
-      if (risks != null) {
-        this.thoughts = risks;
-        console.log(risks);
+    socket.on('collectrisks', function(info) {
+      if (info.risks != null && info.session == this.$session) {
+        this.thoughts = info.risks;
+        console.log(info.risks);
       }
   }.bind(this));
   },
@@ -349,8 +349,8 @@ const Provocative2love = Vue.component('provocative2love', {
       this.thoughts.splice(id,1);
     },
     collectAllRisks() {
-      socket.emit("wantrisks");
-      socket.emit("navigateStudentsToComp", "lovefullclass");
+      socket.emit("wantrisks", this.$session);
+      socket.emit("navigateStudentsToComp", {'comp' : "lovefullclass", 'session': this.$session});
     }
   },
   //TODO generate loverisks arguments from txtfile or db
@@ -396,9 +396,9 @@ const Provocative3War = Vue.component('provocative3war', {
     }
   },
   created: function() {
-    socket.on('collectposs', function(poss) {
-      if (poss != null) {
-        this.thoughts = poss;
+    socket.on('collectposs', function(info) {
+      if (info.session == this.$session) {
+        this.thoughts = info.poss;
       }
   }.bind(this));
   },
@@ -407,8 +407,9 @@ const Provocative3War = Vue.component('provocative3war', {
     this.thoughts.splice(id,1);
     },
    collectAll() {
-    socket.emit("wantposs");
-    socket.emit("navigateStudentsToComp", "warfullclass");
+    console.log('wantposs session: ' + this.$session);
+    socket.emit("wantposs", this.$session);
+    socket.emit("navigateStudentsToComp", {'comp' : "warfullclass", 'session' : this.$session});
     }
   },
   //TODO generate arguments from txtfile or db
@@ -897,7 +898,7 @@ const Vote = Vue.component('Vote', {
       
     },
     navigateStudentsToStart() {
-      socket.emit('navigateStudentsToComp', "start");
+      socket.emit('navigateStudentsToComp', {'comp' : "start", 'session' : this.$session });
     }
   },
   template: `
