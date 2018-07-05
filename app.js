@@ -281,7 +281,8 @@ Data.prototype.addGroupSituations = function (group, groupsituations, session) {
    //todo go trough list of groups and add situations in right group
     for (var i in this.activeSessions[session].groups) {
       if (this.activeSessions[session].groups[i].name == group) {
-        this.activeSessions[session].groups[i].groupSituations.push(groupsituations);
+        console.log("addgroupsituations data prtot: " + i + " and group: " + group);
+        this.activeSessions[session].groups[i].groupSituations = this.activeSessions[session].groups[i].groupSituations.concat(groupsituations);
       }
   }
 };
@@ -483,6 +484,7 @@ var teacherconnection = io.on('connection', function (socket) {
     **/
 
   socket.on('generateGroups', function (info) {
+    console.log("generate groups: " + info.session);
     generateGroups(info.groupSize, info.session);
       //sending groupname,size and ids to teacherpage to print
     socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
@@ -490,8 +492,9 @@ var teacherconnection = io.on('connection', function (socket) {
     //namespace specific to groups
     var i;
     var len;
-    for (i = 0, len = data.groupNames.length; i < len; i++) {
-      io.of(data.groupNames[i]).on('connection', groupsmessages(i));
+    for (i = 0, len = data.activeSessions[info.session].groupNames.length; i < len; i++) {
+      console.log(i);
+      io.of(data.activeSessions[info.session].groupNames[i]).on('connection', groupsmessages(i));
     }(i);
   });
 
@@ -502,7 +505,8 @@ function generateGroups(groupSize, session) {
 
   //create namespace for each group
   for (var i = 0, len = data.activeSessions[session].groupNum; i < len; i++) {
-    var group = '/group' + i.toString();
+    console.log("create namespace for each group: " + i);
+    var group = '/'+ session.toString() + 'group' + i.toString();
     data.addGroupName(group, session);
     //groupobj to print to teacher
     data.addGroupObj(group, session);
@@ -528,6 +532,7 @@ function generateGroups(groupSize, session) {
   for (var i = 0; i < len; i++) {
     if (count < groupSize) {
       var index = Math.floor(getRandomArbitrary(0, allstudents.length));
+      console.log("INDEX" + index);
       data.addStudentToGroupObj(allstudents[index], currentGroup, session);
       studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
       //delete used student
@@ -591,6 +596,8 @@ function groupsmessages(index) {
       data.addGroupSituations(data.activeSessions[info.session].groupNames[index], info.situations, info.session);
       //sending situations within each group
       var groupsitu = data.getGroupSituations(data.activeSessions[info.session].groupNames[index], info.session);
+      console.log("groupsituation before sending: " + JSON.stringify(groupsitu));
+      console.log("index in groupsitusations: " + index);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations : groupsitu, session : info.session });
     
     });
