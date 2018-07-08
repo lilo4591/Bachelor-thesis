@@ -696,7 +696,7 @@ const Exercise2 = Vue.component('Exercise2', {
       this.thoughts.splice(id,1);
     },
     collectThoughts() {
-      studentsocket.emit('thoughts', this.thoughts);
+      studentsocket.emit('thoughts', {'thoughts' : this.thoughts, 'session' : this.$activeSession});
       this.thoughts = [];
     }
   },
@@ -785,7 +785,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       groupName: this.$groupName,
       username: this.$username,
       name: "Autonomy and Heteronomy part 2.2",
-      dilemma: "",
+      dilemma: this.$dilemma,
       notsubmitted: true,
       studentId: null,
     }
@@ -801,7 +801,8 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
       router.push('/');
     }
     else {
-      groupsocket.on('showdilemma', function(data) {
+
+     groupsocket.on('showdilemma', function(data) {
         this.dilemma = data.dilemma;
         this.notsubmitted = data.notsubmitted;
         Vue.prototype.$dilemma = data.dilemma;
@@ -813,20 +814,26 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         //update global variable since dilemma changed
         Vue.prototype.$dilemma = data.dilemma;
       }.bind(this));
+    
+      groupsocket.on('dilemmakeyup', function (data){
+        if(data.session == this.$activeSession) {
+          this.dilemma = data.dilemma
+        }
+      }.bind(this));
     }
  },
   methods: {
     
     notifyGroupSubmit(bool, dilemma) {
       this.notsubmitted = bool;
-      groupsocket.emit('dilemma', {'dilemma': dilemma, 'notsubmitted': false});
+      groupsocket.emit('dilemma', {'dilemma': dilemma, 'notsubmitted': false, 'session' : this.$activeSession });
     },
     notifyGroupEdit(bool, dilemma) {
       this.notsubmitted = bool;
-      groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true});
+      groupsocket.emit('edit', {'dilemma': dilemma, 'notsubmitted': true, 'session' : this.$activeSession });
     },
-    editdilemmatest() {
-      groupsocket.emit('dilemmatest', this.dilemma);
+    editdilemmakeyup() {
+      groupsocket.emit('dilemmakeyup', {'dilemma' : this.dilemma, 'session': this.$activeSession });
 
     }
    },
@@ -837,7 +844,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     <p>Discuss in your group and formulate a dilemma together. The dilemma should be one that you are facing
       now in your proffession, school or in your private life.</p>
         <div v-if="notsubmitted">
-          <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:key-up="editdilemmatest" v-model="dilemma">
+          <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:keyup="editdilemmakeyup" v-model="dilemma">
           </textarea>
           <button class="smallbutton" v-on:click="notifyGroupSubmit(false, dilemma)">Submit dilemma</button>
         </div>
@@ -925,7 +932,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
       this.reflexthoughts.splice(id,1);
     },
     collectReflexThoughts() {
-      groupsocket.emit('reflexthoughts', this.reflexthoughts);
+      groupsocket.emit('reflexthoughts', {'thoughts' : this.reflexthoughts,  'session' : this.$activeSession});
       Vue.prototype.$input = [];
     }
   }

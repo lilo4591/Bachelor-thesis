@@ -486,8 +486,10 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
     }
   },
   created: function() {
-    socket.on('displayThoughts', function(thoughts) {
-     this.thoughts = thoughts;
+    socket.on('displayThoughts', function(info) {
+     if (info.session == this.$session) {
+      this.thoughts = info.thoughts;
+    }
       
     }.bind(this));  
   } ,
@@ -846,27 +848,30 @@ const Vote = Vue.component('Vote', {
     }
   },
   created: function() {
-    socket.emit('initialThoughts', 'want inital thoughts teacher');
-    socket.on('displayInitialThoughts', function(thoughts) {
-     this.thoughts = thoughts;
-    //initialize component with as many poll objs as there are thoughts
-      for (var n = 0; n < thoughts.length; n++) {
-        console.log("loop step: " + n);
+    socket.emit('initialThoughts', this.$session);
+    socket.on('displayInitialThoughts', function (info) {
+      if (info.session == this.$session) {
+        this.thoughts = info.thoughts;
+        //initialize component with as many poll objs as there are thoughts
+        for (var n = 0; n < thoughts.length; n++) {
+          console.log("loop step: " + n);
           this.listoptions.push(
-            {options: {
-              customId: 0,
-              showTotalVotes: true,
-              showResults: true,
-              question: 'Do you think this thought is heteronomy or autonomy?',
-              answers: [
-                { value: 1, text: 'Heteronomy', votes: 0 },
-                { value: 2, text: 'Autonomy', votes: 0 }
-              ],
+            {
+              options: {
+                customId: 0,
+                showTotalVotes: true,
+                showResults: true,
+                question: 'Do you think this thought is heteronomy or autonomy?',
+                answers: [
+                  { value: 1, text: 'Heteronomy', votes: 0 },
+                  { value: 2, text: 'Autonomy', votes: 0 }
+                ],
+              }
             }
-            }  
-          );      
-    }
-   }.bind(this));
+          );
+        }
+      }
+    }.bind(this));
    
   //listen for student votes and updating the poll votes accordingly
   socket.on('vote', function(obj) {

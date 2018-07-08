@@ -79,7 +79,7 @@ function Data() {
 Data.prototype.addActiveSession= function(sessionId) {
   this.activeSessionsNames.push(sessionId);
   //TODO look up when students outside group should be empty or not
-  this.activeSessions[sessionId] = {session: sessionId, groupNum: null, groups: [], groupNames: [], thoughts: [], students: []};
+  this.activeSessions[sessionId] = {session: sessionId, groupNum: null, groups: [], groupNames: [], initialThoughts: [], students: []};
   //console.log("active sessions" + this.activeSessions);
 
 };
@@ -170,8 +170,13 @@ Data.prototype.addGroupObj = function (group, session) {
     //exercise 1
     groupSituations: [], 
     groupRisks: [], 
-    groupPoss: []
+    groupPoss: [],
     //exercise 2
+    dilemma: null,
+    reflexThoughts : [],
+    principles : [],
+    concreteValues : [],
+    actionAlternatives : []
   };
   GROUP.name = group;
   //old
@@ -184,6 +189,13 @@ Data.prototype.getGroupSituations = function (group, session) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
       return this.activeSessions[session].groups[i].groupSituations;
+    }
+}
+
+Data.prototype.getGroupDilemma = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].dilemma;
     }
 }
 
@@ -216,6 +228,13 @@ Data.prototype.getGroupPoss = function (group, session) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
       return this.activeSessions[session].groups[i].groupPoss;
+    }
+}
+
+Data.prototype.getGroupReflexthoughts = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].reflexThoughts;
     }
 }
 Data.prototype.addStudentToGroupObj = function (student, group, session) {
@@ -254,8 +273,14 @@ Data.prototype.setNumGroups = function (groupSize, session) {
   }
 };
 
-Data.prototype.addDilemma = function (group, dilemma) {
-
+Data.prototype.addDilemma = function (group, dilemma, session) {
+  //new
+  for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+        this.activeSessions[session].groups[i].dilemma = dilemma;
+      }  
+          
+    }      //old
   //deletes dilemma if it already exists
   if (this.dilemmas.hasOwnProperty(group)) {
     delete this.dilemmas[group];
@@ -264,8 +289,19 @@ Data.prototype.addDilemma = function (group, dilemma) {
 };
 
 
-Data.prototype.addReflexThoughts = function (group, thoughts) {
+Data.prototype.addReflexThoughts = function (group, thoughts, session) {
+//new
+ for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+        for (var key in thoughts) {
+          this.activeSessions[session].groups[i].reflexThoughts.push(thoughts[key]);
+        }
+    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].reflexThoughts));
+      }
+          
+    }   
 
+/* OLD
   if (this.reflexthoughts.hasOwnProperty(group)) {
     for (var key in thoughts) {
       this.reflexthoughts[group].push(thoughts[key]);
@@ -273,7 +309,7 @@ Data.prototype.addReflexThoughts = function (group, thoughts) {
   }
   else {
     this.reflexthoughts[group] = thoughts;
-  }
+  }*/
 };
 
 Data.prototype.addPrinciples = function (group, principles) {
@@ -438,12 +474,13 @@ var studentconnection = studentsio.on('connection', socket => {
   /** 
     Relevant to exercise 2: heteronomy autonomy  
   **/
-  socket.on('thoughts', function (thoughts) {
+  //new
+  socket.on('thoughts', function (info) {
 
-    for (var i = 0, l = thoughts.length; i < l; i++) {
-      data.addThought(thoughts[i]);
+    for (var i = 0, l = info.thoughts.length; i < l; i++) {
+      data.activeSessions[info.session].initialThoughts.push(info.thoughts[i]);
     }
-    teacherconnection.emit('displayThoughts', data.thoughts);
+    teacherconnection.emit('displayThoughts', {'session': info.session, 'thoughts' : data.activeSessions[info.session].initialThoughts});
   });
 
   socket.on('studentvote', function (obj) {
@@ -528,9 +565,10 @@ var teacherconnection = io.on('connection', function (socket) {
   /**
     Relevant to exercise 2**/
   //listening for teacher to want to display the inital dilemma thoughts
-  socket.on('initialThoughts', function (message) {
-    console.log(message);
-    socket.emit('displayInitialThoughts', data.thoughts);
+  //new
+  socket.on('initialThoughts', function (session) {
+    console.log(session);
+    socket.emit('displayInitialThoughts', { 'thoughts' : data.activeSessions[session].initialThoughts, 'session': session });
   });
 
   /**
@@ -613,18 +651,29 @@ function groupsmessages(index) {
     console.log("A student joined a group " + data.groupNames[index]);
     console.log("active sessions now" + JSON.stringify(data.activeSessions));
     
+    //update groupmembers on keyup 
+    socket.on('dilemmakeyup', function(info) {
+      console.log("test on kwy up" + info.dilemma);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('dilemmakeyup', info);
+    });
+   
+    //new
     socket.on('dilemma', function (info) {
-      data.addDilemma(data.groupNames[index], info.dilemma);
-      io.of(data.groupNames[index]).emit('showdilemma', info)
+      data.addDilemma(data.activeSessions[info.session].groupNames[index], info.dilemma, info.session);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showdilemma', info);
     });
+    //new
     socket.on('edit', function (info) {
-      io.of(data.groupNames[index]).emit('editdilemma', info)
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('editdilemma', info);
     });
+
     //collecting reflexthoughts
-    socket.on('reflexthoughts', function (thoughts) {
-      data.addReflexThoughts(data.groupNames[index], thoughts);
+    socket.on('reflexthoughts', function (info) {
+      data.addReflexThoughts(data.activeSessions[info.session].groupNames[index], info.thoughts, info.session);
+      //get reflex thoughts here
+      var reflexthoughts = data.getGroupReflexthoughts(data.activeSessions[info.session].groupNames[index], info.session);
       //sending reflexthoughts within each group
-      io.of(data.groupNames[index]).emit('showreflexthoughts', data.reflexthoughts[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showreflexthoughts', reflexthoughts);
     });
     //collecting principles
     socket.on('principles', function (principles) {
@@ -644,6 +693,8 @@ function groupsmessages(index) {
       //sending action alternatives within each group
       io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
     });
+    
+    ///exercise 1
     //updated
     //collecting situations for each group
     socket.on('groupsituations', function (info) {
@@ -695,6 +746,7 @@ function groupsmessages(index) {
      // data.groupPoss[data.groupNames[index]].splice(id, 1);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', {'session' : info.session ,'poss' :groupPoss});
     });
+    //end of exercise 1
 
     //sending summary to grooups
     socket.on('wantsummary', function () {
