@@ -1109,7 +1109,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
       this.principles.splice(id,1);
     },
     collectPrinciples() {
-      groupsocket.emit('principles', this.principles);
+      groupsocket.emit('principles', {'principles' : this.principles, 'session' : this.$activeSession });
       Vue.prototype.$input = [];
     }
    }
@@ -1290,7 +1290,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
       this.concreteValues.splice(id,1);
     },
     collectConcreteValues() {
-      groupsocket.emit('concretevalues', this.concreteValues);
+      groupsocket.emit('concretevalues', {'concretevalues' : this.concreteValues, 'session': this.$activeSession });
       Vue.prototype.$input = [];
     }
   }
@@ -1462,7 +1462,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
       this.actionAlternatives.splice(id,1);
     },
     collectActionAlternatives() {
-      groupsocket.emit('actionalternatives', this.actionAlternatives);
+      groupsocket.emit('actionalternatives', {'actionalternatives' : this.actionAlternatives, 'session': this.$activeSession });
       //set global input to [] for backing option not saving data
       Vue.prototype.$input = [];
     }
@@ -1603,8 +1603,7 @@ const Summary = Vue.component('Summary', {
     }  
    else {
      //notify that we want the input from the questions
-     groupsocket.emit('wantsummary', function() {
-     });
+     groupsocket.emit('wantsummary', {'session' :this.$activeSession});
      groupsocket.on('summarydata', function(data) { 
        this.actionAlternatives = data.actionAlternatives;
        this.concreteValues = data.concreteValues;
@@ -1641,28 +1640,29 @@ const Summary = Vue.component('Summary', {
     removeAlternative(index, type) {
       if (type == "reflex") {
         this.reflexthoughts.splice(index,1); 
-        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type, 'session': this.$activeSession});
       }
       if (type == "principle") {
         this.principles.splice(index,1); 
-        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type, 'session': this.$activeSession});
       }
       if (type == "concretevalue") {
         this.concreteValues.splice(index,1);
-        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type, 'session': this.$activeSession});
       }
       if (type == "actionalternative") {
         this.actionAlternatives.splice(index,1);
-        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type});
+        groupsocket.emit('removesummaryinput', {'indx': index, 'inputtype': type, 'session': this.$activeSession});
       }
     },
 
     addinput(type) {
       if (type == "reflex") {
         this.reflexthoughts.push({reflex: this.reflex});
-        groupsocket.emit('reflexthoughts', [{ reflex : this.reflex }]);
+        groupsocket.emit('reflexthoughts', [{ reflex : this.reflex, 'session': this.$activeSession }]);
         this.reflex = '';
       }
+      //TODO add session and check name of data input thought ^
       if (type == "principle") {
         this.principles.push({principle: this.principle});
         groupsocket.emit('principles', [ { principle: this.principle }]);

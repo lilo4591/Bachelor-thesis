@@ -172,11 +172,11 @@ Data.prototype.addGroupObj = function (group, session) {
     groupRisks: [], 
     groupPoss: [],
     //exercise 2
-    dilemma: null,
-    reflexThoughts : [],
-    principles : [],
-    concreteValues : [],
-    actionAlternatives : []
+    groupDilemma: null,
+    groupReflexThoughts : [],
+    groupPrinciples : [],
+    groupConcreteValues : [],
+    groupActionAlternatives : []
   };
   GROUP.name = group;
   //old
@@ -192,12 +192,6 @@ Data.prototype.getGroupSituations = function (group, session) {
     }
 }
 
-Data.prototype.getGroupDilemma = function (group, session) {
-  for (var i in this.activeSessions[session].groups)
-    if (this.activeSessions[session].groups[i].name == group) {
-      return this.activeSessions[session].groups[i].dilemma;
-    }
-}
 
 Data.prototype.deleteGroupSitRiskPoss = function (group, session, id, type) {
   for (var i in this.activeSessions[session].groups)
@@ -217,6 +211,28 @@ Data.prototype.deleteGroupSitRiskPoss = function (group, session, id, type) {
 }
 }
 
+Data.prototype.deleteGroupInput = function (group, session, id, type) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      if (type == "reflex") {
+        this.activeSessions[session].groups[i].groupReflexThoughts.splice(id,1);
+        return this.activeSessions[session].groups[i].groupReflexThoughts;
+      }
+      if (type == "principle") {
+        this.activeSessions[session].groups[i].groupPrinciples.splice(id,1);
+        return this.activeSessions[session].groups[i].groupPrinciples;
+      }
+      if (type == "concretevalue") {
+        this.activeSessions[session].groups[i].groupConcreteValues.splice(id,1);
+        return this.activeSessions[session].groups[i].groupConcreteValues;
+      }
+      if (type == "actionalternative") {
+        this.activeSessions[session].groups[i].groupActionAlternatives.splice(id,1);
+        return this.activeSessions[session].groups[i].groupActionAlternatives;
+      }}
+}
+
+
 Data.prototype.getGroupRisks = function (group, session) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
@@ -231,12 +247,41 @@ Data.prototype.getGroupPoss = function (group, session) {
     }
 }
 
+Data.prototype.getGroupDilemma = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupDilemma;
+    }
+}
+
 Data.prototype.getGroupReflexthoughts = function (group, session) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
-      return this.activeSessions[session].groups[i].reflexThoughts;
+      return this.activeSessions[session].groups[i].groupReflexThoughts;
     }
 }
+
+Data.prototype.getGroupPrinciples = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupPrinciples;
+    }
+}
+
+Data.prototype.getGroupConcreteValues = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupConcreteValues;
+    }
+}
+
+Data.prototype.getGroupActionAlternatives = function (group, session) {
+  for (var i in this.activeSessions[session].groups)
+    if (this.activeSessions[session].groups[i].name == group) {
+      return this.activeSessions[session].groups[i].groupActionAlternatives;
+    }
+}
+
 Data.prototype.addStudentToGroupObj = function (student, group, session) {
   //old
   /*
@@ -273,11 +318,11 @@ Data.prototype.setNumGroups = function (groupSize, session) {
   }
 };
 
-Data.prototype.addDilemma = function (group, dilemma, session) {
+Data.prototype.addGroupDilemma = function (group, dilemma, session) {
   //new
   for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
-        this.activeSessions[session].groups[i].dilemma = dilemma;
+        this.activeSessions[session].groups[i].groupDilemma = dilemma;
       }  
           
     }      //old
@@ -289,14 +334,14 @@ Data.prototype.addDilemma = function (group, dilemma, session) {
 };
 
 
-Data.prototype.addReflexThoughts = function (group, thoughts, session) {
+Data.prototype.addGroupReflexThoughts = function (group, thoughts, session) {
 //new
  for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
         for (var key in thoughts) {
-          this.activeSessions[session].groups[i].reflexThoughts.push(thoughts[key]);
+          this.activeSessions[session].groups[i].groupReflexThoughts.push(thoughts[key]);
         }
-    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].reflexThoughts));
+    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupReflexThoughts));
       }
           
     }   
@@ -312,8 +357,19 @@ Data.prototype.addReflexThoughts = function (group, thoughts, session) {
   }*/
 };
 
+Data.prototype.addGroupPrinciples = function (group, thoughts, session) {
+//new
+ for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+        for (var key in thoughts) {
+          this.activeSessions[session].groups[i].groupPrinciples.push(thoughts[key]);
+        }
+    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupPrinciples));
+      }
+    }   
+  };
 Data.prototype.addPrinciples = function (group, principles) {
-
+//old
   if (this.principles.hasOwnProperty(group)) {
     for (var key in principles) {
       this.principles[group].push(principles[key]);
@@ -324,8 +380,20 @@ Data.prototype.addPrinciples = function (group, principles) {
   }
 };
 
+Data.prototype.addGroupConcreteValues = function (group, thoughts, session) {
+//new
+ for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+        for (var key in thoughts) {
+          this.activeSessions[session].groups[i].groupConcreteValues.push(thoughts[key]);
+        }
+    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupConcreteValues));
+      }
+          
+    }   
+  };
 Data.prototype.addConcreteValues = function (group, concreteValues) {
-
+//old
   if (this.concreteValues.hasOwnProperty(group)) {
     for (var key in concreteValues) {
       this.concreteValues[group].push(concreteValues[key]);
@@ -336,8 +404,21 @@ Data.prototype.addConcreteValues = function (group, concreteValues) {
   }
 };
 
-Data.prototype.addActionAlternatives = function (group, actionAlternatives) {
+Data.prototype.addGroupActionAlternatives = function (group, thoughts, session) {
+//new
+ for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+        for (var key in thoughts) {
+          this.activeSessions[session].groups[i].groupActionAlternatives.push(thoughts[key]);
+        }
+    console.log("reflex thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupActionAlternatives));
+      }
+          
+    }   
+  };
 
+Data.prototype.addActionAlternatives = function (group, actionAlternatives) {
+//old
   if (this.actionAlternatives.hasOwnProperty(group)) {
     for (var key in actionAlternatives) {
       this.actionAlternatives[group].push(actionAlternatives[key]);
@@ -391,16 +472,6 @@ Data.prototype.addGroupPoss = function (group, groupposs, session) {
   
   }
 
-
-//old
-/*  if (this.groupPoss.hasOwnProperty(group)) {
-    for (var key in groupposs) {
-      this.groupPoss[group].push(groupposs[key]);
-    }
-  }
-  else {
-    this.groupPoss[group] = groupposs;
-  }*/
 };
 
 
@@ -659,7 +730,7 @@ function groupsmessages(index) {
    
     //new
     socket.on('dilemma', function (info) {
-      data.addDilemma(data.activeSessions[info.session].groupNames[index], info.dilemma, info.session);
+      data.addGroupDilemma(data.activeSessions[info.session].groupNames[index], info.dilemma, info.session);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showdilemma', info);
     });
     //new
@@ -667,31 +738,40 @@ function groupsmessages(index) {
       io.of(data.activeSessions[info.session].groupNames[index]).emit('editdilemma', info);
     });
 
+    //new
     //collecting reflexthoughts
     socket.on('reflexthoughts', function (info) {
-      data.addReflexThoughts(data.activeSessions[info.session].groupNames[index], info.thoughts, info.session);
+      data.addGroupReflexThoughts(data.activeSessions[info.session].groupNames[index], info.thoughts, info.session);
       //get reflex thoughts here
       var reflexthoughts = data.getGroupReflexthoughts(data.activeSessions[info.session].groupNames[index], info.session);
       //sending reflexthoughts within each group
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showreflexthoughts', reflexthoughts);
     });
+    
+    //new
     //collecting principles
-    socket.on('principles', function (principles) {
-      data.addPrinciples(data.groupNames[index], principles);
+    socket.on('principles', function (info) {
+      data.addGroupPrinciples(data.activeSessions[info.session].groupNames[index], info.principles, info.session);
+      //get group principles
+      var principles = data.getGroupPrinciples(data.activeSessions[info.session].groupNames[index], info.session);
       //sending principles within each group
-      io.of(data.groupNames[index]).emit('showprinciples', data.principles[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showprinciples', principles);
     });
+    //new
     //collecting concreteValues
-    socket.on('concretevalues', function (concreteValues) {
-      data.addConcreteValues(data.groupNames[index], concreteValues);
+    socket.on('concretevalues', function (info) {
+      data.addGroupConcreteValues(data.activeSessions[info.session].groupNames[index], info.concretevalues, info.session);
+      var concretevalues = data.getGroupConcreteValues(data.activeSessions[info.session].groupNames[index], info.session);
       //sending concretevalues within each group
-      io.of(data.groupNames[index]).emit('showconcretevalues', data.concreteValues[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showconcretevalues', concretevalues);
     });
+    //new
     //collecting action alternatives
-    socket.on('actionalternatives', function (actionAlternatives) {
-      data.addActionAlternatives(data.groupNames[index], actionAlternatives);
+    socket.on('actionalternatives', function (info) {
+      data.addGroupActionAlternatives(data.activeSessions[info.session].groupNames[index], info.actionalternatives, info.session);
+      var actionalternatives = data.getGroupActionAlternatives(data.activeSessions[info.session].groupNames[index], info.session);
       //sending action alternatives within each group
-      io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showactionalternatives', actionalternatives);
     });
     
     ///exercise 1
@@ -749,34 +829,55 @@ function groupsmessages(index) {
     //end of exercise 1
 
     //sending summary to grooups
-    socket.on('wantsummary', function () {
+    socket.on('wantsummary', function (info) {
       //sending all groups input on summary page first shown within each group
-      io.of(data.groupNames[index]).emit('summarydata',
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('summarydata',
         {
-          'actionAlternatives': data.actionAlternatives[data.groupNames[index]],
-          'concreteValues': data.concreteValues[data.groupNames[index]],
-          'principles': data.principles[data.groupNames[index]],
-          'reflexThoughts': data.reflexthoughts[data.groupNames[index]]
+          'actionAlternatives': data.getGroupActionAlternatives(data.activeSessions[info.session].groupNames[index], info.session),
+          'concreteValues': data.getGroupConcreteValues(data.activeSessions[info.session].groupNames[index], info.session),
+          'principles': data.getGroupPrinciples(data.activeSessions[info.session].groupNames[index], info.session),
+          'reflexThoughts': data.getGroupReflexthoughts(data.activeSessions[info.session].groupNames[index], info.session)
         });
     });
     //updating server data if students removes a summary input and notify group
     socket.on('removesummaryinput', function (info) {
+
+      var group = data.activeSessions[info.session].groupNames[index];
+      var thoughts = data.deleteGroupInput(group, info.session, info.indx, info.inputtype);
+      
       if (info.inputtype == "reflex") {
-        data.reflexthoughts[data.groupNames[index]].splice(info.indx, 1);
-        io.of(data.groupNames[index]).emit('showreflexthoughts', data.reflexthoughts[data.groupNames[index]]);
-      }
+        io.of(group).emit('showreflexthoughts', thoughts);
+      } 
       if (info.inputtype == "principle") {
-        data.principles[data.groupNames[index]].splice(info.indx, 1);
-        io.of(data.groupNames[index]).emit('showprinciples', data.principles[data.groupNames[index]]);
+        io.of(group).emit('showprinciples', thoughts);
       }
       if (info.inputtype == "concretevalue") {
-        data.concreteValues[data.groupNames[index]].splice(info.indx, 1);
-        io.of(data.groupNames[index]).emit('showconcretevalues', data.concreteValues[data.groupNames[index]]);
+        io.of(group).emit('showconcretevalues', thoughts);
+      }  
+      if (info.inputtype == "actionalternative") {
+        io.of(group).emit('showactionalternatives', thoughts);
+      }
+      /*
+      if (info.inputtype == "reflex") {
+        var group = data.activeSessions[info.session].groupNames[index];
+        var reflexthoughts = data.deleteGroupInput(group, info.session, info.indx, "reflex")
+        io.of(group).emit('showreflexthoughts', reflexthoughts);
+      }
+      if (info.inputtype == "principle") {
+        var group = data.activeSessions[info.session].groupNames[index];
+        var principles = data.deleteGroupInput(group, info.session, info.indx, "principle")
+        io.of(group).emit('showprinciples', principles);
+      }
+      if (info.inputtype == "concretevalue") {
+        var group = data.activeSessions[info.session].groupNames[index];
+        var concretevalues = data.deleteGroupInput(group, info.session, info.indx, "concretevalue")
+        io.of(group).emit('showconcretevalues', concretevalues);
       }
       if (info.inputtype == "actionalternative") {
-        data.actionAlternatives[data.groupNames[index]].splice(info.indx, 1);
-        io.of(data.groupNames[index]).emit('showactionalternatives', data.actionAlternatives[data.groupNames[index]]);
-      }
+        var group = data.activeSessions[info.session].groupNames[index];
+        var actions = data.deleteGroupInput(group, info.session, info.indx, "actionalternative")
+        io.of(group).emit('showactionalternatives', actions);
+      }*/
     });
     //listening for groups to submit their final analysis
     socket.on('submitanalysis', function () {
