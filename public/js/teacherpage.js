@@ -79,12 +79,12 @@ data: function() {
     socket.emit('teachergeneratesession', this.session);
     socket.emit('wantallsessions');
    }
-  },
+   },
   template:`
         <div id="app">
         <p>Start an existing workshop or start new</p>
           <nav>
-           <router-link to="/startworkshop" v-for="(sessionId, index) in sessions" :key='index'>
+           <router-link :to="{name:'startworkshop', params: {'sessionID': sessionId}}" v-on:click="setSession(sessionId)" v-for="(sessionId, index) in sessions" :key='index'>
             {{sessionId}}
            </router-link>
            </nav>
@@ -145,6 +145,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
+    Vue.prototype.$session = this.$route.params.sessionID;
+    this.session = this.$session;
+    console.log('now at session: ' + this.$session);
+
     //TODO check username already exists  
     socket.on("StudentLoggedIn", function(info) {
       if (info.session == this.$session) {  
