@@ -531,9 +531,9 @@ var studentconnection = studentsio.on('connection', socket => {
     teacherconnection.emit("StudentLoggedIn", {username: info.username, session: info.session});
   });
   //listening for Student to want to display the inital dilemma thoughts
-  socket.on('initialThoughtsStudent', function (message) {
-    console.log(message);
-    socket.emit('displayInitialThoughts', data.thoughts);
+  socket.on('initialThoughtsStudent', function (session) {
+    console.log("want initial thoughts: " + session);
+    socket.emit('displayInitialThoughts', {'session': session, 'thoughts' : data.activeSessions[session].initialThoughts});
   });
 
   socket.on('disconnect', function () {
@@ -879,19 +879,23 @@ function groupsmessages(index) {
         io.of(group).emit('showactionalternatives', actions);
       }*/
     });
+    //new
     //listening for groups to submit their final analysis
-    socket.on('submitanalysis', function () {
+    socket.on('submitanalysis', function (session) {
+      var groupname = data.activeSessions[session].groupNames[index];
       io.emit('showanalysis', {
         //sending analysis to teacher
-        'group': data.groupNames[index],
-        'dilemma': data.dilemmas[data.groupNames[index]],
-        'actionAlternatives': data.actionAlternatives[data.groupNames[index]],
-        'concreteValues': data.concreteValues[data.groupNames[index]],
-        'principles': data.principles[data.groupNames[index]],
-        'reflexThoughts': data.reflexthoughts[data.groupNames[index]]
+        'session': session,
+        'group': groupname,
+        'dilemma': data.getGroupDilemma(groupname, session),
+        'actionAlternatives': data.getGroupActionAlternatives(groupname, session),
+        'concreteValues': data.getGroupConcreteValues(groupname, session),
+        'principles': data.getGroupPrinciples(groupname, session),
+        'reflexThoughts': data.getGroupReflexthoughts(groupname, session)
       });
+      //new
       //notify group that analysis is submitted
-      io.of(data.groupNames[index]).emit('analysissubmitted', 'The analysis is submitted');
+      io.of(groupname).emit('analysissubmitted', 'The analysis is submitted');
     });
   }
 };

@@ -850,10 +850,11 @@ const Vote = Vue.component('Vote', {
   created: function() {
     socket.emit('initialThoughts', this.$session);
     socket.on('displayInitialThoughts', function (info) {
+      console.log('display init thoughts '+ info.session);
       if (info.session == this.$session) {
         this.thoughts = info.thoughts;
         //initialize component with as many poll objs as there are thoughts
-        for (var n = 0; n < thoughts.length; n++) {
+        for (var n = 0; n < info.thoughts.length; n++) {
           console.log("loop step: " + n);
           this.listoptions.push(
             {
@@ -875,19 +876,21 @@ const Vote = Vue.component('Vote', {
    
   //listen for student votes and updating the poll votes accordingly
   socket.on('vote', function(obj) {
-    console.log('vote recieved');
-    if (obj.answer === "Heteronomy") {
-      console.log(obj.answer);
-      this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
-      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
-    }
-    else if (obj.answer === "Autonomy") {
-      console.log(obj.answer);
-      this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
-      console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+    if (obj.session == this.$session) {
+      console.log('vote recieved');
+        if (obj.answer === "Heteronomy") {
+          console.log(obj.answer);
+          this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
+        }
+        else if (obj.answer === "Autonomy") {
+          console.log(obj.answer);
+          this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+        }   
     }
   }.bind(this));
-  } ,
+  },
   methods: {
     updateShowIndex() {
       if (this.i >= this.thoughts.length - 1) {
@@ -1049,30 +1052,31 @@ const app = new Vue({
       Vue.prototype.$sessions = sessions;
       console.log('vue sessionscomp: ' + this.$sessions);
     });
-      socket.on('showanalysis', function(data) {
-      var contains = false;
-      var index;
-      //console.log("new analys " + data.group);
-      for (var i in this.$analys) {
-        //if this groups analysis already existis
-        //console.log("existing analys in index " + i + this.$analys[i].group);
-        if (data.group === this.$analys[i].group) {
-          //console.log('match');
-          contains = true;
-          index = i;
+    socket.on('showanalysis', function (data) {
+      if (data.session == this.$session) {
+        var contains = false;
+        var index;
+        //console.log("new analys " + data.group);
+        for (var i in this.$analys) {
+          //if this groups analysis already existis
+          //console.log("existing analys in index " + i + this.$analys[i].group);
+          if (data.group === this.$analys[i].group) {
+            //console.log('match');
+            contains = true;
+            index = i;
+          }
+        }
+        if (contains) {
+          //replace old analysis with new
+          this.$analys.splice(index, 1);
+          this.$analys.push(data);
+        }
+        else {
+          //just add the new analysis
+          this.$analys.push(data);
         }
       }
-      if (contains){
-        //replace old analysis with new
-        this.$analys.splice(index,1);
-        this.$analys.push(data);
-      }
-      else {
-        //just add the new analysis
-        this.$analys.push(data); 
-      }
+    }.bind(this));
 
-    }.bind(this));  
- 
   }
 }); 

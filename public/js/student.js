@@ -1659,30 +1659,29 @@ const Summary = Vue.component('Summary', {
     addinput(type) {
       if (type == "reflex") {
         this.reflexthoughts.push({reflex: this.reflex});
-        groupsocket.emit('reflexthoughts', [{ reflex : this.reflex, 'session': this.$activeSession }]);
+        groupsocket.emit('reflexthoughts', { 'thoughts' :[{reflex: this.reflex}], 'session': this.$activeSession });
         this.reflex = '';
       }
       //TODO add session and check name of data input thought ^
       if (type == "principle") {
         this.principles.push({principle: this.principle});
-        groupsocket.emit('principles', [ { principle: this.principle }]);
+        groupsocket.emit('principles', { 'principles': [{principle : this.principle}], 'session' : this.$activeSession });
         this.principle = '';
       }
       if (type == "concretevalue") {
         this.concreteValues.push({concreteValue: this.concreteValue});
-        groupsocket.emit('concretevalues', [ {concreteValue: this.concreteValue }]);
+        groupsocket.emit('concretevalues', {'concretevalues': [{concreteValue : this.concreteValue}], 'session' : this.$activeSession });
         this.concreteValue = '';
       }
       if (type == "actionalternative") {
         this.actionAlternatives.push({actionAlternative: this.actionAlternative});
-        groupsocket.emit('actionalternatives', [{actionAlternative: this.actionAlternative}]);
+        groupsocket.emit('actionalternatives', {'actionalternatives' :[{actionAlternative: this.actionAlternative}], 'session': this.$activeSession });
         this.actionAlternative = ''; 
       }
     },
 
     submitAnalysis() {
-      groupsocket.emit('submitanalysis', function() {
-      });
+      groupsocket.emit('submitanalysis', this.$activeSession);
     }
   },
   template: `
@@ -1791,44 +1790,49 @@ const StudentVote = Vue.component('StudentVote', {
 
     }
   },
-  created: function() {
-   
-    studentsocket.on('wantcurrentlocation', function() {
+  created: function () {
+
+    studentsocket.on('wantcurrentlocation', function () {
       studentsocket.emit('currentlocation', '/studentvote');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
-    }  
+    }
     else {
-      studentsocket.emit('initialThoughtsStudent', 'want inital thoughts student');
-      studentsocket.on('displayInitialThoughts', function(thoughts) {
-        this.thoughts = thoughts;
-        //initialize component with as many poll objs as there are thoughts
-        for (var n = 0; n < thoughts.length; n++) {
-          this.listoptions.push(
-            {options: {
-              customId: n+1,
-              showTotalVotes: true,
-              question: 'Do you think this thought is heteronomy or autonomy?',
-              answers: [
-                { value: 1, text: 'Heteronomy', votes: 0 },
-                { value: 2, text: 'Autonomy', votes: 0 }
-              ],
-            }
-            }  
-          );      
+      studentsocket.emit('initialThoughtsStudent', this.$activeSession);
+      studentsocket.on('displayInitialThoughts', function (info) {
+        if (info.session == this.$activeSession) {
+          this.thoughts = info.thoughts;
+          //initialize component with as many poll objs as there are thoughts
+          for (var n = 0; n < info.thoughts.length; n++) {
+            this.listoptions.push(
+              {
+                options: {
+                  customId: n + 1,
+                  showTotalVotes: true,
+                  question: 'Do you think this thought is heteronomy or autonomy?',
+                  answers: [
+                    { value: 1, text: 'Heteronomy', votes: 0 },
+                    { value: 2, text: 'Autonomy', votes: 0 }
+                  ],
+                }
+              }
+            );
+          }
         }
       }.bind(this));
 
       //listen for student votes and updating the poll votes accordingly
       studentsocket.on('vote', function(obj) {
-        if (obj.answer === "Heteronomy") {
-          this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
-        }
-        else if (obj.answer === "Autonomy") {
-          this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+        if (obj.session == this.$activeSession) {
+          if (obj.answer === "Heteronomy") {
+            this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+          }
+          else if (obj.answer === "Autonomy") {
+            this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
+          }
         }
       }.bind(this));
     }
@@ -1846,10 +1850,10 @@ const StudentVote = Vue.component('StudentVote', {
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
       if (obj.value === 1) {
-        studentsocket.emit('studentvote', {answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
+        studentsocket.emit('studentvote', {session: this.$activeSession, answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
         }
       if (obj.value === 2) {
-        studentsocket.emit('studentvote', {answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
+        studentsocket.emit('studentvote', {session: this.$activeSession, answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
         }
       }
   },
