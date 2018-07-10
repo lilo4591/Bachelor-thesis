@@ -55,10 +55,10 @@ function Data() {
   this.activeSessions = {};
   this.activeSessionsNames = [];
 }
-Data.prototype.addActiveSession= function(sessionId) {
+Data.prototype.addActiveSession = function (sessionId) {
   this.activeSessionsNames.push(sessionId);
   //TODO look up when students outside group should be empty or not
-  this.activeSessions[sessionId] = {session: sessionId, groupNum: null, groups: [], groupNames: [], initialThoughts: [], students: []};
+  this.activeSessions[sessionId] = { session: sessionId, groupNum: null, groups: [], groupNames: [], initialThoughts: [], students: [] };
   //console.log("active sessions" + this.activeSessions);
 
 };
@@ -82,18 +82,18 @@ Data.prototype.resetInputdata = function (session) {
 }
 
 Data.prototype.addStudent = function (username, socketid, session) {
-  this.activeSessions[session].students.push({studentname: username, id: socketid});
+  this.activeSessions[session].students.push({ studentname: username, id: socketid });
 };
 
 //deletes a student which has disconnected
 Data.prototype.removeStudent = function (socketid) {
-//new
-//delete the id from group but keep the name of the student
+  //new
+  //delete the id from group but keep the name of the student
   for (let key in this.activeSessions) {
-//    console.log("groups: "  + key);
+    //    console.log("groups: "  + key);
     for (var i in this.activeSessions[key].groups) {
       for (var n in this.activeSessions[key].groups[i].students) {
-  //      console.log("student in group: " + this.activeSessions[key].groups[i].name + "with info: " + JSON.stringify(this.activeSessions[key].groups[i].students[n]));
+        //      console.log("student in group: " + this.activeSessions[key].groups[i].name + "with info: " + JSON.stringify(this.activeSessions[key].groups[i].students[n]));
         if (this.activeSessions[key].groups[i].students[n].id == socketid) {
           this.activeSessions[key].groups[i].students[n].id = null;
           console.log("student deleted was: " + this.activeSessions[key].groups[i].students[n].studentname);
@@ -109,20 +109,20 @@ Data.prototype.addGroupName = function (group, session) {
 };
 
 Data.prototype.addGroupObj = function (group, session) {
-  var GROUP = { 
-    name: null, 
-    noOfStudents: 0, 
-    students: [], 
+  var GROUP = {
+    name: null,
+    noOfStudents: 0,
+    students: [],
     //exercise 1
-    groupSituations: [], 
-    groupRisks: [], 
+    groupSituations: [],
+    groupRisks: [],
     groupPoss: [],
     //exercise 2
     groupDilemma: null,
-    groupReflexThoughts : [],
-    groupPrinciples : [],
-    groupConcreteValues : [],
-    groupActionAlternatives : []
+    groupReflexThoughts: [],
+    groupPrinciples: [],
+    groupConcreteValues: [],
+    groupActionAlternatives: []
   };
   GROUP.name = group;
   //new
@@ -141,39 +141,40 @@ Data.prototype.deleteGroupSitRiskPoss = function (group, session, id, type) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
       if (type == "situation") {
-        this.activeSessions[session].groups[i].groupSituations.splice(id,1);
+        this.activeSessions[session].groups[i].groupSituations.splice(id, 1);
         return this.activeSessions[session].groups[i].groupSituations;
       }
       if (type == "risk") {
-        this.activeSessions[session].groups[i].groupRisks.splice(id,1);
+        this.activeSessions[session].groups[i].groupRisks.splice(id, 1);
         return this.activeSessions[session].groups[i].groupRisks;
       }
       if (type == "poss") {
-        this.activeSessions[session].groups[i].groupPoss.splice(id,1);
+        this.activeSessions[session].groups[i].groupPoss.splice(id, 1);
         return this.activeSessions[session].groups[i].groupPoss;
       }
-}
+    }
 }
 
 Data.prototype.deleteGroupInput = function (group, session, id, type) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
       if (type == "reflex") {
-        this.activeSessions[session].groups[i].groupReflexThoughts.splice(id,1);
+        this.activeSessions[session].groups[i].groupReflexThoughts.splice(id, 1);
         return this.activeSessions[session].groups[i].groupReflexThoughts;
       }
       if (type == "principle") {
-        this.activeSessions[session].groups[i].groupPrinciples.splice(id,1);
+        this.activeSessions[session].groups[i].groupPrinciples.splice(id, 1);
         return this.activeSessions[session].groups[i].groupPrinciples;
       }
       if (type == "concretevalue") {
-        this.activeSessions[session].groups[i].groupConcreteValues.splice(id,1);
+        this.activeSessions[session].groups[i].groupConcreteValues.splice(id, 1);
         return this.activeSessions[session].groups[i].groupConcreteValues;
       }
       if (type == "actionalternative") {
-        this.activeSessions[session].groups[i].groupActionAlternatives.splice(id,1);
+        this.activeSessions[session].groups[i].groupActionAlternatives.splice(id, 1);
         return this.activeSessions[session].groups[i].groupActionAlternatives;
-      }}
+      }
+    }
 }
 
 
@@ -227,7 +228,7 @@ Data.prototype.getGroupActionAlternatives = function (group, session) {
 }
 
 Data.prototype.addStudentToGroupObj = function (student, group, session) {
- //new
+  //new
   for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
       this.activeSessions[session].groups[i].noOfStudents += 1;
@@ -274,16 +275,16 @@ Data.prototype.addGroupReflexThoughts = function (group, thoughts, session) {
 };
 
 Data.prototype.addGroupPrinciples = function (group, thoughts, session) {
-//new
- for (var i in this.activeSessions[session].groups) {
+  //new
+  for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
-        for (var key in thoughts) {
-          this.activeSessions[session].groups[i].groupPrinciples.push(thoughts[key]);
-        }
-    console.log("principle thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupPrinciples));
+      for (var key in thoughts) {
+        this.activeSessions[session].groups[i].groupPrinciples.push(thoughts[key]);
       }
-    }   
-  };
+      console.log("principle thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupPrinciples));
+    }
+  }
+};
 
 
 Data.prototype.addGroupConcreteValues = function (group, thoughts, session) {
@@ -300,17 +301,17 @@ Data.prototype.addGroupConcreteValues = function (group, thoughts, session) {
 };
 
 Data.prototype.addGroupActionAlternatives = function (group, thoughts, session) {
-//new
- for (var i in this.activeSessions[session].groups) {
+  //new
+  for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
-        for (var key in thoughts) {
-          this.activeSessions[session].groups[i].groupActionAlternatives.push(thoughts[key]);
-        }
-    console.log("actionalternatives thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupActionAlternatives));
+      for (var key in thoughts) {
+        this.activeSessions[session].groups[i].groupActionAlternatives.push(thoughts[key]);
       }
-          
-    }   
-  };
+      console.log("actionalternatives thoughts added to server: " + JSON.stringify(this.activeSessions[session].groups[i].groupActionAlternatives));
+    }
+
+  }
+};
 
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
@@ -318,11 +319,11 @@ function getRandomArbitrary(min, max) {
 
 Data.prototype.addGroupSituations = function (group, groupsituations, session) {
   //new
-    for (var i in this.activeSessions[session].groups) {
-      if (this.activeSessions[session].groups[i].name == group) {
-        console.log("addgroupsituations data prtot: " + i + " and group: " + group);
-        this.activeSessions[session].groups[i].groupSituations = this.activeSessions[session].groups[i].groupSituations.concat(groupsituations);
-      }
+  for (var i in this.activeSessions[session].groups) {
+    if (this.activeSessions[session].groups[i].name == group) {
+      console.log("addgroupsituations data prtot: " + i + " and group: " + group);
+      this.activeSessions[session].groups[i].groupSituations = this.activeSessions[session].groups[i].groupSituations.concat(groupsituations);
+    }
   }
 };
 
@@ -401,12 +402,12 @@ var studentconnection = studentsio.on('connection', socket => {
       }
     }
     //notify teacher that a student has logged in
-    teacherconnection.emit("StudentLoggedIn", {username: info.username, session: info.session});
+    teacherconnection.emit("StudentLoggedIn", { username: info.username, session: info.session });
   });
   //listening for Student to want to display the inital dilemma thoughts
   socket.on('initialThoughtsStudent', function (session) {
     console.log("want initial thoughts: " + session);
-    socket.emit('displayInitialThoughts', {'session': session, 'thoughts' : data.activeSessions[session].initialThoughts});
+    socket.emit('displayInitialThoughts', { 'session': session, 'thoughts': data.activeSessions[session].initialThoughts });
   });
 
   socket.on('disconnect', function () {
@@ -424,7 +425,7 @@ var studentconnection = studentsio.on('connection', socket => {
     for (var i = 0, l = info.thoughts.length; i < l; i++) {
       data.activeSessions[info.session].initialThoughts.push(info.thoughts[i]);
     }
-    teacherconnection.emit('displayThoughts', {'session': info.session, 'thoughts' : data.activeSessions[info.session].initialThoughts});
+    teacherconnection.emit('displayThoughts', { 'session': info.session, 'thoughts': data.activeSessions[info.session].initialThoughts });
   });
 
   socket.on('studentvote', function (obj) {
@@ -442,13 +443,21 @@ var teacherconnection = io.on('connection', function (socket) {
     studentconnection.emit('activeSessionsNames', data.activeSessionsNames);
   });
   console.log("client with socketID:  " + socket.id + " connected");
- 
+
   //To display sessions on the teacherpage
-  socket.on('wantallsessions', function() {
+  socket.on('wantallsessions', function () {
     console.log("data. ", data.activeSessionsNames);
     socket.emit('allsessions', data.activeSessionsNames);
   });
 
+  //if teacher restarts a session it wants the groups from that session
+  socket.on('wantgroups', function(session) {
+    console.log('test: ' + data.activeSessions[session].groupNames);
+    if (data.activeSessions[session].groupNames.length != 0) {
+      console.log('wantgroups ' + session);
+      socket.emit('sendgroups', {'groups': data.activeSessions[session].groups, 'session' : session});
+    }
+  });
   //listering for teacher want to clear all workshopinput from server
   socket.on('clearallinput', function (session) {
     data.resetInputdata(session);
@@ -471,8 +480,8 @@ var teacherconnection = io.on('connection', function (socket) {
   /** 
     Relevant to exercise 1: Provocative
   **/
-  
- //new
+
+  //new
   socket.on('wantsituations', function (session) {
     var allsituations = [];
     for (var i in data.activeSessions[session].groups) {
@@ -480,10 +489,10 @@ var teacherconnection = io.on('connection', function (socket) {
       allsituations = allsituations.concat(data.activeSessions[session].groups[i].groupSituations);
     }
     console.log("all situations" + JSON.stringify(allsituations));
-    io.emit('collectsituations', {'situations' : allsituations , 'session' : session});
+    io.emit('collectsituations', { 'situations': allsituations, 'session': session });
   });
 
- //new
+  //new
   socket.on('wantrisks', function (session) {
     var allrisks = [];
     for (var i in data.activeSessions[session].groups) {
@@ -491,7 +500,7 @@ var teacherconnection = io.on('connection', function (socket) {
       allrisks = allrisks.concat(data.activeSessions[session].groups[i].groupRisks);
     }
     allrisks = data.generatedRisks.concat(allrisks);
-    io.emit('collectrisks', {'risks': allrisks, 'session' : session});
+    io.emit('collectrisks', { 'risks': allrisks, 'session': session });
   });
   //new
   //TODO make this one function
@@ -502,7 +511,7 @@ var teacherconnection = io.on('connection', function (socket) {
       allposs = allposs.concat(data.activeSessions[session].groups[i].groupPoss);
     }
     allposs = data.generatedPoss.concat(allposs);
-    io.emit('collectposs', { 'poss' : allposs, 'session' : session });
+    io.emit('collectposs', { 'poss': allposs, 'session': session });
   });
 
   /**
@@ -511,7 +520,7 @@ var teacherconnection = io.on('connection', function (socket) {
   //new
   socket.on('initialThoughts', function (session) {
     console.log(session);
-    socket.emit('displayInitialThoughts', { 'thoughts' : data.activeSessions[session].initialThoughts, 'session': session });
+    socket.emit('displayInitialThoughts', { 'thoughts': data.activeSessions[session].initialThoughts, 'session': session });
   });
 
   /**
@@ -519,9 +528,26 @@ var teacherconnection = io.on('connection', function (socket) {
     **/
 
   socket.on('generateGroups', function (info) {
+    // check if there already are groups
+    var groupnames = data.activeSessions[info.session].groupNames;
+    if (groupnames.length != 0) {
+      console.log('regenerate groups');
+      //disconnect the students from the groups groups
+      //console.log(Array.from(Object.keys(groupnamesconnected[0].connected)));
+      for (var i in groupnames) {
+        var connectedclients = Object.keys(io.of(groupnames[i]).clients().connected);
+        console.log( "in groupnamesconnected for loop : " + JSON.stringify(groupnames[i]));
+        for(var n in connectedclients) {
+          connectedclients[n].disconnect();
+        }
+      }
+      //delete the groups
+      data.activeSessions[info.session].groups = [];
+      data.activeSessions[info.session].groupNames = [];  
+    }
     console.log("generate groups: " + info.session);
     generateGroups(info.groupSize, info.session);
-      //sending groupname,size and ids to teacherpage to print
+    //sending groupname,size and ids to teacherpage to print
     socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
 
     //namespace specific to groups
@@ -530,7 +556,7 @@ var teacherconnection = io.on('connection', function (socket) {
     for (i = 0, len = data.activeSessions[info.session].groupNames.length; i < len; i++) {
       console.log(i);
       io.of(data.activeSessions[info.session].groupNames[i]).on('connection', groupsmessages(i, info.session));
-    }(i);
+    } (i);
   });
 
 });
@@ -541,7 +567,7 @@ function generateGroups(groupSize, session) {
   //create namespace for each group
   for (var i = 0, len = data.activeSessions[session].groupNum; i < len; i++) {
     console.log("create namespace for each group: " + i);
-    var group = '/'+ session.toString() + 'group' + i.toString();
+    var group = '/' + session.toString() + 'group' + i.toString();
     data.addGroupName(group, session);
     //groupobj to print to teacher
     data.addGroupObj(group, session);
@@ -593,13 +619,13 @@ function groupsmessages(index, session) {
 
     console.log("A student joined a group " + data.activeSessions[session].groupNames[index]);
     console.log("active sessions now" + JSON.stringify(data.activeSessions));
-    
+
     //update groupmembers on keyup 
-    socket.on('dilemmakeyup', function(info) {
+    socket.on('dilemmakeyup', function (info) {
       console.log("test on kwy up" + info.dilemma);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('dilemmakeyup', info);
     });
-   
+
     //new
     socket.on('dilemma', function (info) {
       data.addGroupDilemma(data.activeSessions[info.session].groupNames[index], info.dilemma, info.session);
@@ -619,7 +645,7 @@ function groupsmessages(index, session) {
       //sending reflexthoughts within each group
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showreflexthoughts', reflexthoughts);
     });
-    
+
     //new
     //collecting principles
     socket.on('principles', function (info) {
@@ -645,7 +671,7 @@ function groupsmessages(index, session) {
       //sending action alternatives within each group
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showactionalternatives', actionalternatives);
     });
-    
+
     ///exercise 1
     //updated
     //collecting situations for each group
@@ -653,25 +679,25 @@ function groupsmessages(index, session) {
       data.addGroupSituations(data.activeSessions[info.session].groupNames[index], info.situations, info.session);
       //sending situations within each group
       var groupsitu = data.getGroupSituations(data.activeSessions[info.session].groupNames[index], info.session);
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations : groupsitu, session : info.session });
-    
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations: groupsitu, session: info.session });
+
     });
     //updated
     //updating server data if students removes a situation input and notify group
     socket.on('removesituation', function (info) {
       var groupsitu = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "situation");
       //data.activeSessions[info.session].groupSituations[data.activeSessions[info.session].groupNames[index]].splice(info.id, 1);
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', {'session' : info.session ,'situations' :groupsitu});
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { 'session': info.session, 'situations': groupsitu });
     });
 
     //collecting risks for each group
     socket.on('grouprisks', function (info) {
-      console.log('in grouprisks ' + JSON.stringify(info) );
+      console.log('in grouprisks ' + JSON.stringify(info));
       data.addGroupRisks(data.activeSessions[info.session].groupNames[index], info.risks, info.session);
       var groupRisks = data.getGroupRisks(data.activeSessions[info.session].groupNames[index], info.session);
-      console.log('in grouprisks  after get ' + JSON.stringify(groupRisks) );
+      console.log('in grouprisks  after get ' + JSON.stringify(groupRisks));
       //sending risks within each group
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', {'session' : info.session ,'risks' :groupRisks});
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', { 'session': info.session, 'risks': groupRisks });
     });
 
     //new
@@ -679,7 +705,7 @@ function groupsmessages(index, session) {
     socket.on('removerisk', function (info) {
       var groupRisks = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "risk");
       //data.groupRisks[data.groupNames[index]].splice(id, 1);
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', {'session' : info.session ,'risks' :groupRisks});
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', { 'session': info.session, 'risks': groupRisks });
     });
 
     //collecting possibilies for each group
@@ -687,7 +713,7 @@ function groupsmessages(index, session) {
       data.addGroupPoss(data.activeSessions[info.session].groupNames[index], info.poss, info.session);
       var groupPoss = data.getGroupPoss(data.activeSessions[info.session].groupNames[index], info.session);
       //sending possibilies within each group
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', {'session' : info.session ,'poss' :groupPoss});
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', { 'session': info.session, 'poss': groupPoss });
     });
 
 
@@ -695,8 +721,8 @@ function groupsmessages(index, session) {
     //updating server data if students removes a possibiliey input and notify group
     socket.on('removeposs', function (info) {
       var groupPoss = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "poss");
-     // data.groupPoss[data.groupNames[index]].splice(id, 1);
-      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', {'session' : info.session ,'poss' :groupPoss});
+      // data.groupPoss[data.groupNames[index]].splice(id, 1);
+      io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', { 'session': info.session, 'poss': groupPoss });
     });
     //end of exercise 1
 
@@ -716,40 +742,19 @@ function groupsmessages(index, session) {
 
       var group = data.activeSessions[info.session].groupNames[index];
       var thoughts = data.deleteGroupInput(group, info.session, info.indx, info.inputtype);
-      
+
       if (info.inputtype == "reflex") {
         io.of(group).emit('showreflexthoughts', thoughts);
-      } 
+      }
       if (info.inputtype == "principle") {
         io.of(group).emit('showprinciples', thoughts);
       }
       if (info.inputtype == "concretevalue") {
         io.of(group).emit('showconcretevalues', thoughts);
-      }  
+      }
       if (info.inputtype == "actionalternative") {
         io.of(group).emit('showactionalternatives', thoughts);
       }
-      /*
-      if (info.inputtype == "reflex") {
-        var group = data.activeSessions[info.session].groupNames[index];
-        var reflexthoughts = data.deleteGroupInput(group, info.session, info.indx, "reflex")
-        io.of(group).emit('showreflexthoughts', reflexthoughts);
-      }
-      if (info.inputtype == "principle") {
-        var group = data.activeSessions[info.session].groupNames[index];
-        var principles = data.deleteGroupInput(group, info.session, info.indx, "principle")
-        io.of(group).emit('showprinciples', principles);
-      }
-      if (info.inputtype == "concretevalue") {
-        var group = data.activeSessions[info.session].groupNames[index];
-        var concretevalues = data.deleteGroupInput(group, info.session, info.indx, "concretevalue")
-        io.of(group).emit('showconcretevalues', concretevalues);
-      }
-      if (info.inputtype == "actionalternative") {
-        var group = data.activeSessions[info.session].groupNames[index];
-        var actions = data.deleteGroupInput(group, info.session, info.indx, "actionalternative")
-        io.of(group).emit('showactionalternatives', actions);
-      }*/
     });
     //new
     //listening for groups to submit their final analysis

@@ -130,8 +130,9 @@ const StartWorkshop = Vue.component('StartWorkshop', {
         </div>
         </ul>
         <router-link to="/workshopexercises">
-        <button class="button"> Start workshop </button>
+        <button class="button">Start workshop </button>
         </router-link>
+        <button class="button" v-on:click="generateGroups(numEachGroup)" type="submit">Regenerate groups</button>
         <br>
       </div>
         <router-link tag="button" class="navbutton" to="/sessions">
@@ -146,13 +147,33 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   `,
   created: function() {
     if (this.$route.params.sessionID != undefined) {
-      Vue.prototype.$session = this.$route.params.sessionID;
+      Vue.prototype.$session = Number(this.$route.params.sessionID);
       this.session = this.$session;
     }
     console.log('now at session: ' + this.$session);
 
+    socket.emit('wantgroups', this.$session);
+    socket.on('sendgroups', function(info){
+      console.log('want group session: ' + info.session);
+      console.log('typeof info.session: ' + typeof(info.session));
+      console.log('this session: ' + this.$session);
+      if (info.session == this.$session) {
+        console.log("in if");
+        this.groupObject = info.groups
+        for (var i in info.groups) {
+          for (var m in info.groups[i].students) {
+            var student = info.groups[i].students[m].studentname;
+            this.addStudent(student);
+          }
+        }
+      console.log("all students already connected: " + this.students);
+      }
+
+    }.bind(this));
+
     //TODO check username already exists  
     socket.on("StudentLoggedIn", function(info) {
+      console.log('student logged in ' + this.$session);
       if (info.session == this.$session) {  
           this.addStudent(info.username);
           console.log(this.students);
@@ -171,10 +192,12 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
-    socket.emit('generateGroups', {groupSize: n, session: this.session});
-    console.log("start generate: " + n); 
-    }
- }
+    if (this.students != []) {
+      socket.emit('generateGroups', {groupSize: n, session: this.session});
+      console.log("start generate: " + n); 
+      }
+    },
+  }
 });
 
 const workshopExercises = Vue.component('WorkshopExercises', {
