@@ -145,8 +145,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
-    Vue.prototype.$session = this.$route.params.sessionID;
-    this.session = this.$session;
+    if (this.$route.params.sessionID != undefined) {
+      Vue.prototype.$session = this.$route.params.sessionID;
+      this.session = this.$session;
+    }
     console.log('now at session: ' + this.$session);
 
     //TODO check username already exists  
@@ -244,7 +246,7 @@ const Settings = Vue.component('Settings', {
   },
   methods: {
   clearAllInput() {
-      socket.emit('clearallinput', 'message');
+      socket.emit('clearallinput', this.$session);
       this.responseShow = true;
     }
   },
