@@ -372,7 +372,7 @@ var studentconnection = studentsio.on('connection', socket => {
     console.log("student with socketID: " + socket.id + " logged in to the workshop");
     //add student to global namespace
     data.addStudent(info.username, socket.id, info.session);
-    console.log("active sessions now just logged in " + JSON.stringify(data.activeSessions));
+    //console.log("active sessions now just logged in " + JSON.stringify(data.activeSessions));
 
     //checks if student username already exists in a group(student has already been logged in)
     if (data.activeSessions[info.session].groups != []) {
@@ -437,12 +437,13 @@ var studentconnection = studentsio.on('connection', socket => {
 
 });
 
-var teacherconnection = io.on('connection', function (socket) {
+const teacherio = io.of('/teacher');
+var teacherconnection = teacherio.on('connection', function (socket) {
   socket.on('teachergeneratesession', function (session) {
     data.addActiveSession(session);
     studentconnection.emit('activeSessionsNames', data.activeSessionsNames);
   });
-  console.log("client with socketID:  " + socket.id + " connected");
+  console.log("teacher with socketID:  " + socket.id + " connected");
 
   //To display sessions on the teacherpage
   socket.on('wantallsessions', function () {
@@ -528,31 +529,16 @@ var teacherconnection = io.on('connection', function (socket) {
     **/
 
   socket.on('generateGroups', function (info) {
-    // check if there already are groups
     var groupnames = data.activeSessions[info.session].groupNames;
-    console.log("groupnames: " + groupnames);
+    //console.log("groupnames: " + groupnames);
+    // check if there already are groups
     if (groupnames.length != 0) {
-      console.log('regenerate groups');
-      //disconnect the students from the groups groups
-      //console.log(Array.from(Object.keys(groupnamesconnected[0].connected)));
-      for (var i in groupnames) {
-        var connectedclients = io.of(groupnames[i]).clients().connected;
-        console.log( "in groupnamesconnected for loop : " + JSON.stringify(groupnames[i]));
-        for(var n in connectedclients) {
-      //TODO
-          console.log('connected clients index number: ' + n);  
-          connectedclients[n].disconnect();
-        }
-      }
-      //delete the groups
-      data.activeSessions[info.session].groups = [];
-      data.activeSessions[info.session].groupNames = [];  
+      //console.log('regenerate groups');
+      resetGroups(groupnames, info.session);
     }
-    console.log("generate groups: " + info.session);
-    console.log("generate group SIZE: " + info.groupSize );
     generateGroups(info.groupSize, info.session);
     //sending groupname,size and ids to teacherpage to print
-    console.log("new groups is: " + JSON.stringify(data.activeSessions[info.session].groups));
+    //console.log("new groups is: " + JSON.stringify(data.activeSessions[info.session].groups));
     socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
 
     //namespace specific to groups
@@ -593,6 +579,7 @@ function generateGroups(groupSize, session) {
     //put student in group
     var index = Math.floor(getRandomArbitrary(0, allstudents.length));
     data.addStudentToGroupObj(allstudents[index], currentGroup, session);
+    console.log("sending namespace to student named: " + JSON.stringify(allstudents[index].studentname));
     studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
     //delete used student
     allstudents.splice(index, 1);
@@ -603,6 +590,7 @@ function generateGroups(groupSize, session) {
       var index = Math.floor(getRandomArbitrary(0, allstudents.length));
       console.log("INDEX" + index);
       data.addStudentToGroupObj(allstudents[index], currentGroup, session);
+      console.log("sending namespace to student named: " + JSON.stringify(allstudents[index].studentname));
       studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
       //delete used student
       allstudents.splice(index, 1);
@@ -618,6 +606,23 @@ function generateGroups(groupSize, session) {
 }
 
 
+function resetGroups(groupnames, session) {
+  //disconnect the students from the groups groups
+  for (var i in groupnames) {
+    const namespace = io.of(groupnames[i]);
+    const connectedstudents = Object.keys(namespace.connected);
+    connectedstudents.forEach(socketId => {
+      namespace.connected[socketId].disconnect();
+    });
+    namespace.removeAllListeners();
+    delete io.nsps[groupnames[i]];
+  }
+  //delete the groups of the session object
+  data.activeSessions[session].groups = [];
+  data.activeSessions[session].groupNames = [];
+
+}
+
 function groupsmessages(index, session) {
   return function (socket) {
     //listening for studens disconnecting from gropus
@@ -626,7 +631,7 @@ function groupsmessages(index, session) {
     });
 
     console.log("A student joined a group " + data.activeSessions[session].groupNames[index]);
-    console.log("active sessions now" + JSON.stringify(data.activeSessions));
+    //console.log("active sessions now - groups: " + JSON.stringify(data.activeSessions[session].groups));
 
     //update groupmembers on keyup 
     socket.on('dilemmakeyup', function (info) {

@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io('/teacher');
 
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];

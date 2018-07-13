@@ -117,8 +117,9 @@ const Start = Vue.component('Start', {
   created:function() {
     studentsocket.on('namespace', function (group) {
       groupsocket = io.connect(group);
-      Vue.prototype.$groupName = (group);
+      Vue.prototype.$groupName = group;
       this.groupName = this.$groupName;
+      //groupsocket = this.$groupName;
       console.log(group);
     }.bind(this));
     this.groupName = this.$groupName;
