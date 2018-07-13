@@ -530,14 +530,17 @@ var teacherconnection = io.on('connection', function (socket) {
   socket.on('generateGroups', function (info) {
     // check if there already are groups
     var groupnames = data.activeSessions[info.session].groupNames;
+    console.log("groupnames: " + groupnames);
     if (groupnames.length != 0) {
       console.log('regenerate groups');
       //disconnect the students from the groups groups
       //console.log(Array.from(Object.keys(groupnamesconnected[0].connected)));
       for (var i in groupnames) {
-        var connectedclients = Object.keys(io.of(groupnames[i]).clients().connected);
+        var connectedclients = io.of(groupnames[i]).clients().connected;
         console.log( "in groupnamesconnected for loop : " + JSON.stringify(groupnames[i]));
         for(var n in connectedclients) {
+      //TODO
+          console.log('connected clients index number: ' + n);  
           connectedclients[n].disconnect();
         }
       }
@@ -546,8 +549,10 @@ var teacherconnection = io.on('connection', function (socket) {
       data.activeSessions[info.session].groupNames = [];  
     }
     console.log("generate groups: " + info.session);
+    console.log("generate group SIZE: " + info.groupSize );
     generateGroups(info.groupSize, info.session);
     //sending groupname,size and ids to teacherpage to print
+    console.log("new groups is: " + JSON.stringify(data.activeSessions[info.session].groups));
     socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
 
     //namespace specific to groups
@@ -562,7 +567,9 @@ var teacherconnection = io.on('connection', function (socket) {
 });
 
 function generateGroups(groupSize, session) {
+  console.log("groupsize in generate groups: " + groupSize);
   data.setNumGroups(groupSize, session);
+  console.log("groupNum in generate groups: " + data.activeSessions[session].groupNum);
 
   //create namespace for each group
   for (var i = 0, len = data.activeSessions[session].groupNum; i < len; i++) {
@@ -573,7 +580,8 @@ function generateGroups(groupSize, session) {
     data.addGroupObj(group, session);
   }
 
-  var allstudents = data.activeSessions[session].students;
+  var allstudents = data.activeSessions[session].students.slice();
+
   var g = 0;
   var currentGroup = data.activeSessions[session].groupNames[g];
   var count = 0;
