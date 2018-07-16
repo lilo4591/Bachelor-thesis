@@ -211,7 +211,13 @@ ul li.example {
 
 #textleft {
   color: gray;
-  text-align: left;
+  float: left;
+  /*text-align: left;*/
+}
+
+#textright {
+  color: gray;
+  float: right;
 }
 /*Forr navigation back symbol*/
 #left {
@@ -239,7 +245,7 @@ ul li.example {
 
 .containheader1 {
   grid-row: 1;
-  grid-column; 1;
+  grid-column: 1;
 }
 
 .containtext1 {
@@ -249,12 +255,12 @@ ul li.example {
 
 .containnav1 {
   grid-row: 3;
-  grid-column; 1;
+  grid-column: 1;
 }
 
 .containheader2 {
   grid-row: 1;
-  grid-column; 2;
+  grid-column: 2;
 }
 
 .containtext2 {
@@ -264,7 +270,7 @@ ul li.example {
 
 .containnav2 {
   grid-row: 3;
-  grid-column; 2;
+  grid-column: 2;
 }
 
 #boldtext {

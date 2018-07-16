@@ -317,22 +317,22 @@ function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-Data.prototype.addGroupSituations = function (group, groupsituations, session) {
+Data.prototype.addGroupSituation = function (group, groupsituation, session) {
   //new
   for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
       console.log("addgroupsituations data prtot: " + i + " and group: " + group);
-      this.activeSessions[session].groups[i].groupSituations = this.activeSessions[session].groups[i].groupSituations.concat(groupsituations);
+      this.activeSessions[session].groups[i].groupSituations.unshift(groupsituation);
     }
   }
 };
 
-Data.prototype.addGroupRisks = function (group, grouprisks, session) {
+Data.prototype.addGroupRisk = function (group, grouprisk, session) {
   //new
   for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
       console.log("addgrouprisks data prtot: " + i + " and group: " + group);
-      this.activeSessions[session].groups[i].groupRisks = this.activeSessions[session].groups[i].groupRisks.concat(grouprisks);
+      this.activeSessions[session].groups[i].groupRisks.unshift(grouprisk);
     }
   }
 };
@@ -342,7 +342,7 @@ Data.prototype.addGroupPoss = function (group, groupposs, session) {
   for (var i in this.activeSessions[session].groups) {
     if (this.activeSessions[session].groups[i].name == group) {
       console.log("addgroupposs data prtot: " + i + " and group: " + group);
-      this.activeSessions[session].groups[i].groupPoss = this.activeSessions[session].groups[i].groupPoss.concat(groupposs);
+      this.activeSessions[session].groups[i].groupPoss.unshift(groupposs);
     }
 
   }
@@ -384,7 +384,7 @@ var studentconnection = studentsio.on('connection', socket => {
             console.log("students in server data atm " + JSON.stringify(data.activeSessions[info.session].groups));
             //put student in the same group as it disconnected from
             data.activeSessions[info.session].groups[i].students[n].id = socket.id;
-            studentsio.to(socket.id).emit('namespace', data.activeSessions[info.session].groups[i].name);
+            studentsio.to(socket.id).emit('namespace', {'session' : info.session, 'group': data.activeSessions[info.session].groups[i].name});
             //ask the other students where they are
             socket.emit('wantcurrentlocation');
             //send student to same page as them
@@ -490,7 +490,8 @@ var teacherconnection = teacherio.on('connection', function (socket) {
       allsituations = allsituations.concat(data.activeSessions[session].groups[i].groupSituations);
     }
     console.log("all situations" + JSON.stringify(allsituations));
-    io.emit('collectsituations', { 'situations': allsituations, 'session': session });
+    console.log("from session: " + session);
+    socket.emit('collectsituations', { 'situations': allsituations, 'session': session });
   });
 
   //new
@@ -501,7 +502,7 @@ var teacherconnection = teacherio.on('connection', function (socket) {
       allrisks = allrisks.concat(data.activeSessions[session].groups[i].groupRisks);
     }
     allrisks = data.generatedRisks.concat(allrisks);
-    io.emit('collectrisks', { 'risks': allrisks, 'session': session });
+    socket.emit('collectrisks', { 'risks': allrisks, 'session': session });
   });
   //new
   //TODO make this one function
@@ -512,7 +513,7 @@ var teacherconnection = teacherio.on('connection', function (socket) {
       allposs = allposs.concat(data.activeSessions[session].groups[i].groupPoss);
     }
     allposs = data.generatedPoss.concat(allposs);
-    io.emit('collectposs', { 'poss': allposs, 'session': session });
+    socket.emit('collectposs', { 'poss': allposs, 'session': session });
   });
 
   /**
@@ -536,16 +537,18 @@ var teacherconnection = teacherio.on('connection', function (socket) {
       //console.log('regenerate groups');
       resetGroups(groupnames, info.session);
     }
-    generateGroups(info.groupSize, info.session);
+    generateGroups(info.groupSize, info.session, socket);
     //sending groupname,size and ids to teacherpage to print
-    //console.log("new groups is: " + JSON.stringify(data.activeSessions[info.session].groups));
-    socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
+    console.log("new groups is: " + JSON.stringify(data.activeSessions[info.session].groups));
+//    socket.emit('groupInfo', { 'groupObject': data.activeSessions[info.session].groups });
 
     //namespace specific to groups
     var i;
     var len;
     for (i = 0, len = data.activeSessions[info.session].groupNames.length; i < len; i++) {
-      console.log(i);
+//      console.log("loop i: " + i);
+//      console.log("groupnames i: " + JSON.stringify(data.activeSessions[info.session].groupNames));
+      console.log("LENGTH" + (data.activeSessions[info.session].groupNames.length));
       io.of(data.activeSessions[info.session].groupNames[i]).on('connection', groupsmessages(i, info.session));
     } (i);
   });
@@ -567,7 +570,7 @@ function generateGroups(groupSize, session) {
   }
 
   var allstudents = data.activeSessions[session].students.slice();
-
+  console.log("allstudents: "+ JSON.stringify(allstudents));
   var g = 0;
   var currentGroup = data.activeSessions[session].groupNames[g];
   var count = 0;
@@ -580,9 +583,13 @@ function generateGroups(groupSize, session) {
     var index = Math.floor(getRandomArbitrary(0, allstudents.length));
     data.addStudentToGroupObj(allstudents[index], currentGroup, session);
     console.log("sending namespace to student named: " + JSON.stringify(allstudents[index].studentname));
-    studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
+    //route student to startpage just in case there are somewhere else
+    studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'component': 'start'});
+    //send group to student
+    studentconnection.to(allstudents[index].id).emit('namespace', {'session': session , 'group':currentGroup});
     //delete used student
     allstudents.splice(index, 1);
+    console.log("allstudents after splice: "+ JSON.stringify(allstudents));
     len = len - 1;
   }
   for (var i = 0; i < len; i++) {
@@ -591,9 +598,13 @@ function generateGroups(groupSize, session) {
       console.log("INDEX" + index);
       data.addStudentToGroupObj(allstudents[index], currentGroup, session);
       console.log("sending namespace to student named: " + JSON.stringify(allstudents[index].studentname));
-      studentconnection.to(allstudents[index].id).emit('namespace', currentGroup);
+      //route student to startpage just in case there are somewhere else
+      studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'comp': 'start'});
+      //send group to student
+      studentconnection.to(allstudents[index].id).emit('namespace', {'session': session, 'group' : currentGroup });
       //delete used student
       allstudents.splice(index, 1);
+      console.log("allstudents after splice: "+ JSON.stringify(allstudents));
       count = count + 1;
     }
     else {
@@ -603,6 +614,8 @@ function generateGroups(groupSize, session) {
       i = i - 1;
     }
   }
+  teacherconnection.emit('groupInfo', { 'session': session, 'groupObject': data.activeSessions[session].groups });
+
 }
 
 
@@ -630,10 +643,16 @@ function groupsmessages(index, session) {
       console.log("Student with socketID: " + socket.id + " disconnected from group: " + data.activeSessions[session].groupNames[index]);
     });
 
+    
     console.log("A student joined a group " + data.activeSessions[session].groupNames[index]);
-    //console.log("active sessions now - groups: " + JSON.stringify(data.activeSessions[session].groups));
-
-    //update groupmembers on keyup 
+    console.log("students in group: " + JSON.stringify(data.activeSessions[session].groups[index].students));
+    console.log(" ");
+    /*console.log("active sessions now - students: " + JSON.stringify(data.activeSessions[session].students));
+    console.log(" ");
+    console.log("active sessions now - groups: " + JSON.stringify(data.activeSessions[session].groups));
+    console.log(" ");
+    */
+    //update groupmembers on dilemma on keyup 
     socket.on('dilemmakeyup', function (info) {
       console.log("test on kwy up" + info.dilemma);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('dilemmakeyup', info);
@@ -689,11 +708,15 @@ function groupsmessages(index, session) {
     //updated
     //collecting situations for each group
     socket.on('groupsituations', function (info) {
-      data.addGroupSituations(data.activeSessions[info.session].groupNames[index], info.situations, info.session);
+      data.addGroupSituation(data.activeSessions[info.session].groupNames[index], info.situation, info.session);
       //sending situations within each group
       var groupsitu = data.getGroupSituations(data.activeSessions[info.session].groupNames[index], info.session);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupsituations', { situations: groupsitu, session: info.session });
 
+    });
+    socket.on('wantgroupsituations', function(session) {
+      var groupsitu = data.getGroupSituations(data.activeSessions[session].groupNames[index], session);
+      io.of(data.activeSessions[session].groupNames[index]).emit('showgroupsituations', { 'situations': groupsitu, 'session': session });
     });
     //updated
     //updating server data if students removes a situation input and notify group
@@ -706,14 +729,18 @@ function groupsmessages(index, session) {
     //collecting risks for each group
     socket.on('grouprisks', function (info) {
       console.log('in grouprisks ' + JSON.stringify(info));
-      data.addGroupRisks(data.activeSessions[info.session].groupNames[index], info.risks, info.session);
+      data.addGroupRisk(data.activeSessions[info.session].groupNames[index], info.risks, info.session);
       var groupRisks = data.getGroupRisks(data.activeSessions[info.session].groupNames[index], info.session);
       console.log('in grouprisks  after get ' + JSON.stringify(groupRisks));
       //sending risks within each group
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgrouprisks', { 'session': info.session, 'risks': groupRisks });
     });
 
-    //new
+    socket.on('wantgrouprisks', function(session) {
+      var grouprisk = data.getGroupRisks(data.activeSessions[session].groupNames[index], session);
+      io.of(data.activeSessions[session].groupNames[index]).emit('showgrouprisks', { 'risks': grouprisk, 'session': session });
+    });
+     //new
     //updating server data if students removes a risk input and notify group
     socket.on('removerisk', function (info) {
       var groupRisks = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "risk");
@@ -729,8 +756,11 @@ function groupsmessages(index, session) {
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showgroupposs', { 'session': info.session, 'poss': groupPoss });
     });
 
-
-    //new
+    socket.on('wantgroupposs', function(session) {
+      var groupposs = data.getGroupPoss(data.activeSessions[session].groupNames[index], session);
+      io.of(data.activeSessions[session].groupNames[index]).emit('showgroupposs', { 'poss': groupposs, 'session': session });
+    });
+     //new
     //updating server data if students removes a possibiliey input and notify group
     socket.on('removeposs', function (info) {
       var groupPoss = data.deleteGroupSitRiskPoss(data.activeSessions[info.session].groupNames[index], info.session, info.id, "poss");

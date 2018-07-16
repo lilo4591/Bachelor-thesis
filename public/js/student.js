@@ -102,7 +102,7 @@ const Start = Vue.component('Start', {
   data: function(){
     return {
       studentId: 0,
-      groupName: null
+      groupName: this.$groupName
 
     }
   },
@@ -115,18 +115,17 @@ const Start = Vue.component('Start', {
   </div>
   `,
   created:function() {
-    studentsocket.on('namespace', function (group) {
-      groupsocket = io.connect(group);
-      Vue.prototype.$groupName = group;
-      this.groupName = this.$groupName;
-      //groupsocket = this.$groupName;
-      console.log(group);
+    studentsocket.on('namespace', function (info) {
+      if (info.session == this.$activeSession) {
+        groupsocket = io.connect(info.group);
+        Vue.prototype.$groupName = info.group;
+        this.groupName = this.$groupName;
+        //groupsocket = this.$groupName;
+        console.log(info.group);
+      }
     }.bind(this));
     this.groupName = this.$groupName;
-    /*if (this.$route.params.pathfrom != null)       
-      this.pathfrom = this.$route.params;
-      router.push({name: this.pathfrom});
-     */
+
   }
 
 });
@@ -138,6 +137,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
       studentId: null,
       thought: '',
       thoughts: [],
+      situations: [],
       groupName: this.$groupName,
       username: this.$username,
 
@@ -159,33 +159,43 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
-    }  
+    }
+    else {
+      groupsocket.emit('wantgroupsituations', this.$activeSession);
+      groupsocket.on('showgroupsituations', function (data) {
+        console.log('showgroupsit: ' + data.session);
+        console.log('situations are now: ' + JSON.stringify(data.situations));
+        if (data.session == this.$activeSession) {
+          console.log("helliii");
+          this.thoughts = data.situations;
+        }
+      }.bind(this));
+    }
+
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      //this.thoughts.push({thought: this.thought});
+      groupsocket.emit('groupsituations', {situation: {thought: this.thought}, session: this.$activeSession});
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
-    },
-    collectSituations() {
-      //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      console.log("orkar inte: " + this.$activeSession);
-      groupsocket.emit(this.collect, {situations: this.thoughts, session: this.$activeSession});
-      this.thoughts = [];
+      groupsocket.emit(this.remove, {'id': id, 'session' : this.$activeSession});  
     }
   },
   template: `
   <div id= "page">
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</div>
+      <div id="textright">Step <b>1</b> of <b>6</b></div></br>
       <h2>Ethical awareness</h2>
       <p>Try to come up with <b>real life situations</b> which has <b>no moral implications at all</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
-        </form> 
-        <p>These are your {{thoughttype}}s</p>
+          </form> 
+          <button v-on:click="addThought()">Submit situation to group</button>
+        <p>These are your group's {{thoughttype}}s</p>
         <ul>
           <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -194,84 +204,10 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
           </li>
         </ul>
       </div>  
-      <div v-on:click="collectSituations()"> 
-        <router-link tag="button" :to="{name: 'showgroupsituations' }">
-          Submit {{thoughttype}}s to group
-        </router-link>
-      </div>
     </div>
   `
 });
 
-//group by group
-const ShowGroupSituations = Vue.component('ShowGroupSituations', {
- data: function() {
-    return {
-      situations: null,
-      groupName: this.$groupName,
-      username: this.$username,
-
-      name: "Ethical awareness, situations", 
-      thoughttype:'situation', 
-      collect: 'groupsituations', 
-      showing: 'showgroupsituations',
-      remove: 'removesituation',
-      example: 'Deciding which company to buy hardware from', 
-      text: 'situations that has no moral implication' 
-
-   }
- },
-  created: function() {
-    
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/showgroupsituations');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    } 
-    else {
-      //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-      groupsocket.on(this.showing, function(data) {
-      console.log('showgroupsit: ' + data.session);
-        if (data.session == this.$activeSession) {
-        this.situations = data.situations;
-      }
-      }.bind(this));
-    }
-       },
-  methods: {
-    removeThought(id) {
-      this.situations.splice(id,1);
-      groupsocket.emit(this.remove, {'id': id, 'session' : this.$activeSession});  
-  },
- 
-  },  
-   template: `
-  <div>
-    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>{{ name }}</h2>
-    <p>Discuss your groups list of {{text}}
-    <br>Discuss and revise the list</p>
-      <div class="holder">
-        <p>These are your group's {{text}} </p>
-        <ul>
-          <li v-for="(data, index) in situations" :key='index'> 
-            {{data.thought}}
-            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
-          </li>
-        </ul>
-      </div>
-    <router-link tag="button" class="navbutton ":to="{ name: 'exercise1situations' } ">
-       <i id="left" class="material-icons">
-           arrow_back
-          </i>
-          Go Back 
-    </router-link>
-  </div>
-  `
-});
 
 const SituationsFullClass = Vue.component('SituationsFullClass', {
   data: function() {
@@ -304,6 +240,7 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
   template: `
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>2</b> of <b>6</b></div></br>
     <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
@@ -346,32 +283,42 @@ const Exercise1Love = Vue.component('Exercise1Love', {
       window.alert("You are disconnected from your group. Please log in again with the same username to join your group");
       router.push('/');
     } 
-  
+ 
+    else {
+    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+      groupsocket.emit('wantgrouprisks', this.$activeSession);
+      groupsocket.on('showgrouprisks', function(data) {
+        if (data.session == this.$activeSession) {
+          this.thoughts = data.risks;
+        }
+      }.bind(this));
+
+
+    }
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      //this.thoughts.push({thought: this.thought});
+      groupsocket.emit('grouprisks', {'risks' : {thought: this.thought}, 'session': this.$activeSession});
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
-    },
-    collectSituations() {
-      //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      groupsocket.emit('grouprisks', {'risks' : this.thoughts, 'session': this.$activeSession});
-      this.thoughts = [];
+      groupsocket.emit('removerisk', {'id' : id, 'session' : this.$activeSession});  
     }
-  },
+     },
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>3</b> of <b>6</b></div></br>
       <h2>Ethical awareness</h2>
       <p><b> Identify risks</b> with a morally correct principle: <b>Love.</b></p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
-        <p>These are your {{thoughttype}}s</p>
+        <button v-on:click="addThought()">Submit risk to group</button>
+        <p>These are your group's {{thoughttype}}s</p>
         <ul>
           <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -380,80 +327,7 @@ const Exercise1Love = Vue.component('Exercise1Love', {
           </li>
         </ul>
       </div>  
-      <div v-on:click="collectSituations()"> 
-        <router-link tag="button" :to="{name: 'showgrouplove'}">
-          Submit {{thoughttype}}s to group
-        </router-link>
-      </div>
     </div>
-  `
-});
-
-//group by group
-const ShowGroupLove = Vue.component('ShowGroupLove', {
- data: function() {
-    return {
-      groupName: this.$groupName,
-      username: this.$username,
-      situations: null,
-      name: "Risks with love", 
-      thoughttype: 'risk', 
-      collect: 'grouprisks', 
-      showing: 'showgrouprisks',
-      remove: 'removerisk',
-      example:'Love makes you act irrational',
-      text: 'risks with love'
-      
-   }
- },
-  created: function() {
-
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/showgrouplove');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    } 
-    else {
-      //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-      groupsocket.on('showgrouprisks', function(data) {
-        if (data.session == this.$activeSession) {
-          this.situations = data.risks;
-        }
-      }.bind(this));
-    }
-    },
-  methods: {
-    removeThought(id) {
-      this.situations.splice(id,1);
-      groupsocket.emit('removerisk', {'id' : id, 'session' : this.$activeSession});  
-  },
- 
-  },  
-   template: `
-  <div>
-    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>{{ name }}</h2>
-    <p>Discuss your groups list of {{text}}
-    <br>Discuss and revise the list</p>
-      <div class="holder">
-        <p>These are your group's {{text}} </p>
-        <ul>
-          <li v-for="(data, index) in situations" :key='index'> 
-            {{data.thought}}
-            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
-          </li>
-        </ul>
-      </div>
-    <router-link tag="button" class="navbutton" :to="{ name: 'exercise1love' }">
-       <i id="left" class="material-icons">
-           arrow_back
-          </i>
-          Go Back 
-    </router-link>
-  </div>
   `
 });
 
@@ -486,6 +360,7 @@ const LoveFullClass = Vue.component('LoveFullClass', {
   template: `
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>4</b> of <b>6</b></div></br>
     <h2>{{ name }}</h2>
     <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
@@ -529,31 +404,38 @@ const Exercise1War = Vue.component('Exercise1War', {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
     }  
-  },
+    else {
+    groupsocket.emit('wantgroupposs', this.$activeSession);
+    groupsocket.on('showgroupposs', function(data) {
+      if (data.session == this.$activeSession) {
+        this.thoughts = data.poss;
+      }
+    }.bind(this));
+    }
+   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+      //this.thoughts.push({thought: this.thought});
+      groupsocket.emit('groupposs', {'poss' : {thought: this.thought}, 'session' : this.$activeSession });
       this.thought = '';
     },
     removeThought(id) {
       this.thoughts.splice(id,1);
+      groupsocket.emit('removeposs', { 'id': id , 'session' : this.$activeSession });  
     },
-    collectSituations() {
-      //id sent either :groupsituations, grouprisks, grouppossibities depending on wich step we are at
-      groupsocket.emit('groupposs', {'poss' : this.thoughts, 'session' : this.$activeSession });
-      this.thoughts = [];
-    }
-  },
+     },
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>5</b> of <b>6</b></div></br>
       <h2>Ethical awareness</h2>
       <p><b>Identify possibilities</b> with a morally incorrect principle: <b>War</b>.</p>
       <div class="holder">
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
-        <p>These are your {{thoughttype}}s</p>
+        <button v-on:click="addThought()">Submit possibility to group</button>
+        <p>These are your group's {{thoughttype}}s</p>
         <ul>
           <li class="example">Example {{thoughttype}}: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -562,79 +444,7 @@ const Exercise1War = Vue.component('Exercise1War', {
           </li>
         </ul>
       </div>  
-      <div v-on:click="collectSituations()"> 
-        <router-link tag="button" :to="{name: 'showgroupwar'}">
-          Submit possibilities to group
-        </router-link>
-      </div>
-    </div>
-  `
-});
-
-//group by group
-const ShowGroupWar = Vue.component('ShowGroupWar', {
- data: function() {
-    return {
-      groupName: this.$groupName,
-      username: this.$username,
-      situations: null,
-      name: "Possibilities with war", 
-      thoughttype:'possibility', 
-      collect: 'groupposs', 
-      showing: 'showgroupposs', 
-      remove: 'removeposs',
-      example:'War is a way to solve a conflict',
-      text: 'possibilties with war'
-     
-   }
- },
-  created: function() {
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/showgroupwar');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    }
-    else {
-    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-    groupsocket.on('showgroupposs', function(data) {
-      if (data.session == this.$activeSession) {
-        this.situations = data.poss;
-      }
-    }.bind(this));
-    }
-     },
-  methods: {
-    removeThought(id) {
-      this.situations.splice(id,1);
-      groupsocket.emit('removeposs', { 'id': id , 'session' : this.$activeSession });  
-  },
- 
-  },  
-   template: `
-  <div>
-    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <h2>{{ name }}</h2>
-    <p>Discuss your groups list of {{text}}
-    <br>Discuss and revise the list</p>
-      <div class="holder">
-        <p>These are your group's {{text}} </p>
-        <ul>
-          <li v-for="(data, index) in situations" :key='index'> 
-            {{data.thought}}
-            <i class="material-icons" v-on:click="removeThought(index)">delete</i>
-          </li>
-        </ul>
-      </div>
-    <router-link class="navbutton" tag="button" :to="{ name: 'exercise1war' }">
-       <i id="left" class="material-icons">
-           arrow_back
-          </i>
-          Go Back 
-    </router-link>
-  </div>
+       </div>
   `
 });
 
@@ -661,7 +471,8 @@ const WarFullClass = Vue.component('WarFullClass', {
   }, 
   template: `
   <div> 
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>6</b> of <b>6</b></div></br>
     <h2>Ethical awareness, possibilites.</h2>
     <p>Please have a look at the bigger screen and discuss your possibilities.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
@@ -1918,21 +1729,6 @@ const router = new VueRouter({
       name: 'exercise1war',
       component:Exercise1War
     },
-    { //show group situatons
-      path:'/showgroupsituations',
-      component:ShowGroupSituations,
-      name: 'showgroupsituations'
-    },
-    { //show group risks
-      path:'/showgrouplove',
-      component:ShowGroupLove,
-      name: 'showgrouplove'
-    },
-    { //show group possibilies
-      path:'/showgroupwar',
-      component:ShowGroupWar,
-      name: 'showgroupwar'
-    }, 
     { //
       path:'/situationsfullclass',
       component:SituationsFullClass,
@@ -2046,7 +1842,7 @@ const app = new Vue({
     }
    },
   created: function() {
-    
+   
     studentsocket.on('activeSessionsNames', function(sessions){
       //list of all active sessions
       Vue.prototype.$sessions = sessions;

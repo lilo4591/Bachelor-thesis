@@ -182,8 +182,10 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       }.bind(this));    
       socket.on('groupInfo', function(data) {
         console.log("groupinfo");
-        console.log(JSON.stringify(data.groupObject));
-        this.groupObject = data.groupObject;
+        if (data.session == this.$session) {
+          console.log(JSON.stringify(data.groupObject));
+          this.groupObject = data.groupObject;
+        }
       }.bind(this));
     },
 
@@ -213,6 +215,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
    template: `
     <div>
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <br>
       <nav>
         <router-link to="/settings">Clear Input</router-link>
       </nav>
@@ -302,6 +305,7 @@ const Provocative1 = Vue.component('provocative1', {
   },
   created: function() {
     socket.on('collectsituations', function(info) {
+      console.log('collectsituations');
       if (info.situations != null && info.session == this.$session) {
         this.thoughts = info.situations;
         console.log(info.situations);
@@ -324,6 +328,7 @@ const Provocative1 = Vue.component('provocative1', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>1</b> of <b>4</b></div></br>
       <h2>Ethical awareness exercise</h2>      
       <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
       <button class="button" v-on:click="collectAllSituations">End the discussion and show all group's situations</button>
@@ -386,6 +391,7 @@ const Provocative2love = Vue.component('provocative2love', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>2</b> of <b>4</b></div></br>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
       <button class="button" v-on:click="collectAllRisks">End the discussion and show all group's risks</button>
@@ -445,6 +451,7 @@ const Provocative3War = Vue.component('provocative3war', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>3</b> of <b>4</b></div></br>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
       <button class="button" v-on:click="collectAll">End the discussion and show all group's possibilites</button>
@@ -486,6 +493,7 @@ template:
 `
 <div id="app">
   <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+  <div id="textright">Step <b>4</b> of <b>4</b></div></br>
   <h2>To Conclude</h2>
   <p>By managing to come up with several risks and possibilites with these examples
     one realizes that many things that you take for granted can be questioned.</p>

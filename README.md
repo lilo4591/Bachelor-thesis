@@ -34,7 +34,7 @@ npm install
 ### 2.1 Run program
 Navigate to the folder and start the server
 ```
-nodejs app.js
+node app.js
 ```
 Open a browser of your choice navigate to localhost:3000/student and localhost:3000/teacher
 Happy learning!
