@@ -129,6 +129,15 @@ Data.prototype.addGroupObj = function (group, session) {
   this.activeSessions[session].groups.push(GROUP);
 }
 
+Data.prototype.addInitialThought = function(thought, session) {
+  this.activeSessions[session].initialThoughts.unshift(thought);
+  console.log("initial thousgt s added: " + JSON.stringify(this.activeSessions[session].initialThoughts));
+}
+
+Data.prototype.removeInitialThought = function(id, session) {
+  this.activeSessions[session].initialThoughts.splice(id,1);
+}
+
 Data.prototype.getGroupSituations = function (group, session) {
   for (var i in this.activeSessions[session].groups)
     if (this.activeSessions[session].groups[i].name == group) {
@@ -420,14 +429,21 @@ var studentconnection = studentsio.on('connection', socket => {
     Relevant to exercise 2: heteronomy autonomy  
   **/
   //new
-  socket.on('thoughts', function (info) {
-
-    for (var i = 0, l = info.thoughts.length; i < l; i++) {
-      data.activeSessions[info.session].initialThoughts.push(info.thoughts[i]);
-    }
+  socket.on('thought', function (info) {
+    data.addInitialThought(info.thought, info.session);
     teacherconnection.emit('displayThoughts', { 'session': info.session, 'thoughts': data.activeSessions[info.session].initialThoughts });
+    studentconnection.emit('displayThoughts', { 'session': info.session, 'thoughts': data.activeSessions[info.session].initialThoughts });
   });
 
+  socket.on('removeinitialthought', function(info) {
+    data.removeInitialThought(info.id, info.session);
+    teacherconnection.emit('displayThoughts', { 'session': info.session, 'thoughts': data.activeSessions[info.session].initialThoughts });
+    studentconnection.emit('displayThoughts', { 'session': info.session, 'thoughts': data.activeSessions[info.session].initialThoughts });
+  });
+
+  socket.on('wantInitialThoughts', function(session) {
+    studentconnection.emit('displayThoughts', { 'session': session, 'thoughts': data.activeSessions[session].initialThoughts });
+  });
   socket.on('studentvote', function (obj) {
     //sending to all students except sender
     socket.broadcast.emit('vote', obj);

@@ -506,15 +506,13 @@ const Exercise2 = Vue.component('Exercise2', {
   },
   methods: {
     addThought() { 
-      this.thoughts.push({thought: this.thought});
+//      this.thoughts.push({thought: this.thought});
+      studentsocket.emit('thought', {'thought' : {thought: this.thought}, 'session' : this.$activeSession});
       this.thought = '';
     },
     removeThought(id) {
-      this.thoughts.splice(id,1);
-    },
-    collectThoughts() {
-      studentsocket.emit('thoughts', {'thoughts' : this.thoughts, 'session' : this.$activeSession});
-      this.thoughts = [];
+      studentsocket.emit('removeinitialthought', {'id': id, 'session': this.$activeSession});
+      //this.thoughts.splice(id,1);
     }
   },
 
@@ -527,7 +525,15 @@ const Exercise2 = Vue.component('Exercise2', {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
     }
-   
+    studentsocket.emit("wantInitialThoughts", this.$activeSession); 
+    studentsocket.on('displayThoughts', function(info) {
+      console.log(JSON.stringify(info.thoughts));
+      if (info.session == this.$activeSession) {
+      this.thoughts = info.thoughts;
+    }
+      
+    }.bind(this));  
+ 
   },
   template: `
   <div id= "page">
@@ -539,6 +545,7 @@ const Exercise2 = Vue.component('Exercise2', {
         <form @submit.prevent="addThought">
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
+        <button v-on:click="addThought()">Submit thought</button>
         <ul><li class="example">Example: It's illegal, therefor its wrong..</li></ul>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -547,9 +554,9 @@ const Exercise2 = Vue.component('Exercise2', {
           </li>
         </ul>
       </div>
-      <div v-on:click="collectThoughts()"> 
-    <router-link tag="button" to="/exercise2p1">
-    Submit Thoughts
+      <div> 
+    <router-link tag="button" class="navbutton" id="right" to="/exercise2p1">
+    Continue
     </router-link>
     </div>
     </div>
