@@ -109,7 +109,7 @@ const Start = Vue.component('Start', {
   },
   template: `
    <div>
-    <div id="textleft"> Group: <b v-if="this.groupName != null">{{groupName}}</b> <b v-else>Not assigned</b> Username: <b>{{username}}</div>
+    <div id="textleft"> Group: <b v-if="this.groupName != null">{{groupName}}</b> <b v-else>Not assigned</b> Username: <b>{{username}}</b></div>
     <p v-if="this.groupName == null">Waiting for a group to be assigned to you...</p>
     <p v-if="this.groupName != null">Waiting for an exercise to start!..</p>
     <p v-if="this.groupName != null">The name of your group is <ul><li class="groups">{{ this.groupName }}</li></ul></p>
@@ -532,6 +532,7 @@ const Exercise2 = Vue.component('Exercise2', {
   template: `
   <div id= "page">
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>1</b> of <b>9</b></div></br>
       <p id="boldtext">Adopt this dilemma and try to solve it. Then write down your most important thoughts.</p>
         <p>{{staticdilemma}}</p>
       <div class="holder">
@@ -578,6 +579,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
   template: `
   <div> 
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>2</b> of <b>9</b></div></br>
     <p>Please have a look at the bigger screen and discuss your thoughts.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
     To add more thoughts press go back</p>
@@ -658,6 +660,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
    template: `
   <div id="student">
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>3</b> of <b>9</b></div></br>
     <p>Discuss in your group and formulate a dilemma together. The dilemma should be one that you are facing
       now in your proffession, school or in your private life.</p>
         <div v-if="notsubmitted">
@@ -668,7 +671,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
         <div v-if="notsubmitted===false"><div class="text"> {{ dilemma }}</div> 
           <button class="smallbutton" v-on:click="notifyGroupEdit(true, dilemma)">Edit dilemma</button>
         </div>
-        <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p3' }">
+        <router-link id="right" class="navbutton" tag="button" :to="{ name: 'reflex' }">
           <i class="material-icons">
             arrow_forward
           </i>
@@ -687,7 +690,7 @@ const ReflexHelp = Vue.component('ReflexHelp', {
   },
   created: function() {
     studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p3');
+      studentsocket.emit('currentlocation', '/reflex');
     });
 
     if (groupsocket == undefined) {
@@ -704,7 +707,7 @@ const ReflexHelp = Vue.component('ReflexHelp', {
         Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p3'}">
+      <router-link class="navbutton" tag="button" :to="{ name: 'reflex'}">
          <i id="left" class="material-icons">
            arrow_back
           </i>
@@ -713,7 +716,7 @@ const ReflexHelp = Vue.component('ReflexHelp', {
   </div>`
   });
 
-const Exercise2p3 = Vue.component('Exercise2p3', {
+const Reflex = Vue.component('Reflex', {
   //TODO: This is individual
  data: function() {
     return {
@@ -730,26 +733,37 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
   created: function() {
     //this.dilemma = this.$route.params.dilemma;
     studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p3');
+      studentsocket.emit('currentlocation', '/reflex');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
     } 
+    else {
+      groupsocket.emit('wantgroupreflex', this.$activeSession);
+      groupsocket.on('showgroupreflexthoughts', function(data) {
+        console.log(JSON.stringify(data));
+        this.reflexthoughts = data;
+        Vue.prototype.$input = data;
+      }.bind(this));
+    }
     this.dilemma = this.$dilemma;
     this.reflexthoughts = this.$input;
  },
   methods: {
     addReflexThought() { 
-      this.reflexthoughts.push({reflex: this.reflex});
+      //this.reflexthoughts.push({reflex: this.reflex});
+      groupsocket.emit('reflexthoughts', {'thoughts' : [{reflex : this.reflex}],  'session' : this.$activeSession});
+      //Vue.prototype.$input = [];
       this.reflex = '';
-    },
+ },
     removeReflexThought(id) {
-      this.reflexthoughts.splice(id,1);
+      //this.reflexthoughts.splice(id,1);
+      groupsocket.emit('removesummaryinput', {'indx': id, 'inputtype': "reflex", 'session': this.$activeSession});
     },
-    collectReflexThoughts() {
-      groupsocket.emit('reflexthoughts', {'thoughts' : this.reflexthoughts,  'session' : this.$activeSession});
+    resetInputVariable() {
+      //groupsocket.emit('reflexthoughts', {'thoughts' : this.reflexthoughts,  'session' : this.$activeSession});
       Vue.prototype.$input = [];
     }
   }
@@ -757,12 +771,13 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
    
    template: `
   <div>
-    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <nav>
       <router-link :to="{ name: 'reflexhelp'}">
         Explain More!
       </router-link>
-    </nav>
+    </nav><br>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>4</b> of <b>9</b></div></br>
     <p>Discuss in your group but individually write the first things that comes to your mind when you consider this dilemma?</p> 
      Your group's dilemma is the following: 
       <div class="text">{{dilemma}}</div>
@@ -770,7 +785,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here please..." v-model="reflex">
         </form> 
-        <p>These are your reflex thoughts, press continue to submit to group</p>
+        <p>These are your group's reflex thoughts</p>
         <ul><li class="example">Example thought: If I don't do this someone else will do it!</li></ul>
         <ul>
           <li v-for="(data, index) in reflexthoughts" :key='index'> 
@@ -779,71 +794,7 @@ const Exercise2p3 = Vue.component('Exercise2p3', {
           </li>
         </ul>
       </div>
-      <div v-on:click="collectReflexThoughts()">
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p4'}">
-      <i class="material-icons">
-          arrow_forward
-        </i>
-      Continue
-    </router-link>
-    </div>
-  </div>
-  `
-});
-
-
-const Exercise2p4 = Vue.component('Exercise2p4', {
- data: function() {
-    return {
-      groupName: this.$groupName,
-      username: this.$username,
-      name: "Autonomy and Heteronomy part 2.4: Show groups reflex thoughts",
-      dilemma: "",
-      reflexthoughts: null
-  }
- },
-  created: function() {
- 
-    studentsocket.on('wantcurrentlocation', function() {
-      // route to previous route if disconnected
-      studentsocket.emit('currentlocation', '/exercise2p3');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    } 
-    else {
-      groupsocket.on('showreflexthoughts', function(data) {
-        this.reflexthoughts = data;
-      }.bind(this));
-    
-      this.dilemma = this.$dilemma; 
-    }
-  },
-   
-   template: `
-  <div>
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <p>Discuss in your group! What is the first things you think about?<br>
-    These are thoughts that means that you dont want to deal with or take your responsibility for the dilemma.</p>
-      Your group's dilemma is the following: 
-      <div class="text">{{dilemma}}</div>
-      <div class="holder">
-        <p>These are your group's reflex thoughts</p>
-        <ul>
-          <li v-for="(data, index) in reflexthoughts" :key='index'> 
-            {{data.reflex}}
-          </li>
-        </ul>
-      </div>
-    <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p3'} ">
-       <i id="left" class="material-icons">
-           arrow_back
-          </i>
-       Go Back 
-    </router-link>
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p5'} ">
+    <router-link id="right" class="navbutton" v-on:click="resetInputVariable" tag="button" :to="{ name: 'principlefixations'}">
       <i class="material-icons">
           arrow_forward
         </i>
@@ -863,7 +814,7 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
   created: function() {
    studentsocket.on('wantcurrentlocation', function() {
       // route to previous route if disconnected
-      studentsocket.emit('currentlocation', '/exercise2p5');
+      studentsocket.emit('currentlocation', '/principlefixations');
     });
 
     if (groupsocket == undefined) {
@@ -882,7 +833,7 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
         Think about principle fixations of other perspectives, you don't need to agree with all.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
-      <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p5'} ">
+      <router-link tag="button" class="navbutton" :to="{ name: 'principlefixations'} ">
          <i id="left" class="material-icons">
            arrow_back
           </i>
@@ -892,7 +843,7 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
   });
 
 
-const Exercise2p5 = Vue.component('Exercise2p5', {
+const PrincipleFixations = Vue.component('PrincipleFixations', {
  data: function() {
     return {
       groupName: this.$groupName,
@@ -907,39 +858,46 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
  },
   created: function() {
    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p5');
+      studentsocket.emit('currentlocation', '/principlefixations');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
+    }
+    else {
+      groupsocket.emit('wantgroupprinciples', this.$activeSession);
+      groupsocket.on('showgroupprinciples', function(data) {
+        console.log(JSON.stringify(data));
+        this.principles = data;
+        Vue.prototype.$input = data;
+      }.bind(this));
     } 
     this.dilemma = this.$dilemma;
     this.principles = this.$input;
  },
   methods: {
     addPrinciple() { 
-      this.principles.push({principle: this.principle});
+      //this.principles.push({principle: this.principle});
+      groupsocket.emit('principles', {'principles' : [{ principle : this.principle }], 'session' : this.$activeSession });
       this.principle = '';
     },
     removePrinciple(id) {
-      this.principles.splice(id,1);
-    },
-    collectPrinciples() {
-      groupsocket.emit('principles', {'principles' : this.principles, 'session' : this.$activeSession });
-      Vue.prototype.$input = [];
+      groupsocket.emit('removesummaryinput', {'indx': id, 'inputtype': "principle", 'session': this.$activeSession});
+     // this.principles.splice(id,1);
     }
    }
   ,
    
    template: `
   <div>
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <nav>
       <router-link :to="{ name: 'principlehelp'} " >
         Explain More!
       </router-link>
-    </nav>
+    </nav><br>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>5</b> of <b>9</b></div></br>
      <p>Discuss in your group but individually write down principles fixations that relates to the dilemma.
     Write all principles you can come up with, independent of the solution you want to come to.</p>
       Your group's dilemma is the following: 
@@ -948,7 +906,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
         <form @submit.prevent="addPrinciple">
           <input type="text" placeholder="Enter your principle here please..." v-model="principle">
         </form> 
-        <p>These are your principles, press continue to submit them to your group.</p>
+        <p>These are your group's principles.</p>
         <ul><li class="example">Example principle: You have to follow the law....</li></ul>
         <ul>
           <li v-for="(data, index) in principles" :key='index'> 
@@ -957,69 +915,7 @@ const Exercise2p5 = Vue.component('Exercise2p5', {
           </li>
         </ul>
       </div>
-      <div v-on:click="collectPrinciples()">
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p6' }">
-      <i class="material-icons">
-          arrow_forward
-        </i>
-      Continue
-    </router-link>
-    </div>
-  </div>
-  `
-});
-
-
-const Exercise2p6 = Vue.component('Exercise2p6', {
- data: function() {
-    return {
-      groupName: this.$groupName,
-      username: this.$username,
-      name: "Autonomy and Heteronomy part 2.6: Show groups principles",
-      dilemma: "",
-      principles: null
-  }
- },
-  created: function() {
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p5');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    } 
-    else 
-    {  //set global input to [] to not save state when going back
-      groupsocket.on('showprinciples', function(data) {
-        this.principles = data;
-      }.bind(this));
-      this.dilemma = this.$dilemma;
-    }
-  },
-   
-   template: `
-  <div>
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <p>Group thoughts on principles, discuss with your group!
-    <br>If you fixate by a principle will make you bild to the others </p>
-      Your group's dilemma is the following: 
-      <div class="text">{{dilemma}}</div>
-      <div class="holder">
-        <p>These are your group's thoughts on principles</p>
-        <ul>
-          <li v-for="(data, index) in principles" :key='index'> 
-            {{data.principle}}
-          </li>
-        </ul>
-      </div>
-    <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p5'} ">
-      <i id="left" class="material-icons">
-           arrow_back
-          </i>
-         Go Back 
-    </router-link>
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p7'} ">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'concretevalues' }">
       <i class="material-icons">
           arrow_forward
         </i>
@@ -1039,7 +935,7 @@ const ValueHelp = Vue.component('ValueHelp', {
   created: function() {
   
   studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p7');
+      studentsocket.emit('currentlocation', '/concretevalues');
     });
 
     if (groupsocket == undefined) {
@@ -1058,7 +954,7 @@ const ValueHelp = Vue.component('ValueHelp', {
         but always question your conclusions. Discuss in group what values, interests duties feelings etc these parties have.
         Be critical and prepared to go back and revise your conclusions.
       </p>
-      <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p7' } ">
+      <router-link tag="button" class="navbutton" :to="{ name: 'concretevalues' } ">
          <i id="left" class="material-icons">
            arrow_back
           </i>
@@ -1069,7 +965,7 @@ const ValueHelp = Vue.component('ValueHelp', {
 
 
 //concrete values
-const Exercise2p7 = Vue.component('Exercise2p7', {
+const ConcreteValues = Vue.component('ConcreteValues', {
  data: function() {
     return {
       username: this.$username,
@@ -1085,14 +981,22 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
   created: function() {
   
     studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p7');
+      studentsocket.emit('currentlocation', '/concretevalues');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
     }   
-    
+   
+    else {
+      groupsocket.emit('wantgroupconcretevalues', this.$activeSession);
+        groupsocket.on('showgroupconcretevalues', function(data) {
+          console.log(JSON.stringify(data));
+          this.concreteValues = data;
+          Vue.prototype.$input = data;
+        }.bind(this));
+    }
     //set dilemma to global dilemma
     this.dilemma = this.$dilemma;
     //set global variable to this input instance
@@ -1100,14 +1004,16 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
  },
   methods: {
     addConcreteValue() { 
-      this.concreteValues.push({concreteValue: this.concreteValue});
+      //this.concreteValues.push({concreteValue: this.concreteValue});
+      groupsocket.emit('concretevalues', {'concretevalues' : [{ concreteValue : this.concreteValue}], 'session': this.$activeSession });
       this.concreteValue = '';
     },
     removeConcreteValue(id) {
-      this.concreteValues.splice(id,1);
+      groupsocket.emit('removesummaryinput', {'indx': id, 'inputtype': "concretevalue", 'session': this.$activeSession});
+      //this.concreteValues.splice(id,1);
     },
-    collectConcreteValues() {
-      groupsocket.emit('concretevalues', {'concretevalues' : this.concreteValues, 'session': this.$activeSession });
+    resetInputVariable() {
+   //   groupsocket.emit('concretevalues', {'concretevalues' : this.concreteValues, 'session': this.$activeSession });
       Vue.prototype.$input = [];
     }
   }
@@ -1115,12 +1021,13 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
    
    template: `
   <div>
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <nav>
       <router-link :to="{ name: 'valuehelp'} ">
         Explain More!
       </router-link>
      </nav>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+      <div id="textright">Step <b>6</b> of <b>9</b></div></br>
     <p>Discuss with your group.
     <br>Think about and define the different parties the dilemma concerns and individually write down what their values and interests are.</p>
       Your group's dilemma is the following: 
@@ -1129,7 +1036,7 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
         <form @submit.prevent="addConcreteValue">
           <input type="text" placeholder="Enter your value here please..." v-model="concreteValue">
         </form> 
-        <p>These are your stakeholder values, press continue to submit them to your group</p>
+        <p>These are your group's stakeholder values.</p>
         <ul>
         <li class="example">Example value: Is the collaboration with this customer important.?..</li>
           <li v-for="(data, index) in concreteValues" :key='index'> 
@@ -1138,8 +1045,8 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
           </li>
         </ul>
       </div>
-      <div v-on:click="collectConcreteValues()">
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p8showvalues'}">
+      <div v-on:click="resetInputVariable()">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'actions'}">
       <i class="material-icons">
           arrow_forward
         </i>
@@ -1150,61 +1057,6 @@ const Exercise2p7 = Vue.component('Exercise2p7', {
   `
 });
 
-const Exercise2p8ShowValues = Vue.component('Exercise2p8ShowValues', {
- data: function() {
-    return {
-      username: this.$username,
-      groupName: this.$groupName,
-      name: "Autonomy and Heteronomy part 2.8: Show groups stakeholder values",
-      dilemma: "",
-      concreteValues: null
-  }
- },
-  created: function() {
-  studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p7');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    }  
-    else {
-    groupsocket.on('showconcretevalues', function(data) {
-      this.concreteValues = data;
-    }.bind(this));
-    this.dilemma = this.$dilemma;
-    }
-  },
-   
-   template: `
-  <div>
-    <p>Group thoughts on all the concerned parties values and interests</p>
-      Your group's dilemma is the following: 
-      <div class="text">{{dilemma}}</div>
-      <div class="holder">
-        <p>These are your group's thoughts on values and interests</p>
-        <ul>
-          <li v-for="(data, index) in concreteValues" :key='index'> 
-            {{data.concreteValue}}
-          </li>
-        </ul>
-      </div>
-    <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p7'} ">
-      <i id="left" class="material-icons">
-           arrow_back
-          </i>
-         Go Back 
-    </router-link>
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p9'} ">
-      <i class="material-icons">
-          arrow_forward
-        </i>
-      Continue
-    </router-link>
-  </div>
-  `
-});
 
 const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   data: function() {
@@ -1215,7 +1067,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   created: function() {
   
     studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p9');
+      studentsocket.emit('currentlocation', '/actions');
     });
 
     if (groupsocket == undefined) {
@@ -1233,7 +1085,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
         Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
         There is always a risk to miss a good action alternative, so be prepared to revise the list of action alternatives later.
       </p>
-      <router-link class="navbutton" tag="button" :to="{ name: 'exercise2p9'} ">
+      <router-link class="navbutton" tag="button" :to="{ name: 'actions'} ">
          <i id="left" class="material-icons">
            arrow_back
           </i>
@@ -1243,7 +1095,7 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   });
 
 
-const Exercise2p9 = Vue.component('Exercise2p9', {
+const Actions = Vue.component('Actions', {
  data: function() {
     return {
       name: "Autonomy and Heteronomy part 2.9: Action alternatives and relevant values",
@@ -1259,27 +1111,37 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
   created: function() {
   
     studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p9');
+      studentsocket.emit('currentlocation', '/actions');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
-    }  
+    } 
+    else {
+      groupsocket.emit('wantgroupactionalternatives', this.$activeSession);
+        groupsocket.on('showgroupactionalternatives', function(data) {
+          console.log(JSON.stringify(data));
+          this.actionAlternatives = data;
+          Vue.prototype.$input = data;
+        }.bind(this));
+       
+    } 
   
     this.dilemma = this.$dilemma;
     this.actionAlternatives = this.$input;
   },
   methods: {
     addActionAlternative() { 
-      this.actionAlternatives.push({actionAlternative: this.actionAlternative});
+      //this.actionAlternatives.push({actionAlternative: this.actionAlternative});
+      groupsocket.emit('actionalternatives', {'actionalternatives' : [{ actionAlternative: this.actionAlternative}], 'session': this.$activeSession });
       this.actionAlternative = '';
     },
     removeActionAlternative(id) {
-      this.actionAlternatives.splice(id,1);
+      groupsocket.emit('removesummaryinput', {'indx': id, 'inputtype': "actionalternative", 'session': this.$activeSession});
+      //this.actionAlternatives.splice(id,1);
     },
-    collectActionAlternatives() {
-      groupsocket.emit('actionalternatives', {'actionalternatives' : this.actionAlternatives, 'session': this.$activeSession });
+    resetInputVariable() {
       //set global input to [] for backing option not saving data
       Vue.prototype.$input = [];
     }
@@ -1288,12 +1150,13 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
    
    template: `
   <div>
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <nav>
       <router-link :to="{ name: 'actionoptionhelp'} ">
         Explain More!
       </router-link>
      </nav>
+     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+     <div id="textright">Step <b>7</b> of <b>9</b></div></br>
     <p>Discuss with your group.<br>
     Individually write down what possible actions could one take and how does that effect the values from the previous question?</p>
       Your group's dilemma is the following: 
@@ -1302,7 +1165,7 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
         <form @submit.prevent="addActionAlternative()">
           <input type="text" placeholder="Enter your action alternative here please..." v-model="actionAlternative">
         </form> 
-        <p>These are your action alternatives and their effects, press continue to submit them to your group.</p>
+        <p>These are your group's action alternatives and their effects.</p>
         <ul>
         <li class="example">Example: state an action alternative, how will this affect our reputation?</li>
           <li v-for="(data, index) in actionAlternatives" :key='index'> 
@@ -1311,8 +1174,8 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
           </li>
         </ul>
       </div>
-      <div v-on:click="collectActionAlternatives()">
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'exercise2p9showalter'}">
+      <div v-on:click="resetInputVariable()">
+    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'summary'}">
       <i class="material-icons">
           arrow_forward
         </i>
@@ -1322,67 +1185,6 @@ const Exercise2p9 = Vue.component('Exercise2p9', {
   </div>
   `
 });
-
-const Exercise2p9ShowAlter = Vue.component('Exercise2p9ShowAlter', {
- data: function() {
-    return {
-      name: "Autonomy and Heteronomy part 2.9: Show groups action alternatives and values",
-      username: this.$username,
-      groupName: this.$groupName,
-      dilemma: "",
-      actionAlternatives: null
-  }
- },
-  created: function() {
-   
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2p9');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    } 
-    else {
-  
-      groupsocket.on('showactionalternatives', function(data) {
-        this.actionAlternatives = data;
-      }.bind(this));
-      this.dilemma = this.$dilemma;
-  }
-      
-  },
-   
-   template: `
-  <div>
-    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <p>Group thoughts on action alternatives. These are all action alternatives that your group find relevant. </p>
-      Your group's dilemma is the following: 
-      <div class="text">{{dilemma}}</div>
-      <div class="holder">
-        <p>These are your group's thoughts on action alternatives</p>
-        <ul>
-          <li v-for="(data, index) in actionAlternatives" :key='index'> 
-            {{data.actionAlternative}}
-          </li>
-        </ul>
-      </div>
-    <router-link tag="button" class="navbutton" :to="{ name: 'exercise2p9'} ">
-      <i id="left" class="material-icons">
-           arrow_back
-          </i>
-         Go Back 
-    </router-link>
-    <router-link id="right" class="navbutton" tag="button" :to="{ name: 'summary'} ">
-      <i class="material-icons">
-          arrow_forward
-        </i>
-      Continue
-    </router-link>
-  </div>
-  `
-});
-
 
 const Summary = Vue.component('Summary', {
  data: function() {
@@ -1428,19 +1230,19 @@ const Summary = Vue.component('Summary', {
        this.reflexthoughts = data.reflexThoughts;
      }.bind(this)); 
      //so that changes on input will be seen by allgroup members
-     groupsocket.on('showreflexthoughts', function(data) {
+     groupsocket.on('showgroupreflexthoughts', function(data) {
        this.reflexthoughts = data; 
      }.bind(this));
 
-     groupsocket.on('showprinciples', function(data) {
+     groupsocket.on('showgroupprinciples', function(data) {
        this.principles = data;
      }.bind(this));
 
-     groupsocket.on('showconcretevalues', function(data) {
+     groupsocket.on('showgroupconcretevalues', function(data) {
        this.concreteValues = data;
      }.bind(this));
 
-     groupsocket.on('showactionalternatives', function(data) {
+     groupsocket.on('showgroupactionalternatives', function(data) {
        this.actionAlternatives = data;
      }.bind(this));
 
@@ -1503,19 +1305,20 @@ const Summary = Vue.component('Summary', {
   },
   template: `
   <div> 
-  <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-  <h2>This is a summary of your group's analysis</h2>
-  <p>The goal of this exercise is to differentiate between two ways to think heteronomy and autonomy
-  when we face a moral problem. 
-  <br><br><b>Heteronomy</b>:<br> automatic, dogmatic, constrained, intincts and reflexes, authoritarian thoughts. 
-  <br><b>Autonomy</b>:<br> critical searching, systematic thinking, supervision, holistic.</p>
-  <p v-if="submitted==false">You may now revise your analysis</p>
-    <ul v-if="submitted"><li id="boldtext" class="groups">Your analysis is now submitted, wait for your turn to present it!</li></ul>
-    This is your groups dilemma: <br>
-    {{dilemma}} <br>
-    <div class="wrapper" v-if="submitted==false">
-      <div class="box a"><h2>Heteronomy</h2></div>
-        <div class="box b"><h2>Autonomy</h2></div>
+    <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>8</b> of <b>9</b></div></br>
+      <h2>This is a summary of your group's analysis</h2>
+      <p>The goal of this exercise is to differentiate between two ways to think heteronomy and autonomy
+      when we face a moral problem. 
+      <br><br><b>Heteronomy</b>:<br> automatic, dogmatic, constrained, intincts and reflexes, authoritarian thoughts. 
+      <br><b>Autonomy</b>:<br> critical searching, systematic thinking, supervision, holistic.</p>
+      <p v-if="submitted==false">You may now revise your analysis</p>
+        <ul v-if="submitted"><li id="boldtext" class="groups">Your analysis is now submitted, wait for your turn to present it!</li></ul>
+      This is your groups dilemma: <br>
+      {{dilemma}} <br>
+      <div class="wrapper" v-if="submitted==false">
+        <div class="box a"><h2>Heteronomy</h2></div>
+           <div class="box b"><h2>Autonomy</h2></div>
         <div class="box c">
           <div class="box g"><h3>Reflex thoughts</h3>
           (Dominated by an automatic thought.)
@@ -1571,11 +1374,11 @@ const Summary = Vue.component('Summary', {
     </div>
     <button v-if="submitted==false" class="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
     <br>
-    <router-link tag="button" class="navbutton" v-if="submitted==true" to="/studentvote">
+    <router-link tag="button" id="right" class="navbutton" v-if="submitted==true" to="/studentvote">
     <i class="material-icons">
           arrow_forward
         </i>
-      Next
+      Continue
     </router-link>
   </div>
     `
@@ -1677,6 +1480,7 @@ const StudentVote = Vue.component('StudentVote', {
   template: `
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
+    <div id="textright">Step <b>9</b> of <b>9</b></div></br>
     <h2>Inital dilemma</h2>
     <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <p>{{staticdilemma}}</p>
@@ -1764,66 +1568,74 @@ const router = new VueRouter({
       path:'/exercise2p2',
       component:Exercise2p2
     },
-    { //reflex thoughts individual
-      path:'/exercise2p3',
-      component:Exercise2p3,
-      name: 'exercise2p3'
+    { //reflex thoughts individual in groups
+      path:'/reflex',
+      component:Reflex,
+      name: 'reflex'
     },
     { //page explaining the reflex question
       path:'/reflexhelp',
       component: ReflexHelp,
       name: 'reflexhelp'
     },
+    /* DELETED
     { //reflex thoughts all thoughts in group
       path:'/exercise2p4',
       component:Exercise2p4,
       name: 'exercise2p4'
     },
+    */
     { //Principles individual (Dogmatic låsningar)
-      path:'/exercise2p5',
-      component:Exercise2p5,
-      name: 'exercise2p5'
+      path:'/principlefixations',
+      component:PrincipleFixations,
+      name: 'principlefixations'
     },
     { //page explaining the reflex question
       path:'/principlehelp',
       component: PrincipleHelp,
       name: 'principlehelp'
     },
+    /* DELETED
      { //Principles show all in group
       path:'/exercise2p6',
       component:Exercise2p6,
       name: 'exercise2p6'
     },
+    */
     { //concrete values individual
-      path:'/exercise2p7',
-      component:Exercise2p7,
-      name: 'exercise2p7'
+      path:'/concretevalues',
+      component:ConcreteValues,
+      name: 'concretevalues'
     },
     { //page explaining the value question
       path:'/valuehelp',
       component: ValueHelp,
       name: 'valuehelp'
     },
+/* DELETED
     { //concrete values show all in group
       path:'/exercise2p8showvalues',
       component:Exercise2p8ShowValues,
       name: 'exercise2p8showvalues'
     },
+    */
     { //action alternatives individual
-      path:'/exercise2p9',
-      component:Exercise2p9,
-      name: 'exercise2p9'
+      path:'/actions',
+      component:Actions,
+      name: 'actions'
     },
     { //page explaining the actionalternatives question
       path:'/actionoptionhelp',
       component: ActionOptionHelp,
       name: 'actionoptionhelp'
     },
+    /*DELETED
     { //action alternatives show all in group
       path:'/exercise2p9showalter',
       component:Exercise2p9ShowAlter,
       name: 'exercise2p9showalter'
     },
+    */
     { //summary of each groups answer
       path:'/summary',
       component:Summary,

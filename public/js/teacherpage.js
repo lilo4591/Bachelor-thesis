@@ -327,8 +327,8 @@ const Provocative1 = Vue.component('provocative1', {
   },
   template: `
   <div id= "page">
-    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <div id="textright">Step <b>1</b> of <b>4</b></div></br>
+    <div id="textleft"> Sessiontoken: <b>{{session}}</b></div><br>
+    <div id="textright">Step <b>1</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
       <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
       <button class="button" v-on:click="collectAllSituations">End the discussion and show all group's situations</button>
@@ -391,7 +391,7 @@ const Provocative2love = Vue.component('provocative2love', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <div id="textright">Step <b>2</b> of <b>4</b></div></br>
+    <div id="textright">Step <b>2</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
       <button class="button" v-on:click="collectAllRisks">End the discussion and show all group's risks</button>
@@ -451,7 +451,7 @@ const Provocative3War = Vue.component('provocative3war', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-    <div id="textright">Step <b>3</b> of <b>4</b></div></br>
+    <div id="textright">Step <b>3</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
       <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
       <button class="button" v-on:click="collectAll">End the discussion and show all group's possibilites</button>
@@ -493,7 +493,7 @@ template:
 `
 <div id="app">
   <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-  <div id="textright">Step <b>4</b> of <b>4</b></div></br>
+  <div id="textright">Step <b>4</b> of <b>4</b></div><br>
   <h2>To Conclude</h2>
   <p>By managing to come up with several risks and possibilites with these examples
     one realizes that many things that you take for granted can be questioned.</p>
@@ -544,6 +544,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
   template: `
   <div id= "page">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>1</b> of <b>7</b></div><br>
       <h2>Starting with an example dilemma</h2>
       <p id="boldtext">Adopt this dilemma and try to solve it. Then write your down most important thoughts.</p>
       <p>{{staticdilemma}}</p>
@@ -588,6 +589,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>2</b> of <b>7</b></div><br>
     <p v-if="displayreflex===false">Formulate your own dilemma in your groups</p>
   
       <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
@@ -599,7 +601,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
           <p>Write down your <b>instinctive thoughts</b> about this dilemma.<br>
             This is Individuall, but discuss with your group.</p>
         </div>
-    <router-link tag="button" class="navbutton" to="/autonomyheteronomy1">
+    <router-link tag="button" id="left" class="navbutton" to="/autonomyheteronomy1">
         <i id="left" class="material-icons">
           arrow_back
         </i>
@@ -627,6 +629,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>3</b> of <b>7</b></div><br>
     <p>Write down <b>principle fixations about</b> this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy2">
@@ -657,6 +660,7 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>4</b> of <b>7</b></div><br>
     <p>Write down <b>concrete values</b> about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy3">
@@ -688,6 +692,7 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>5</b> of <b>7</b></div><br>
     <p>Write down what <b>can be done</b> about this dilemma.<br>
       This is Individuall but discuss with your group.</p>
       <router-link tag="button" class="navbutton" to="/autonomyheteronomy4">
@@ -746,6 +751,7 @@ var analysis = Vue.component('analysis', {
   template:`
   <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>6</b> of <b>7</b></div><br>
     <h3>Presentation</h3>
     <p id="boldtext">The goal with this exercise was to learn to differentiate between the different ways of thinking,
       Heteronomy and Autonomy and thus becoming more concious of one owns thoughtprocess and being able to controll it. 
@@ -807,6 +813,7 @@ const showAnalysis = Vue.component('showAnalysis', {
   template: `
   <div> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>6</b> of <b>7</b></div><br>
     <h2>This is a summary of {{group}}'s analysis</h2>
     This is your groups dilemma: <br>
     {{dilemma}}
@@ -949,6 +956,7 @@ const Vote = Vue.component('Vote', {
   template: `
   <div> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
+    <div id="textright">Step <b>7</b> of <b>7</b></div><br>
     <h2>Inital dilemma</h2>
     <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
     <p>{{ staticdilemma }}</p>
