@@ -102,19 +102,24 @@ const Start = Vue.component('Start', {
   data: function(){
     return {
       studentId: 0,
-      groupName: this.$groupName
+      groupName: this.$groupName,
+      username: this.$username
 
     }
   },
   template: `
    <div>
-    <h2>Lets go!</h2>
-    <p v-if="this.groupName == null">Waiting for a group to be assigned to you...<p/>
+    <div id="textleft"> Group: <b v-if="this.groupName != null">{{groupName}}</b> <b v-else>Not assigned</b> Username: <b>{{username}}</div>
+    <p v-if="this.groupName == null">Waiting for a group to be assigned to you...</p>
+    <p v-if="this.groupName != null">Waiting for an exercise to start!..</p>
     <p v-if="this.groupName != null">The name of your group is <ul><li class="groups">{{ this.groupName }}</li></ul></p>
-    <p v-if="this.groupName != null">Waiting for an exercise to start!</p>
   </div>
   `,
   created:function() {
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session, please log in again with the same username");
+      router.push('/');
+    }
     studentsocket.on('namespace', function (info) {
       if (info.session == this.$activeSession) {
         groupsocket = io.connect(info.group);
