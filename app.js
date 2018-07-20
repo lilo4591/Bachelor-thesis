@@ -119,6 +119,8 @@ Data.prototype.addGroupObj = function (group, session) {
     groupPoss: [],
     //exercise 2
     groupDilemma: null,
+    tempdilemma: null,
+    dilemmasubmitted: false,
     groupReflexThoughts: [],
     groupPrinciples: [],
     groupConcreteValues: [],
@@ -668,19 +670,34 @@ function groupsmessages(index, session) {
     console.log("active sessions now - groups: " + JSON.stringify(data.activeSessions[session].groups));
     console.log(" ");
     */
-    //update groupmembers on dilemma on keyup 
+    //update groupmembers on dilemma on keyup
+     
     socket.on('dilemmakeyup', function (info) {
       console.log("test on kwy up" + info.dilemma);
+      data.activeSessions[info.session].groups[index].tempdilemma = info.dilemma;
       io.of(data.activeSessions[info.session].groupNames[index]).emit('dilemmakeyup', info);
+    
     });
-
+    socket.on('wantdilemma', function(session) {
+      console.log("asking about dilemma");
+      var tempdilemma = data.activeSessions[session].groups[index].tempdilemma;
+      //if one student has started editing dilemma and another comes to that page at a later step in time
+      io.of(data.activeSessions[session].groupNames[index]).emit('dilemmakeyup', {'session': session, 'dilemma': tempdilemma});
+      //makes sure that if other student has submitted dilemma inital page load will show that to the others students in that group
+      if (data.activeSessions[session].groups[index].dilemmasubmitted == true) {
+        io.of(data.activeSessions[session].groupNames[index]).emit('showdilemma', {'dilemma': tempdilemma, 'notsubmitted': false, 'session' : session });
+      }
+       //io.of(data.activeSessions[info.session].groupNames[index]).emit('showdilemma', info);
+    });
     //new
     socket.on('dilemma', function (info) {
+      data.activeSessions[info.session].groups[index].dilemmasubmitted = true;
       data.addGroupDilemma(data.activeSessions[info.session].groupNames[index], info.dilemma, info.session);
       io.of(data.activeSessions[info.session].groupNames[index]).emit('showdilemma', info);
     });
     //new
     socket.on('edit', function (info) {
+      data.activeSessions[info.session].groups[index].dilemmasubmitted = false;
       io.of(data.activeSessions[info.session].groupNames[index]).emit('editdilemma', info);
     });
 

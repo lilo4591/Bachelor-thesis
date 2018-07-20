@@ -628,7 +628,8 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     }
     else {
 
-     groupsocket.on('showdilemma', function(data) {
+      groupsocket.emit('wantdilemma', this.$activeSession);
+      groupsocket.on('showdilemma', function(data) {
         this.dilemma = data.dilemma;
         this.notsubmitted = data.notsubmitted;
         Vue.prototype.$dilemma = data.dilemma;
@@ -668,7 +669,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   <div id="student">
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>3</b> of <b>9</b></div></br>
-    <p>Discuss in your group and formulate a dilemma together. The dilemma should be one that you are facing
+    <p>Discuss in your group and formulate an ethical dilemma together. The dilemma should be one that you are facing
       now in your proffession, school or in your private life.</p>
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:keyup="editdilemmakeyup" v-model="dilemma">
