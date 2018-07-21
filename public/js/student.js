@@ -13,11 +13,11 @@ Vue.prototype.$dilemma = "";
 Vue.prototype.$staticdilemma = 
 "A student are conducting her master thesis at the university. " +
   "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
-  "To test this algorithm the student implements a system that uses the algorithm to hack into different companies systems. " +
-  "The algorithm manages to find a few vulnerabilities on the different companies systems and this is added to the report. " +
-  "Her professor is both impressed with her ability also concerned. " +
-  "One of the companies security team notice that they have been attacked and can track the attack back to the student and are planning to press charges. " +
-  "But the student however didn't do any damage to the companies system and claims that she did them a favor, because now they can make their systems more secure."
+  "To test this algorithm the student implements a system that uses the algorithm to hack into different companies's systems. " +
+  "The algorithm manages to find a few vulnerabilities and this is added to the report. " +
+  "Her professor is both impressed with her ability but also concerned. " +
+  "One of the companies's security team notices that they have been attacked and can track the attack back to the student and are planning to press charges. " +
+  "But the student however didn't do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
 
 Vue.use(VuePoll);
 
