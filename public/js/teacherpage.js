@@ -10,7 +10,7 @@ Vue.prototype.$staticdilemma =
   "The algorithm manages to find a few vulnerabilities and this is added to the report. " +
   "Her professor is both impressed with her ability but also concerned. " +
   "One of the companies's security team notices that they have been attacked and can track the attack back to the student and are planning to press charges. " +
-  "But the student however didn't do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
+  "But the student however did not do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
 
   Vue.use(VuePoll);
 
@@ -237,7 +237,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
           <h2>Exercise 2: <br>Autonomy and Heteronomy</h2>
           </div>
           <div class="containtext2">
-            <p>This exercise will train your ability to recognice the two different ways to think.</p>
+            <p>This exercise will train your ability to recognize the two different ways to think.</p>
           </div>
           <div class="containnav2">
             <router-link to="/autonomyheteronomy1">
@@ -394,9 +394,9 @@ const Provocative2love = Vue.component('provocative2love', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>2</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
-      <p>This exercise is about identifing <b>risks</b> with <b>Love</b>.</p>
+      <p>This exercise is about identifying <b>risks</b> with <b>Love</b>.</p>
       <button class="button" v-on:click="collectAllRisks">End the discussion and show all group's risks</button>
-      <div class="holder">
+      <div class="holder">  
         <p>Risks with love</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
@@ -454,10 +454,10 @@ const Provocative3War = Vue.component('provocative3war', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>3</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
-      <p>This exercise is about identifing <b>possibilities</b> with <b>war</b>.</p>
-      <button class="button" v-on:click="collectAll">End the discussion and show all group's possibilites</button>
+      <p>This exercise is about identifying <b>possibilities</b> with <b>war</b>.</p>
+      <button class="button" v-on:click="collectAll">End the discussion and show all group's possibilities</button>
       <div class="holder">
-        <p>Possibilies with war</p>
+        <p>Possibilities with war</p>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
@@ -496,7 +496,7 @@ template:
   <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
   <div id="textright">Step <b>4</b> of <b>4</b></div><br>
   <h2>To Conclude</h2>
-  <p>By managing to come up with several risks and possibilites with these examples
+  <p>By managing to come up with several risks and possibilities with these examples
     one realizes that many things that you take for granted can be questioned.</p>
   <router-link tag="button" class="navbutton" to="/provocative3war">
         <i id="left" class="material-icons">
@@ -591,7 +591,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>2</b> of <b>7</b></div><br>
-    <p v-if="displayreflex===false">Formulate your own dilemma in your groups</p>
+    <p v-if="displayreflex===false">Formulate your own dilemma in your groups.</p>
   
       <div v-if="displayreflex==false" v-on:click="updateDisplayReflex(true)">
         <button class="smallbutton">
@@ -600,7 +600,7 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
       </div>
         <div v-if="displayreflex">
           <p>Write down your <b>instinctive thoughts</b> about this dilemma.<br>
-            This is Individuall, but discuss with your group.</p>
+            This is individual, but discuss with your group.</p>
         </div>
     <router-link tag="button" id="left" class="navbutton" to="/autonomyheteronomy1">
         <i id="left" class="material-icons">
@@ -632,7 +632,7 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>3</b> of <b>7</b></div><br>
     <p>Write down <b>principle fixations about</b> this dilemma.<br>
-      This is Individuall but discuss with your group.</p>
+      This is individual but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy2">
         <i id="left" class="material-icons">
           arrow_back
@@ -663,7 +663,7 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>4</b> of <b>7</b></div><br>
     <p>Write down <b>concrete values</b> about this dilemma.<br>
-      This is Individuall but discuss with your group.</p>
+      This is individual but discuss with your group.</p>
     <router-link tag="button" class="navbutton" to="/autonomyheteronomy3">
         <i id="left" class="material-icons">
           arrow_back
@@ -695,7 +695,7 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>5</b> of <b>7</b></div><br>
     <p>Write down what <b>can be done</b> about this dilemma.<br>
-      This is Individuall but discuss with your group.</p>
+      This is individual but discuss with your group.</p>
       <router-link tag="button" class="navbutton" to="/autonomyheteronomy4">
         <i id="left" class="material-icons">
           arrow_back
@@ -720,34 +720,6 @@ var analysis = Vue.component('analysis', {
     }
   
   },
-   created: function() {
-   /*
-     socket.on('showanalysis', function(data) {
-      var contains = false;
-      var index;
-      //console.log("new analys " + data.group);
-      for (var i in this.$analys) {
-        //if this groups analysis already existis
-        //console.log("existing analys in index " + i + this.$analys[i].group);
-        if (data.group === this.$analys[i].group) {
-          //console.log('match');
-          contains = true;
-          index = i;
-        }
-      }
-      if (contains){
-        //replace old analysis with new
-        this.$analys.splice(index,1);
-        this.$analys.push(data);
-      }
-      else {
-        //just add the new analysis
-        this.$analys.push(data); 
-      }
-
-    }.bind(this));  
-  */
-  },
 
   template:`
   <div id="app">
@@ -755,15 +727,15 @@ var analysis = Vue.component('analysis', {
     <div id="textright">Step <b>6</b> of <b>7</b></div><br>
     <h3>Presentation</h3>
     <p id="boldtext">The goal with this exercise was to learn to differentiate between the different ways of thinking,
-      Heteronomy and Autonomy and thus becoming more concious of one owns thoughtprocess and being able to controll it. 
+      Heteronomy and Autonomy and thus becoming more conscious of one owns thought process and being able to control it. 
     </p>
     <p> 
       Heteronomy and Autonomy are two different ways of thinking. Heteronomy is the fast way of accepting one truth without reflecting
       based on for example authority, strong principles or that you know that this is right and this is wrong so that you don't need to reflect upon it.
-      Autonomy on the other hand is when you analyse the dilemma from different perspectives and weights the possible solutions against each other.
+      Autonomy on the other hand is when you analyze the dilemma from different perspectives and weights the possible solutions against each other.
       <br>
       <br>
-      All sumitted analyses will be presented here</p>
+      All submitted analyses will be presented here</p>
     <nav>
     <router-link :to="{name: 'showanalysis', params: {groupanalys: obj} }" 
       v-for="obj in groupsanalys" 
@@ -849,7 +821,7 @@ const showAnalysis = Vue.component('showAnalysis', {
             </ul> 
           </div>
           <div class="box f"><h3>Action alternatives and Values</h3>
-          (What can be done and how does that affect everyones interests?)
+          (What can be done and how does that affect everyone's interests?)
             <ul class="summaryList">
               <li v-for="(data, index) in actionAlternatives" :key='index'> 
                 {{data.actionAlternative}}
@@ -959,7 +931,7 @@ const Vote = Vue.component('Vote', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>7</b> of <b>7</b></div><br>
     <h2>Inital dilemma</h2>
-    <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+    <p id="boldtext">With our newly acquired knowledge about heteronomy and autonomy lets discuss the initial dilemma in this exercise.</p>
     <p>{{ staticdilemma }}</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">

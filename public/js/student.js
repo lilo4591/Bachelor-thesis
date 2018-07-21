@@ -7,7 +7,7 @@ var studentsocket = io('/students');
 var groupsocket; 
 //global variable to save input when going to 'explain more'
 Vue.prototype.$input = [];
-//global dilemma to not having to passit trough routes
+//global dilemma to not having to pass it trough routes
 Vue.prototype.$dilemma = "";
 //TODO: read dilemma from file or db to be able to change it.
 Vue.prototype.$staticdilemma = 
@@ -17,7 +17,7 @@ Vue.prototype.$staticdilemma =
   "The algorithm manages to find a few vulnerabilities and this is added to the report. " +
   "Her professor is both impressed with her ability but also concerned. " +
   "One of the companies's security team notices that they have been attacked and can track the attack back to the student and are planning to press charges. " +
-  "But the student however didn't do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
+  "But the student however did not do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
 
 Vue.use(VuePoll);
 
@@ -89,7 +89,7 @@ const Login = Vue.component('Login', {
         <form>
           <h3>Enter Sessiontoken</h3>
           <input type="number" v-model="tokenInput" placeholder="Sessiontoken" required>
-          <h3>Enter a username of your choice</h3>
+          <h3>Enter a username of your choice.</h3>
           <input type="text" v-model="username" placeholder="Username"required>
        </form> 
       <button v-on:click="validateToken()" class="smallbutton">Log in</button>
@@ -367,9 +367,9 @@ const LoveFullClass = Vue.component('LoveFullClass', {
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>4</b> of <b>6</b></div></br>
     <h2>{{ name }}</h2>
-    <p>Please have a look at the bigger screen and discuss your {{thoughttype}}s.<br>
+    <p>Please have a look at the bigger screen and discuss your risks.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
-    You can not add more {{thoughttype}}s now.</p>
+    You can not add more risks now.</p>
     <router-link id="right" class="navbutton" tag="button" :to="{name: 'exercise1war' }">
       <i class="material-icons">
           arrow_forward
@@ -440,9 +440,9 @@ const Exercise1War = Vue.component('Exercise1War', {
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
         <button v-on:click="addThought()">Submit possibility to group</button>
-        <p>These are your group's {{thoughttype}}s</p>
+        <p>These are your group's possibilities</p>
         <ul>
-          <li class="example">Example {{thoughttype}}: {{example}}.</li>
+          <li class="example">Example possibility: {{example}}.</li>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
             <i class="material-icons" v-on:click="removeThought(index)">delete</i>
@@ -478,10 +478,10 @@ const WarFullClass = Vue.component('WarFullClass', {
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>6</b> of <b>6</b></div></br>
-    <h2>Ethical awareness, possibilites.</h2>
+    <h2>Ethical awareness, possibilities.</h2>
     <p>Please have a look at the bigger screen and discuss your possibilities.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
-    You can not add more {{thoughttype}}s now.</p>
+    You can not add more possibilities now.</p>
     <router-link id="right" class="navbutton" tag="button" :to="{name: 'start' }">
       <i class="material-icons">
           arrow_forward
@@ -546,7 +546,7 @@ const Exercise2 = Vue.component('Exercise2', {
           <input type="text" placeholder="Enter your thoughts here please..." v-model="thought">
         </form> 
         <button v-on:click="addThought()">Submit thought</button>
-        <ul><li class="example">Example: It's illegal, therefor its wrong..</li></ul>
+        <ul><li class="example">Example: It's illegal, therefor it's wrong..</li></ul>
         <ul>
           <li v-for="(data, index) in thoughts" :key='index'> 
             {{data.thought}}
@@ -589,7 +589,7 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
       <div id="textright">Step <b>2</b> of <b>9</b></div></br>
     <p>Please have a look at the bigger screen and discuss your thoughts.<br>
     When you the teacher tells you it is time for the next step in this exercise press continue..<br>
-    To add more thoughts press go back</p>
+    To add more thoughts press go back.</p>
     <router-link tag="button" class="navbutton" to="/exercise2">
      <i id="left" class="material-icons">
            arrow_back
@@ -670,7 +670,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>3</b> of <b>9</b></div></br>
     <p>Discuss in your group and formulate an ethical dilemma together. The dilemma should be one that you are facing
-      now in your proffession, school or in your private life.</p>
+      now in your profession, school or in your private life.</p>
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:keyup="editdilemmakeyup" v-model="dilemma">
           </textarea>
@@ -709,9 +709,9 @@ const ReflexHelp = Vue.component('ReflexHelp', {
   template: `
   <div>
       <p> This question is about the reflex thoughts that occur, for example </p>
-        <ul><li class="example">This is someone elses responsibility and does not apply to me, so I'll ignore it</li></ul>
+        <ul><li class="example">This is someone else's responsibility and does not apply to me, so I'll ignore it</li></ul>
         <p>
-        Discuss in your group but individually write down thoughts that implies that you dont want to deal with the dilemma.
+        Discuss in your group but individually write down thoughts that implies that you don't want to deal with the dilemma.
         Think about possible instinctive thoughts of other perspectives, you don't need to agree with all thoughts.
         Write all thoughts you can come up with, independent of the solution you want to come to.
       </p>
@@ -787,7 +787,7 @@ const Reflex = Vue.component('Reflex', {
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>4</b> of <b>9</b></div></br>
     <p>Discuss in your group but individually write the first things that comes to your mind when you consider this dilemma?</p> 
-     Your group's dilemma is the following: 
+     Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addReflexThought">
@@ -908,7 +908,7 @@ const PrincipleFixations = Vue.component('PrincipleFixations', {
     <div id="textright">Step <b>5</b> of <b>9</b></div></br>
      <p>Discuss in your group but individually write down principles fixations that relates to the dilemma.
     Write all principles you can come up with, independent of the solution you want to come to.</p>
-      Your group's dilemma is the following: 
+      Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addPrinciple">
@@ -958,7 +958,7 @@ const ValueHelp = Vue.component('ValueHelp', {
         <ul><li class="example">Do we want to implement this customer's demand?</li></ul>
       <p>
         There is a risk to leave out relevant arguments here, to eliminate that risk try to first
-        identify all parties which the moral dilemma concerns (groups, companies, people organisation, environment, society etc) 
+        identify all parties which the moral dilemma concerns (groups, companies, people organization, environment, society etc) 
         but always question your conclusions. Discuss in group what values, interests duties feelings etc these parties have.
         Be critical and prepared to go back and revise your conclusions.
       </p>
@@ -1037,12 +1037,12 @@ const ConcreteValues = Vue.component('ConcreteValues', {
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>6</b> of <b>9</b></div></br>
     <p>Discuss with your group.
-    <br>Think about and define the different parties the dilemma concerns and individually write down what their values and interests are.</p>
-      Your group's dilemma is the following: 
+    <br>Think about and define the different parties the ethical dilemma concerns and individually write down what their values and interests are.</p>
+      Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addConcreteValue">
-          <input type="text" placeholder="Enter your value here please..." v-model="concreteValue">
+          <input type="text" placeholder="Enter your values here please..." v-model="concreteValue">
         </form> 
         <p>These are your group's stakeholder values.</p>
         <ul>
@@ -1087,10 +1087,10 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
   template: `
   <div>
     <h2>Instructions explanation</h2>
-      <p> This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example</p>
+      <p>This question is about the different action alternatives one could take and how that will affect the values and interests from previous question, for example</p>
         <ul><li class="example">State an action alternative, with this action how are we going to make it financially?</li></ul>
       <p> 
-        Write all relevant option to act and their effects on the concerned values as they are decribed in the previous question.
+        Write all relevant options to act and their effects on the concerned values as they are decribed in the previous question.
         There is always a risk to miss a good action alternative, so be prepared to revise the list of action alternatives later.
       </p>
       <router-link class="navbutton" tag="button" :to="{ name: 'actions'} ">
@@ -1166,8 +1166,8 @@ const Actions = Vue.component('Actions', {
      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
      <div id="textright">Step <b>7</b> of <b>9</b></div></br>
     <p>Discuss with your group.<br>
-    Individually write down what possible actions could one take and how does that effect the values from the previous question?</p>
-      Your group's dilemma is the following: 
+    Individually write down what possible actions could one take and how that effects the values from the previous question?</p>
+      Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
         <form @submit.prevent="addActionAlternative()">
@@ -1316,13 +1316,13 @@ const Summary = Vue.component('Summary', {
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>8</b> of <b>9</b></div></br>
       <h2>This is a summary of your group's analysis</h2>
-      <p>The goal of this exercise is to differentiate between two ways to think heteronomy and autonomy
+      <p>The goal of this exercise is to differentiate between two ways to think, heteronomy and autonomy
       when we face a moral problem. 
-      <br><br><b>Heteronomy</b>:<br> automatic, dogmatic, constrained, intincts and reflexes, authoritarian thoughts. 
+      <br><br><b>Heteronomy</b>:<br> automatic, dogmatic, constrained, instincts and reflexes, authoritarian thoughts. 
       <br><b>Autonomy</b>:<br> critical searching, systematic thinking, supervision, holistic.</p>
       <p v-if="submitted==false">You may now revise your analysis</p>
         <ul v-if="submitted"><li id="boldtext" class="groups">Your analysis is now submitted, wait for your turn to present it!</li></ul>
-      This is your groups dilemma: <br>
+      This is your group's ethical dilemma: <br>
       {{dilemma}} <br>
       <div class="wrapper" v-if="submitted==false">
         <div class="box a"><h2>Heteronomy</h2></div>
@@ -1355,7 +1355,7 @@ const Summary = Vue.component('Summary', {
         </div>
         <div class="box d">
           <div class="box e"><h3>Concrete Values</h3>
-          (Who does the dilemma concerns and what are their interests?)
+          (Who does the dilemma concern and what are their interests?)
           <form @submit.prevent="addinput('concretevalue')">
               <input type="text" placeholder="Enter additional value thoughts..." v-model="concreteValue">
             </form> 
@@ -1367,7 +1367,7 @@ const Summary = Vue.component('Summary', {
             </ul> 
           </div>
           <div class="box f"><h3>Action alternatives and Values</h3>
-          (What can be done and how does that affect everyones interests?)
+          (What can be done and how does that affect everyone's interests?)
             <form @submit.prevent="addinput('actionalternative')">
               <input type="text" placeholder="Enter additional action alternatives..." v-model="actionAlternative">
             </form> 
@@ -1490,7 +1490,7 @@ const StudentVote = Vue.component('StudentVote', {
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>9</b> of <b>9</b></div></br>
     <h2>Inital dilemma</h2>
-    <p id="boldtext">With our new aquired knowledge about heteronomy and autonomy lets discuss the inital dilemma in this exercise</p>
+    <p id="boldtext">With our newly acquired knowledge about heteronomy and autonomy lets discuss the initial dilemma in this exercise.</p>
     <p>{{staticdilemma}}</p>
     <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
@@ -1603,13 +1603,6 @@ const router = new VueRouter({
       component: PrincipleHelp,
       name: 'principlehelp'
     },
-    /* DELETED
-     { //Principles show all in group
-      path:'/exercise2p6',
-      component:Exercise2p6,
-      name: 'exercise2p6'
-    },
-    */
     { //concrete values individual
       path:'/concretevalues',
       component:ConcreteValues,
@@ -1620,13 +1613,6 @@ const router = new VueRouter({
       component: ValueHelp,
       name: 'valuehelp'
     },
-/* DELETED
-    { //concrete values show all in group
-      path:'/exercise2p8showvalues',
-      component:Exercise2p8ShowValues,
-      name: 'exercise2p8showvalues'
-    },
-    */
     { //action alternatives individual
       path:'/actions',
       component:Actions,
@@ -1637,13 +1623,6 @@ const router = new VueRouter({
       component: ActionOptionHelp,
       name: 'actionoptionhelp'
     },
-    /*DELETED
-    { //action alternatives show all in group
-      path:'/exercise2p9showalter',
-      component:Exercise2p9ShowAlter,
-      name: 'exercise2p9showalter'
-    },
-    */
     { //summary of each groups answer
       path:'/summary',
       component:Summary,
