@@ -331,7 +331,7 @@ const Provocative1 = Vue.component('provocative1', {
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div><br>
     <div id="textright">Step <b>1</b> of <b>4</b></div><br>
       <h2>Ethical awareness exercise</h2>      
-      <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implication</b> at all.</p>
+      <p>The first part of this exercise is to come up with <b>real life situations</b> which has <b>no moral implications</b> at all.</p>
       <button class="button" v-on:click="collectAllSituations">End the discussion and show all group's situations</button>
       <div class="holder">
         <p>These are situations from all groups</p>
@@ -846,9 +846,10 @@ const Vote = Vue.component('Vote', {
     return {
       session: this.$session,
       thought: '',
-      thoughts: null,
+      thoughts: [],
       staticdilemma: this.$staticdilemma,
       i: 0,
+      showVotes: false,
       showNextButton: true,
       listoptions: [ {options: {
                       customId: 0,
@@ -865,7 +866,7 @@ const Vote = Vue.component('Vote', {
     }
   },
   created: function() {
-    socket.emit('initialThoughts', this.$session);
+   socket.emit('initialThoughts', this.$session);
     socket.on('displayInitialThoughts', function (info) {
       console.log('display init thoughts '+ info.session);
       if (info.session == this.$session) {
@@ -890,11 +891,26 @@ const Vote = Vue.component('Vote', {
         }
       }
     }.bind(this));
-   
+  
+    socket.emit('wantvotes', this.$session);
+    socket.on('showvotes', function(info) {
+      if (info.session == this.$session) {
+        for (var i in info.votes) {
+          this.addVoteObj(info.votes[i]);
+        } 
+    }
+    }.bind(this));
+    
   //listen for student votes and updating the poll votes accordingly
   socket.on('vote', function(obj) {
     if (obj.session == this.$session) {
-      console.log('vote recieved');
+     this.addVoteObj(obj); 
+    }
+  }.bind(this));
+  },
+  methods: {
+  addVoteObj(obj) {
+    console.log('vote recieved');
         if (obj.answer === "Heteronomy") {
           console.log(obj.answer);
           this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
@@ -904,22 +920,29 @@ const Vote = Vue.component('Vote', {
           console.log(obj.answer);
           this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
           console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
+          console.log(JSON.stringify(obj));
         }   
-    }
-  }.bind(this));
-  },
-  methods: {
+      },
     updateShowIndex() {
       if (this.i >= this.thoughts.length - 1) {
         this.showNextButton = false;
       }
       else {
         this.i += 1;
+        this.showVotes=false;
       }
-
+    },
+    showResult(){
+      this.showVotes=true;
+    },
+    goBackOneQuestion(){
+      if (this.i != 0) {
+        this.i -= 1;
+      }
     },
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
+      console.log(JSON.stringify(obj));
       
     },
     navigateStudentsToStart() {
@@ -933,17 +956,22 @@ const Vote = Vue.component('Vote', {
     <h2>Inital dilemma</h2>
     <p id="boldtext">With our newly acquired knowledge about heteronomy and autonomy lets discuss the initial dilemma in this exercise.</p>
     <p>{{ staticdilemma }}</p>
-    <div v-for="(data, index) in thoughts">
+    <div id="clear">
+      <button class="halfbutton" id="left" v-if="i!=0" v-on:click="goBackOneQuestion">Previous thought</button>
+      <button class="halfbutton" id="right" v-if="i != (thoughts.length - 1)" v-on:click="updateShowIndex">Next thought</button>
+    </div>
+      <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
         <ul>
           <li>
             {{data.thought}}
           </li>
         </ul>
-        <vue-poll v-bind="listoptions[index].options" @addvote="addVote"/>
-        <button class="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
-      </div>
+        <button v-if="showVotes==false" v-on:click="showResult">Show result</button>
+        <vue-poll v-if="showVotes" v-bind="listoptions[index].options" @addvote="addVote"/>
+       </div>
     </div>
+    <p>Describe this thought with focus on autonomy and heteronomy.</p>
        <router-link tag="button" class="navbutton" to="/analysis">
         <i id="left" class="material-icons">
           arrow_back

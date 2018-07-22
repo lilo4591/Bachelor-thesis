@@ -179,6 +179,7 @@ ul li {
   overflow: hidden;
   text-overflow: ellipsis;
   color: #3E5252;
+  width: 100%;
 }
 
 ul li.groups {
@@ -382,3 +383,11 @@ ul li.example {
 }
 
 
+.halfbutton {
+  width: 49%;
+}
+
+#clear {
+  clear:both;
+  width:100%;
+}

@@ -54,7 +54,7 @@ const Login = Vue.component('Login', {
         router.push('/start');
         studentsocket.emit('loggedIn', {"username": this.username, "session": this.tokenInput} );
         Vue.prototype.$activeSession = Number(this.tokenInput);
-        console.log("this session is " + this.tokenInput);
+        console.log("this session is " + this.$activeSession);
         Vue.prototype.$username = this.username;
       
       }
@@ -152,7 +152,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
       showing: 'showgroupsituations',
       remove: 'removesituation',
       example: 'Deciding which company to buy hardware from', 
-      text: 'situations that has no moral implication' 
+      text: 'situations that has no moral implications' 
 
     }
   },
@@ -226,7 +226,7 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
       showing: 'showgroupsituations',
       remove: 'removesituation',
       example: 'Deciding which company to buy hardware from', 
-      text: 'situations that has no moral implication' 
+      text: 'situations that has no moral implications' 
     
     }
   },
@@ -669,7 +669,7 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
   <div id="student">
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>3</b> of <b>9</b></div></br>
-    <p>Discuss in your group and formulate an ethical dilemma together. The dilemma should be one that you are facing
+    <p>Discuss in your group and <b>formulate</b> an <b>ethical dilemma</b> together. The dilemma should be one that you are facing
       now in your profession, school or in your private life.</p>
         <div v-if="notsubmitted">
           <textarea placeholder="Enter your dilemma here please" cols="40" rows="5" v-on:keyup="editdilemmakeyup" v-model="dilemma">
@@ -786,7 +786,7 @@ const Reflex = Vue.component('Reflex', {
     </nav><br>
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>4</b> of <b>9</b></div></br>
-    <p>Discuss in your group but individually write the first things that comes to your mind when you consider this dilemma?</p> 
+    <p>Discuss in your group but individually write <b>the first things that comes to your mind</b> when you consider this dilemma?</p> 
      Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -906,7 +906,7 @@ const PrincipleFixations = Vue.component('PrincipleFixations', {
     </nav><br>
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
     <div id="textright">Step <b>5</b> of <b>9</b></div></br>
-     <p>Discuss in your group but individually write down principles fixations that relates to the dilemma.
+     <p>Discuss in your group but individually write down <b>principles fixations</b> that relates to the dilemma.
     Write all principles you can come up with, independent of the solution you want to come to.</p>
       Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
@@ -1037,7 +1037,7 @@ const ConcreteValues = Vue.component('ConcreteValues', {
       <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>6</b> of <b>9</b></div></br>
     <p>Discuss with your group.
-    <br>Think about and define the different parties the ethical dilemma concerns and individually write down what their values and interests are.</p>
+    <br>Think about and <b>define the different parties</b> the ethical dilemma concerns and individually write down what their <b>values and interests</b> are.</p>
       Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -1166,7 +1166,7 @@ const Actions = Vue.component('Actions', {
      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
      <div id="textright">Step <b>7</b> of <b>9</b></div></br>
     <p>Discuss with your group.<br>
-    Individually write down what possible actions could one take and how that effects the values from the previous question?</p>
+    Individually write down what <b>possible actions</b> could one take and how that effects the values from the previous question?</p>
       Your group's ethical dilemma is the following: 
       <div class="text">{{dilemma}}</div>
       <div class="holder">
@@ -1408,6 +1408,7 @@ const StudentVote = Vue.component('StudentVote', {
             {options: {
               customId: 0,
               showTotalVotes: true,
+              showResults: false,
               question: 'Do you think this thought is heteronomy or autonomy?',
               answers: [
                 { value: 1, text: 'Heteronomy', votes: 0 },
@@ -1452,59 +1453,91 @@ const StudentVote = Vue.component('StudentVote', {
         }
       }.bind(this));
 
+      studentsocket.emit('studentwantvotes', this.$activeSession);
+      studentsocket.on('studentshowvotes', function (info) {
+          console.log("student want wotes: " + JSON.stringify(info.votes));
+          console.log("student want wotes: " + info.session + " and "+ this.$activeSession);
+          
+        if (info.session == this.$activeSession) {
+          console.log(JSON.stringify(info.votes));
+          for (var i in info.votes) {
+            this.addVoteObj(info.votes[i]);
+          }
+        }
+      }.bind(this));
+
       //listen for student votes and updating the poll votes accordingly
       studentsocket.on('vote', function(obj) {
         if (obj.session == this.$activeSession) {
-          if (obj.answer === "Heteronomy") {
-            this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
-          }
-          else if (obj.answer === "Autonomy") {
-            this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
-          }
+            this.addVoteObj(obj);
         }
       }.bind(this));
     }
   } ,
   methods: {
-    updateShowIndex() {
+    addVoteObj(obj) {
+      if (obj.answer === "Heteronomy") {
+        this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+      }
+      else if (obj.answer === "Autonomy") {
+        this.listoptions[obj.thoughtindex].options.answers[1].votes += 1;
+      }
+    },
+ updateShowIndex(options) {
       if (this.i == this.thoughts.length - 1) {
         this.showNextButton = false;
       }
       else {
         this.i += 1;
       }
-
     },
+      goBackOneQuestion(options) {
+        if (this.i != 0) {
+          this.i -= 1;
+        }
+        this.showNextButton = true;
+      },
     addVote(obj){
       console.log('You voted ' + obj.value + '!');
+      console.log("student vote object: " + JSON.stringify(obj));
       if (obj.value === 1) {
         studentsocket.emit('studentvote', {session: this.$activeSession, answerindex: obj.value, answer: "Heteronomy", thoughtindex: this.i});
         }
       if (obj.value === 2) {
         studentsocket.emit('studentvote', {session: this.$activeSession, answerindex: obj.value, answer: "Autonomy", thoughtindex: this.i});
         }
-      }
+      //set the poll you answered to show results
+      this.listoptions[this.i].options.showResults = true; 
+        }
   },
   template: `
   <div> 
     <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
-    <div id="textright">Step <b>9</b> of <b>9</b></div></br>
-    <h2>Inital dilemma</h2>
-    <p id="boldtext">With our newly acquired knowledge about heteronomy and autonomy lets discuss the initial dilemma in this exercise.</p>
-    <p>{{staticdilemma}}</p>
-    <div v-for="(data, index) in thoughts">
+      <div id="textright">Step <b>9</b> of <b>9</b></div></br>
+      <h2>Inital dilemma</h2>
+      <p id="boldtext">With our newly acquired knowledge about heteronomy and autonomy lets discuss the initial dilemma in this exercise.</p>
+      <p>{{staticdilemma}}</p>
+      <div id="clear">
+        <button class="halfbutton" id="left" v-if="i != 0" v-on:click="goBackOneQuestion(listoptions[i].options)">
+          Previous thought
+        </button>
+        <button class="halfbutton" id="right" v-if="i != (thoughts.length - 1)" v-on:click="updateShowIndex(listoptions[i].options)">
+          Next thought
+        </button>
+      </div>
+      <br><br>
+      <div v-for="(data, index) in thoughts">
       <div v-if="i == index">
         <ul>
           <li>
             {{data.thought}}
           </li>
         </ul>
-        <vue-poll v-bind="listoptions[i].options" @addvote="addVote"/>
-        <button class="smallbutton" v-if=showNextButton v-on:click="updateShowIndex">Next thought</button>
-      </div>
+       <vue-poll v-bind="listoptions[i].options" @addvote="addVote"/>
+        </div>
     
     </div>
-    <router-link class="navbutton" tag="button" to="/summary">
+    <router-link id="left" class="navbutton" tag="button" to="/summary">
       <i id="left" class="material-icons">
         arrow_back
       </i>

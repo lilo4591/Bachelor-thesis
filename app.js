@@ -58,10 +58,18 @@ function Data() {
 Data.prototype.addActiveSession = function (sessionId) {
   this.activeSessionsNames.push(sessionId);
   //TODO look up when students outside group should be empty or not
-  this.activeSessions[sessionId] = { session: sessionId, groupNum: null, groups: [], groupNames: [], initialThoughts: [], students: [] };
+  this.activeSessions[sessionId] = { session: sessionId, groupNum: null, groups: [], groupNames: [], initialThoughts: [], voteObjects: [], students: [] };
   //console.log("active sessions" + this.activeSessions);
 
 };
+
+Data.prototype.addVoteObj = function (voteobj, session) {
+  this.activeSessions[session].voteObjects.push(voteobj);
+}
+
+Data.prototype.getVotes = function (session) {
+  return this.activeSessions[session].voteObjects;
+}
 
 Data.prototype.resetInputdata = function (session) {
 
@@ -448,10 +456,19 @@ var studentconnection = studentsio.on('connection', socket => {
   });
   socket.on('studentvote', function (obj) {
     //sending to all students except sender
+    data.addVoteObj(obj, obj.session);
+    console.log(JSON.stringify(obj));
     socket.broadcast.emit('vote', obj);
     //and also to teacher
     teacherconnection.emit('vote', obj);
   });
+
+  socket.on('studentwantvotes', function(session){
+    var votes = data.getVotes(session);
+    console.log("student want votes: " + JSON.stringify(votes));
+    socket.emit('studentshowvotes', {'votes': votes, 'session': session});
+  });
+  
 
 });
 
@@ -543,6 +560,11 @@ var teacherconnection = teacherio.on('connection', function (socket) {
     socket.emit('displayInitialThoughts', { 'thoughts': data.activeSessions[session].initialThoughts, 'session': session });
   });
 
+ //send votes already sent to server by students before teacher reaches votepage
+  socket.on('wantvotes', function(session){
+    var votes = data.getVotes(session);
+    socket.emit('showvotes', {'votes': votes, 'session': session});
+  });
   /**
     * Teacher generating groups depending on size of connected students
     **/
@@ -861,7 +883,7 @@ function groupsmessages(index, session) {
     //listening for groups to submit their final analysis
     socket.on('submitanalysis', function (session) {
       var groupname = data.activeSessions[session].groupNames[index];
-      io.emit('showanalysis', {
+      teacherconnection.emit('showanalysis', {
         //sending analysis to teacher
         'session': session,
         'group': groupname,
