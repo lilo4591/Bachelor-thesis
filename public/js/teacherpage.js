@@ -1,5 +1,6 @@
 var socket = io('/teacher');
 
+Vue.prototype.$students = [];
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
 //TODO: read dilemma from file or db to be able to change it.
@@ -102,7 +103,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     return {
       name: 'Startworkshop',
       student: '',
-      students: [],
+      students: this.$students,
       session: this.$session,
       numEachGroup: null,
       groupObject: null,
@@ -173,7 +174,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     }.bind(this));
 
     //TODO check username already exists  
-    socket.on("StudentLoggedIn", function(info) {
+    /*socket.on("StudentLoggedIn", function(info) {
       console.log('student logged in ' + this.$session);
       if (info.session == this.$session) {  
           this.addStudent(info.username);
@@ -181,6 +182,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
           console.log("student logged in the same workshop" + info.session);
       }
       }.bind(this));    
+      */
       socket.on('groupInfo', function(data) {
         console.log("groupinfo");
         if (data.session == this.$session) {
@@ -195,9 +197,9 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
-    if (this.students != []) {
-      socket.emit('generateGroups', {groupSize: n, session: this.session});
-      console.log("start generate: " + n); 
+      if (this.students.length !== 0) {
+        socket.emit('generateGroups', {groupSize: n, session: this.session});
+        console.log("start generate: " + n); 
       }
     },
   }
@@ -1098,7 +1100,15 @@ const app = new Vue({
       Vue.prototype.$sessions = sessions;
       console.log('vue sessionscomp: ' + this.$sessions);
     });
-    socket.on('showanalysis', function (data) {
+    socket.on("StudentLoggedIn", function(info) {
+      console.log('student logged in ' + this.$session);
+      if (info.session == this.$session) {  
+          this.$students.push(info.username);
+          console.log(this.$students);
+          console.log("student logged in the same workshop" + info.session);
+      }
+      }.bind(this));    
+     socket.on('showanalysis', function (data) {
       if (data.session == this.$session) {
         var contains = false;
         var index;
