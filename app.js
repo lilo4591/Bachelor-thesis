@@ -129,6 +129,7 @@ Data.prototype.addGroupObj = function (group, session) {
     groupDilemma: null,
     tempdilemma: null,
     dilemmasubmitted: false,
+    analysissubmitted: false,
     groupReflexThoughts: [],
     groupPrinciples: [],
     groupConcreteValues: [],

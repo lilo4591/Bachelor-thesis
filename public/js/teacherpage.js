@@ -40,6 +40,33 @@ const Help = Vue.component('Help', {
   </div>`
   });
 
+const LogIn = Vue.component('login', {
+  data: function() {
+    return {
+      username: "",
+      password: "",
+    }
+  },
+  methods : {
+    logIn() {
+      this.$parent.logIn(this.username, this.password);
+    }
+  },
+  template: `<div>
+      <nav>
+        <router-link to="/help">Help</router-link>
+      </nav>
+        <form>
+          <h3>Username</h3>
+          <input type="text" v-model="username" placeholder="Username"required>
+          <h3>Password</h3>
+          <input type="text" v-model="password" placeholder="Password" required>
+       </form> 
+      <button v-on:click="logIn()" class="smallbutton">Log in</button>
+    </div>
+  `
+});
+
 
 const TeacherStartPage = Vue.component('TeacherStartPage', {
   data: function() {
@@ -49,6 +76,7 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
   },
   template:`
         <div id="app">
+        <p>{{this.name}}</p>
         <nav>
           <router-link to="/help">Help</router-link>
         </nav>
@@ -997,7 +1025,12 @@ const router = new VueRouter({
     },
     {
       path:'/',
-      component:TeacherStartPage
+      component:LogIn,
+      name: 'login'
+    },
+    {
+      path: '/teacherstartpage',
+      component: TeacherStartPage
     },
     {
       path:'/startworkshop',
@@ -1087,13 +1120,43 @@ const app = new Vue({
   name: 'Workshop',
   router,
   socket,
-  data () {
+  data() {
     return {
+      authenticated: false,
+      mockaccount: {
+        username: "teacher2018",
+        password: "notsecurepassword"
+      },
       name: 'Workshop',
       session: null,
-      thoughts: [],
+      thoughts: []
     }
-  },
+   },
+   mounted() {
+     if(!this.authenticated) {
+        this.$router.replace({ name: "login" });
+       }
+   },
+   methods: {
+     logout() {
+        this.authenticated = false;
+     },
+    logIn(username, password) {
+      if (this.username != "" && this.password != "") {
+        if (username == this.mockaccount.username && password == this.mockaccount.password) {
+          this.authenticated = true; 
+          console.log("printtest " + this.authenticated);
+          router.push('/teacherstartpage');
+      }
+      else {
+        window.alert("Username or password was incorrect");
+      }
+    }
+    else {
+      window.alert("please fill in the fields");
+    }
+   }
+   },
   created: function() {
    socket.emit('wantallsessions');
     socket.on('allsessions', function(sessions) {
