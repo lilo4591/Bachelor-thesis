@@ -16,11 +16,13 @@
     "socket.io": "^2.1.1",
     "uniq": "^1.0.1",
     "vue": "^2.5.16",
-    "vue-stash": "^2.0.1-beta"
+    "vue-stash": "^2.0.1-beta",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "eslint-config-google": "^0.9.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.12.0",

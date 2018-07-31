@@ -1,6 +1,7 @@
 var socket = io('/teacher');
 
-Vue.prototype.$students = [];
+//access by session as id
+Vue.prototype.$students = {};
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
 //TODO: read dilemma from file or db to be able to change it.
@@ -14,6 +15,7 @@ Vue.prototype.$staticdilemma =
   "But the student however did not do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
 
   Vue.use(VuePoll);
+
 
 const Help = Vue.component('Help', {
   template: `
@@ -47,11 +49,11 @@ const LogIn = Vue.component('login', {
       password: "",
     }
   },
-  methods : {
+ methods : {
     logIn() {
       this.$parent.logIn(this.username, this.password);
     }
-  },
+   },
   template: `<div>
       <nav>
         <router-link to="/help">Help</router-link>
@@ -74,11 +76,17 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
       session: null,
     };
   },
+  methods: {
+  logOut() {
+      this.$parent.logOut();
+    }
+  },
   template:`
         <div id="app">
         <p>{{this.name}}</p>
         <nav>
           <router-link to="/help">Help</router-link>
+          <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
         </nav>
         <router-link to="/sessions">
           <button class="button">Start Workshop</button>
@@ -101,17 +109,25 @@ data: function() {
    socket.emit('wantallsessions');
   
   },
-  methods: {
-  generateSession(min, max) {
+ methods: {
+  
+   generateSession(min, max) {
     Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
     this.session = this.$session;
+    this.$students[this.$session] = []
     console.log(this.session);
     socket.emit('teachergeneratesession', this.session);
     socket.emit('wantallsessions');
-   }
+   },
+   logOut() {
+      this.$parent.logOut();
+    }
    },
   template:`
         <div id="app">
+       <nav>
+          <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
+       </nav>
         <p>Start an existing workshop or start new</p>
           <nav>
            <router-link :to="{name:'startworkshop', params: {'sessionID': sessionId}}" v-on:click="setSession(sessionId)" v-for="(sessionId, index) in sessions" :key='index'>
@@ -131,7 +147,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     return {
       name: 'Startworkshop',
       student: '',
-      students: this.$students,
+      students: [],
       session: this.$session,
       numEachGroup: null,
       groupObject: null,
@@ -141,10 +157,15 @@ const StartWorkshop = Vue.component('StartWorkshop', {
  
     <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
-      <h2>Log in to 192.168.1.5:3000/student with sessiontoken {{ session }} </h2>
+    <br>   
+    <nav>
+          <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
+       </nav>
+       <h2>Log in to localhost:3000/student with sessiontoken {{ session }} </h2>
       <ul>
-        <li v-for="(data, index) in students" :key='index'>
-          {{students[index]}} has connected</li>
+        <div v-for="(data,index) in students" :key='index'>
+          <li>{{students[index]}} has connected</li>
+        </div>
       </ul>
       <form @submit.prevent="generateGroups(numEachGroup)">
         Enter number of student in each group<br>
@@ -176,12 +197,26 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   
   `,
   created: function() {
+    console.log(JSON.stringify(this.students));
     if (this.$route.params.sessionID != undefined) {
       Vue.prototype.$session = Number(this.$route.params.sessionID);
       this.session = this.$session;
+      if (this.$students[this.$session] == undefined) {
+          this.$students[this.$session] = [];
+      }
+      console.log(this.session);
     }
     console.log('now at session: ' + this.$session);
-
+    if (this.$session != undefined) {
+      socket.emit('wantstudents', this.$session);
+      socket.on('sendstudents', function (info) {
+        if (this.$session == info.session) {
+          for (var m in info.students) {
+            var student = info.students[m].studentname;
+            this.addStudent(student);
+          }
+        }
+      }.bind(this));
     socket.emit('wantgroups', this.$session);
     socket.on('sendgroups', function(info){
       console.log('want group session: ' + info.session);
@@ -190,38 +225,40 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       if (info.session == this.$session) {
         console.log("in if");
         this.groupObject = info.groups
-        for (var i in info.groups) {
+       /* for (var i in info.groups) {
           for (var m in info.groups[i].students) {
             var student = info.groups[i].students[m].studentname;
             this.addStudent(student);
           }
-        }
+        }*/
       console.log("all students already connected: " + this.students);
       }
 
     }.bind(this));
-
-    //TODO check username already exists  
-    /*socket.on("StudentLoggedIn", function(info) {
-      console.log('student logged in ' + this.$session);
-      if (info.session == this.$session) {  
-          this.addStudent(info.username);
-          console.log(this.students);
-          console.log("student logged in the same workshop" + info.session);
-      }
-      }.bind(this));    
-      */
-      socket.on('groupInfo', function(data) {
+  }
+     socket.on('groupInfo', function(data) {
         console.log("groupinfo");
         if (data.session == this.$session) {
           console.log(JSON.stringify(data.groupObject));
           this.groupObject = data.groupObject;
         }
       }.bind(this));
+   
+    socket.on("StudentLoggedIn", function(info) {
+      console.log('student logged in ' + this.$session);
+      if (info.session == this.$session) {  
+          
+          this.students.push(info.username);
+      }
+      }.bind(this));    
+    
     },
 
  methods: {    
-    addStudent(studentUsername) { 
+  logOut() {
+      this.$parent.logOut();
+    },
+     addStudent(studentUsername) { 
       this.students.push(studentUsername);
     },
     generateGroups(n) {
@@ -249,6 +286,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
     <br>
       <nav>
         <router-link to="/settings">Clear Input</router-link>
+        <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
       </nav>
       <div id="contain">
           <div class="containheader1">
@@ -286,7 +324,10 @@ const workshopExercises = Vue.component('WorkshopExercises', {
   
   ` ,
   methods: { 
-    navigateStudentsTo(exercisecomp) {
+   logOut() {
+      this.$parent.logOut();
+    },
+     navigateStudentsTo(exercisecomp) {
       socket.emit("navigateStudentsToComp", {'comp' : exercisecomp, 'session' : this.$session});
     }
   }
@@ -1120,7 +1161,7 @@ const app = new Vue({
   name: 'Workshop',
   router,
   socket,
-  data() {
+ data() {
     return {
       authenticated: false,
       mockaccount: {
@@ -1138,8 +1179,9 @@ const app = new Vue({
        }
    },
    methods: {
-     logout() {
+     logOut() {
         this.authenticated = false;
+        this.$router.replace({ name: "login" });
      },
     logIn(username, password) {
       if (this.username != "" && this.password != "") {
@@ -1163,15 +1205,7 @@ const app = new Vue({
       Vue.prototype.$sessions = sessions;
       console.log('vue sessionscomp: ' + this.$sessions);
     });
-    socket.on("StudentLoggedIn", function(info) {
-      console.log('student logged in ' + this.$session);
-      if (info.session == this.$session) {  
-          this.$students.push(info.username);
-          console.log(this.$students);
-          console.log("student logged in the same workshop" + info.session);
-      }
-      }.bind(this));    
-     socket.on('showanalysis', function (data) {
+    socket.on('showanalysis', function (data) {
       if (data.session == this.$session) {
         var contains = false;
         var index;

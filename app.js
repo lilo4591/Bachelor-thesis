@@ -495,7 +495,13 @@ var teacherconnection = teacherio.on('connection', function (socket) {
       socket.emit('sendgroups', {'groups': data.activeSessions[session].groups, 'session' : session});
     }
   });
-  //listering for teacher want to clear all workshopinput from server
+  socket.on('wantstudents', function(session) {
+    console.log('want students test: ' + data.activeSessions[session].students);
+    if (data.activeSessions[session].students.length != 0) {
+      socket.emit('sendstudents', {'students': data.activeSessions[session].students, 'session' : session});
+    }
+  });
+   //listering for teacher want to clear all workshopinput from server
   socket.on('clearallinput', function (session) {
     data.resetInputdata(session);
     console.log("input deleted");
