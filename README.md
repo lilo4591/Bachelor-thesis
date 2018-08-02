@@ -51,3 +51,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 6. USED CODE AND LINKS
 This project has used sceletoncode on the serverside as a basis from this project
 [Sceleton Code] [very-taxi-skeleton](https://github.com/laaksoharju/very-taxi-skeleton)
+
+This project has used the library Vue Poll to create a poll
+[Vue Poll] [Vue Poll](https://www.npmjs.com/package/vue-poll)
+
+This project has used some css style from this free introduction course in vue.js
+[CSS] [Vue CSS Tutorial - Class and Style Binding](https://coursetro.com/posts/code/136/Vue-CSS-Tutorial---Class-and-Style-Binding)
