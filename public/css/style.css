@@ -68,6 +68,10 @@ nav a {
   margin-right: 15px;
 }
 
+.longnav {
+margin-bottom: 15px;
+}
+
 body:before{
   content:'';
   height:100%;

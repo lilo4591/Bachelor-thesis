@@ -1,7 +1,5 @@
 var socket = io('/teacher');
 
-//access by session as id
-Vue.prototype.$students = {};
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
 //TODO: read dilemma from file or db to be able to change it.
@@ -114,7 +112,6 @@ data: function() {
    generateSession(min, max) {
     Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
     this.session = this.$session;
-    this.$students[this.$session] = []
     console.log(this.session);
     socket.emit('teachergeneratesession', this.session);
     socket.emit('wantallsessions');
@@ -131,7 +128,7 @@ data: function() {
         <p>Start an existing workshop or start new</p>
           <nav>
            <router-link :to="{name:'startworkshop', params: {'sessionID': sessionId}}" v-on:click="setSession(sessionId)" v-for="(sessionId, index) in sessions" :key='index'>
-            {{sessionId}}
+            <br v-if="index== 14">{{sessionId}}
            </router-link>
            </nav>
           <router-link to="/startworkshop">
