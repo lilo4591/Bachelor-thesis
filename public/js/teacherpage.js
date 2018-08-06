@@ -77,7 +77,10 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
   methods: {
   logOut() {
       this.$parent.logOut();
-    }
+    },
+  popUp() {
+    window.alert("This is not yet implemented.");
+  }
   },
   template:`
         <div id="app">
@@ -89,7 +92,7 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
         <router-link to="/sessions">
           <button class="button">Start Workshop</button>
           </router-link><br>
-          <button class= "button">Edit Workshop</button> 
+          <button v-on:click="popUp()" class= "button">Edit Workshop</button> 
         </div>
     `
 });

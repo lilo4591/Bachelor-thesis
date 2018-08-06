@@ -636,7 +636,7 @@ function generateGroups(groupSize, session) {
     data.addStudentToGroupObj(allstudents[index], currentGroup, session);
     console.log("sending namespace to student named: " + JSON.stringify(allstudents[index].studentname));
     //route student to startpage just in case there are somewhere else
-    studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'component': 'start'});
+    studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'comp': 'start'});
     //send group to student
     studentconnection.to(allstudents[index].id).emit('namespace', {'session': session , 'group':currentGroup});
     //delete used student
