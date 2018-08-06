@@ -793,6 +793,7 @@ const Reflex = Vue.component('Reflex', {
         <form @submit.prevent="addReflexThought">
           <input type="text" placeholder="Enter your reflex thoughts here please..." v-model="reflex">
         </form> 
+        <button v-on:click="addReflexThought()">Submit reflex to group</button>
         <p>These are your group's reflex thoughts</p>
         <ul><li class="example">Example thought: If I don't do this someone else will do it!</li></ul>
         <ul>
@@ -914,6 +915,7 @@ const PrincipleFixations = Vue.component('PrincipleFixations', {
         <form @submit.prevent="addPrinciple">
           <input type="text" placeholder="Enter your principle here please..." v-model="principle">
         </form> 
+        <button v-on:click="addPrinciple()">Submit principle to group</button>
         <p>These are your group's principles.</p>
         <ul><li class="example">Example principle: You have to follow the law....</li></ul>
         <ul>
@@ -1044,6 +1046,7 @@ const ConcreteValues = Vue.component('ConcreteValues', {
         <form @submit.prevent="addConcreteValue">
           <input type="text" placeholder="Enter your values here please..." v-model="concreteValue">
         </form> 
+        <button v-on:click="addConcreteValue()">Submit value to group</button>
         <p>These are your group's stakeholder values.</p>
         <ul>
         <li class="example">Example value: Is the collaboration with this customer important.?..</li>
@@ -1173,6 +1176,7 @@ const Actions = Vue.component('Actions', {
         <form @submit.prevent="addActionAlternative()">
           <input type="text" placeholder="Enter your action alternative here please..." v-model="actionAlternative">
         </form> 
+        <button v-on:click="addActionAlternative()">Submit action alternative to group</button>
         <p>These are your group's action alternatives and their effects.</p>
         <ul>
         <li class="example">Example: state an action alternative, how will this affect our reputation?</li>
@@ -1220,7 +1224,9 @@ const Summary = Vue.component('Summary', {
 
  created: function() {
  
-   studentsocket.on('wantcurrentlocation', function() {
+   
+  
+  studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/summary');
     });
 
@@ -1230,6 +1236,17 @@ const Summary = Vue.component('Summary', {
     }  
    else {
      //notify that we want the input from the questions
+    groupsocket.emit('wantissummarysubmitted', this.$activeSession);
+    groupsocket.on('issummarysubmitted', function(data) {
+      console.log('issummarysubmitted');
+      console.log(' data session' + (data.session));
+      console.log(' active session' + (this.$activeSession));
+      if (data.session == this.$activeSession) {
+        console.log(data.submitted);
+        this.submitted = data.submitted;
+      }
+    }.bind(this));
+
      groupsocket.emit('wantsummary', {'session' :this.$activeSession});
      groupsocket.on('summarydata', function(data) { 
        this.actionAlternatives = data.actionAlternatives;
@@ -1309,6 +1326,9 @@ const Summary = Vue.component('Summary', {
 
     submitAnalysis() {
       groupsocket.emit('submitanalysis', this.$activeSession);
+    },
+    editAnalysis() {
+      this.submitted = false;
     }
   },
   template: `
@@ -1381,6 +1401,7 @@ const Summary = Vue.component('Summary', {
         </div>
     </div>
     <button v-if="submitted==false" class="smallbutton" v-on:click="submitAnalysis()">Submit analysis</button>
+    <button v-if="submitted" class="smallbutton" v-on:click="editAnalysis()">Edit analysis</button>
     <br>
     <router-link tag="button" id="right" class="navbutton" v-if="submitted==true" to="/studentvote">
     <i class="material-icons">

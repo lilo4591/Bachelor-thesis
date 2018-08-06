@@ -854,8 +854,11 @@ function groupsmessages(index, session) {
       io.of(data.activeSessions[session].groupNames[index]).emit('showgroupactionalternatives', groupact);
     });
 
-
-
+    socket.on('wantissummarysubmitted', function(session) {
+      var submitted = data.activeSessions[session].groups[index].analysissubmitted;
+      console.log("submitted: " + submitted + " session: " + session);
+      io.of(data.activeSessions[session].groupNames[index]).emit('issummarysubmitted', {'session' : session, 'submitted': submitted });
+    });
      //sending summary to grooups
     socket.on('wantsummary', function (info) {
       //sending all groups input on summary page first shown within each group
@@ -889,6 +892,7 @@ function groupsmessages(index, session) {
     //new
     //listening for groups to submit their final analysis
     socket.on('submitanalysis', function (session) {
+      data.activeSessions[session].groups[index].analysissubmitted = true;
       var groupname = data.activeSessions[session].groupNames[index];
       teacherconnection.emit('showanalysis', {
         //sending analysis to teacher

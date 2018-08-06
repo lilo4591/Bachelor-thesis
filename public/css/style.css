@@ -68,10 +68,6 @@ nav a {
   margin-right: 15px;
 }
 
-.longnav {
-margin-bottom: 15px;
-}
-
 body:before{
   content:'';
   height:100%;
@@ -139,6 +135,23 @@ button.navbutton:before,button.navbutton:after {
   height: 40px;
 }
 
+.sessionbutton {
+  width: 8%;
+  padding: 10px;
+  text-decoration: none;
+  background: #fff;
+  border-radius: 3px;
+  color: rgb(0, 110, 255);
+  font-weight: bold;
+  margin: 10px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
 
 input {
   text-align: center;

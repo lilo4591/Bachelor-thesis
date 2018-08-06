@@ -60,7 +60,7 @@ const LogIn = Vue.component('login', {
           <h3>Username</h3>
           <input type="text" v-model="username" placeholder="Username"required>
           <h3>Password</h3>
-          <input type="text" v-model="password" placeholder="Password" required>
+          <input type="password" v-model="password" placeholder="Password" required>
        </form> 
       <button v-on:click="logIn()" class="smallbutton">Log in</button>
     </div>
@@ -124,18 +124,36 @@ data: function() {
         <div id="app">
        <nav>
           <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
+          <router-link to="/resetsessions">Clear all sessions</router-link>
        </nav>
         <p>Start an existing workshop or start new</p>
-          <nav>
+          <div>
            <router-link :to="{name:'startworkshop', params: {'sessionID': sessionId}}" v-on:click="setSession(sessionId)" v-for="(sessionId, index) in sessions" :key='index'>
-            <br v-if="index== 14">{{sessionId}}
+           <button class="sessionbutton"> 
+           {{sessionId}}
+           </button>
            </router-link>
-           </nav>
+           </div>
           <router-link to="/startworkshop">
             <button class="button" v-on:click="generateSession(1111,9999)">Start a new workshop</button>
           </router-link>
         </div>
     `
+
+});
+
+const ResetSessions = Vue.component('ResetSessions', {
+
+template: `
+<div>
+  <router-link tag="button" class="navbutton" to="/sessions">
+    <i id="left" class="material-icons">
+      arrow_back
+    </i>
+    Go Back
+  </router-link>
+</div>
+`
 
 });
 
@@ -166,7 +184,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       </ul>
       <form @submit.prevent="generateGroups(numEachGroup)">
         Enter number of student in each group<br>
-        <input type="number" min="1" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
+        <input type="number" min="1" max="10" placeholder="Enter number of students in each group" v-model="numEachGroup" required>
         <br>
         <button v-if="this.groupObject==null" type="submit" class="button" >Generate groups</button>
       </form>
@@ -198,6 +216,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     if (this.$route.params.sessionID != undefined) {
       Vue.prototype.$session = Number(this.$route.params.sessionID);
       this.session = this.$session;
+      //TODO cannot read property 1234 of undefined
       if (this.$students[this.$session] == undefined) {
           this.$students[this.$session] = [];
       }
@@ -1069,6 +1088,10 @@ const router = new VueRouter({
     {
       path: '/teacherstartpage',
       component: TeacherStartPage
+    },
+    {
+      path: '/resetsessions',
+      component: ResetSessions
     },
     {
       path:'/startworkshop',
