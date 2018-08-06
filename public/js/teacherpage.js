@@ -143,9 +143,28 @@ data: function() {
 });
 
 const ResetSessions = Vue.component('ResetSessions', {
-
+data: function() {
+  return {
+    deleted: false
+  }
+},
+  methods: {
+  resetsessions(){
+    this.deleted = true;
+    Vue.prototype.$sessions = [];
+    socket.emit('resetsessions');
+  }
+},
 template: `
 <div>
+  <p v-if="deleted==false">Are you sure you want to resent all sessions?
+  This will delete all sessions, groups and their work.</p>
+  <div style="text-align:center">
+    <button v-if="deleted == false" class="smallbutton" v-on:click="resetsessions()">Yes</button>
+    <router-link to="/sessions" v-if="deleted==false" tag="button" class="smallbutton">No, abort</router-link>
+  </div>
+  <p v-if="deleted">All sessions are now deleted</p>  
+  <br>
   <router-link tag="button" class="navbutton" to="/sessions">
     <i id="left" class="material-icons">
       arrow_back

@@ -511,6 +511,11 @@ var teacherconnection = teacherio.on('connection', function (socket) {
     var allclientconnections = Array.from(Object.keys(teacherconnection.connected));
   });
 
+  //deletes all sessions on 
+  socket.on('resetsessions', function() {
+    resetSessions();
+    console.log("after reset: " + JSON.stringify(data.activeSessions));
+  });
   /**Relevent for teacher to route students to different pages(components)**/
 
   socket.on('navigateStudentsToComp', function (info) {
@@ -681,6 +686,24 @@ function resetGroups(groupnames, session) {
   data.activeSessions[session].groups = [];
   data.activeSessions[session].groupNames = [];
 
+}
+
+function resetSessions(){
+ var sessions = data.activeSessionsNames;
+  for (var s in sessions) {
+    console.log(s);
+    var session = data.activeSessions[data.activeSessionsNames[s]];
+    var groupnames = session.groupNames;
+    studentconnection.emit('redirectcomponent', {'session' : data.activeSessionsNames[s], 'comp' : 'login'});
+    studentconnection.emit('studentresetsessions', data.activeSessionsNames[s]);
+    //    studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'component': 'start'});
+    for (var g in groupnames) {
+      resetGroups(groupnames[g], data.activeSessionsNames[s]);
+    }
+  }
+  console.log("sessions now: " + JSON.stringify(data.activeSessions));
+  data.activeSessions = {};
+  data.activeSessionsNames = [];
 }
 
 function groupsmessages(index, session) {

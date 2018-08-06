@@ -117,22 +117,23 @@ const Start = Vue.component('Start', {
   `,
   created:function() {
     if (this.$activeSession == undefined) {
-      window.alert("You are disconnected from your session, please log in again with the same username");
+      window.alert("You are disconnected from your session");
       router.push('/');
+    } 
+    else {
+      studentsocket.on('namespace', function (info) {
+        if (info.session == this.$activeSession) {
+          groupsocket = io.connect(info.group);
+          Vue.prototype.$groupName = info.group;
+          this.groupName = this.$groupName;
+          //groupsocket = this.$groupName;
+          console.log(info.group);
+        }
+      }.bind(this));
+      this.groupName = this.$groupName;
+
     }
-    studentsocket.on('namespace', function (info) {
-      if (info.session == this.$activeSession) {
-        groupsocket = io.connect(info.group);
-        Vue.prototype.$groupName = info.group;
-        this.groupName = this.$groupName;
-        //groupsocket = this.$groupName;
-        console.log(info.group);
-      }
-    }.bind(this));
-    this.groupName = this.$groupName;
-
   }
-
 });
 
 
@@ -157,26 +158,31 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
     }
   },
   created: function() {
-   studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise1situations');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
     }
     else {
-      groupsocket.emit('wantgroupsituations', this.$activeSession);
-      groupsocket.on('showgroupsituations', function (data) {
-        console.log('showgroupsit: ' + data.session);
-        console.log('situations are now: ' + JSON.stringify(data.situations));
-        if (data.session == this.$activeSession) {
-          console.log("helliii");
-          this.thoughts = data.situations;
-        }
-      }.bind(this));
-    }
+      studentsocket.on('wantcurrentlocation', function () {
+        studentsocket.emit('currentlocation', '/exercise1situations');
+      });
 
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+      else {
+        groupsocket.emit('wantgroupsituations', this.$activeSession);
+        groupsocket.on('showgroupsituations', function (data) {
+          console.log('showgroupsit: ' + data.session);
+          console.log('situations are now: ' + JSON.stringify(data.situations));
+          if (data.session == this.$activeSession) {
+            console.log("helliii");
+            this.thoughts = data.situations;
+          }
+        }.bind(this));
+      }
+  }
   },
   methods: {
     addThought() { 
@@ -191,7 +197,7 @@ const Exercise1Situations = Vue.component('Exercise1Situations', {
   },
   template: `
   <div id= "page">
-      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</div>
+      <div id="textleft"> Group: <b>{{groupName}}</b> Username: <b>{{username}}</b></div>
       <div id="textright">Step <b>1</b> of <b>6</b></div></br>
       <h2>Ethical awareness</h2>
       <p>Try to come up with <b>real life situations</b> which has <b>no moral implications at all</b>.</p>
@@ -231,15 +237,20 @@ const SituationsFullClass = Vue.component('SituationsFullClass', {
     }
   },
   created: function() {
-  
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/situationsfullclass');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, Please log in again with the same username to join your group");
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
     } 
+    else {
+      studentsocket.on('wantcurrentlocation', function () {
+        studentsocket.emit('currentlocation', '/situationsfullclass');
+      });
+
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, Please log in again with the same username to join your group");
+        router.push('/');
+      }
+     }
    },
  
   template: `
@@ -280,26 +291,32 @@ const Exercise1Love = Vue.component('Exercise1Love', {
   },
   created: function () {
  
-      studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise1love');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group. Please log in again with the same username to join your group");
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    } 
- 
-    else {
-    //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
-      groupsocket.emit('wantgrouprisks', this.$activeSession);
-      groupsocket.on('showgrouprisks', function(data) {
-        if (data.session == this.$activeSession) {
-          this.thoughts = data.risks;
-        }
-      }.bind(this));
-
-
     }
+   else {
+     studentsocket.on('wantcurrentlocation', function () {
+       studentsocket.emit('currentlocation', '/exercise1love');
+     });
+
+     if (groupsocket == undefined) {
+       window.alert("You are disconnected from your group. Please log in again with the same username to join your group");
+       router.push('/');
+     }
+
+     else {
+       //showins: 'showgroupsituations', ''showgrouprisks, showgrouppossibilites
+       groupsocket.emit('wantgrouprisks', this.$activeSession);
+       groupsocket.on('showgrouprisks', function (data) {
+         if (data.session == this.$activeSession) {
+           this.thoughts = data.risks;
+         }
+       }.bind(this));
+
+
+     }
+          }
   },
   methods: {
     addThought() { 
@@ -352,6 +369,10 @@ const LoveFullClass = Vue.component('LoveFullClass', {
     }
   },
   created: function () {
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
     studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/lovefullclass');
     });
@@ -401,23 +422,29 @@ const Exercise1War = Vue.component('Exercise1War', {
      
   },
   created: function() {
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise1war');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    }  
-    else {
-    groupsocket.emit('wantgroupposs', this.$activeSession);
-    groupsocket.on('showgroupposs', function(data) {
-      if (data.session == this.$activeSession) {
-        this.thoughts = data.poss;
-      }
-    }.bind(this));
     }
-   },
+    else {
+      studentsocket.on('wantcurrentlocation', function () {
+        studentsocket.emit('currentlocation', '/exercise1war');
+      });
+
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+      else {
+        groupsocket.emit('wantgroupposs', this.$activeSession);
+        groupsocket.on('showgroupposs', function (data) {
+          if (data.session == this.$activeSession) {
+            this.thoughts = data.poss;
+          }
+        }.bind(this));
+      }
+    }
+       },
   methods: {
     addThought() { 
       //this.thoughts.push({thought: this.thought});
@@ -464,6 +491,10 @@ const WarFullClass = Vue.component('WarFullClass', {
     }
   },
   created: function() {
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
     studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/warfullclass');
     });
@@ -517,23 +548,29 @@ const Exercise2 = Vue.component('Exercise2', {
   },
 
   created: function() {
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/exercise2');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    }
-    studentsocket.emit("wantInitialThoughts", this.$activeSession); 
-    studentsocket.on('displayThoughts', function(info) {
-      console.log(JSON.stringify(info.thoughts));
-      if (info.session == this.$activeSession) {
-      this.thoughts = info.thoughts;
-    }
+    } 
+    else {
+      studentsocket.on('wantcurrentlocation', function() {
+        studentsocket.emit('currentlocation', '/exercise2');
+      });
+
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+
+      studentsocket.emit("wantInitialThoughts", this.$activeSession); 
+      studentsocket.on('displayThoughts', function(info) {
+        console.log(JSON.stringify(info.thoughts));
+        if (info.session == this.$activeSession) {
+          this.thoughts = info.thoughts;
+      }
       
     }.bind(this));  
- 
+  } 
   },
   template: `
   <div id= "page">
@@ -573,7 +610,11 @@ const Exercise2p1 = Vue.component('Exercise2p1', {
     }
   },
   created: function () {
-     studentsocket.on('wantcurrentlocation', function() {
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
+  studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/exercise2p1');
     });
 
@@ -618,37 +659,43 @@ const Exercise2p2 = Vue.component('Exercise2p2', {
  },
   created: function() {
 
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
+    else {
     studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/exercise2p2');
     });
 
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
-      router.push('/');
-    }
-    else {
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+      else {
 
-      groupsocket.emit('wantdilemma', this.$activeSession);
-      groupsocket.on('showdilemma', function(data) {
-        this.dilemma = data.dilemma;
-        this.notsubmitted = data.notsubmitted;
-        Vue.prototype.$dilemma = data.dilemma;
-      }.bind(this));
+        groupsocket.emit('wantdilemma', this.$activeSession);
+        groupsocket.on('showdilemma', function (data) {
+          this.dilemma = data.dilemma;
+          this.notsubmitted = data.notsubmitted;
+          Vue.prototype.$dilemma = data.dilemma;
+        }.bind(this));
 
-      groupsocket.on('editdilemma', function(data) {
-        this.dilemma = data.dilemma;
-        this.notsubmitted = data.notsubmitted;
-        //update global variable since dilemma changed
-        Vue.prototype.$dilemma = data.dilemma;
-      }.bind(this));
-    
-      groupsocket.on('dilemmakeyup', function (data){
-        if(data.session == this.$activeSession) {
-          this.dilemma = data.dilemma
-        }
-      }.bind(this));
+        groupsocket.on('editdilemma', function (data) {
+          this.dilemma = data.dilemma;
+          this.notsubmitted = data.notsubmitted;
+          //update global variable since dilemma changed
+          Vue.prototype.$dilemma = data.dilemma;
+        }.bind(this));
+
+        groupsocket.on('dilemmakeyup', function (data) {
+          if (data.session == this.$activeSession) {
+            this.dilemma = data.dilemma
+          }
+        }.bind(this));
+      }
     }
- },
+   },
   methods: {
     
     notifyGroupSubmit(bool, dilemma) {
@@ -697,6 +744,10 @@ const ReflexHelp = Vue.component('ReflexHelp', {
     }
   },
   created: function() {
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
     studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/reflex');
     });
@@ -740,25 +791,31 @@ const Reflex = Vue.component('Reflex', {
  },
   created: function() {
     //this.dilemma = this.$route.params.dilemma;
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/reflex');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    } 
-    else {
-      groupsocket.emit('wantgroupreflex', this.$activeSession);
-      groupsocket.on('showgroupreflexthoughts', function(data) {
-        console.log(JSON.stringify(data));
-        this.reflexthoughts = data;
-        Vue.prototype.$input = data;
-      }.bind(this));
     }
-    this.dilemma = this.$dilemma;
-    this.reflexthoughts = this.$input;
- },
+   else {
+     studentsocket.on('wantcurrentlocation', function () {
+       studentsocket.emit('currentlocation', '/reflex');
+     });
+
+     if (groupsocket == undefined) {
+       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+       router.push('/');
+     }
+     else {
+       groupsocket.emit('wantgroupreflex', this.$activeSession);
+       groupsocket.on('showgroupreflexthoughts', function (data) {
+         console.log(JSON.stringify(data));
+         this.reflexthoughts = data;
+         Vue.prototype.$input = data;
+       }.bind(this));
+     }
+     this.dilemma = this.$dilemma;
+     this.reflexthoughts = this.$input;
+   }
+   },
   methods: {
     addReflexThought() { 
       //this.reflexthoughts.push({reflex: this.reflex});
@@ -821,7 +878,11 @@ const PrincipleHelp = Vue.component('PrincipleHelp', {
     }
   },  
   created: function() {
-   studentsocket.on('wantcurrentlocation', function() {
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
+    studentsocket.on('wantcurrentlocation', function() {
       // route to previous route if disconnected
       studentsocket.emit('currentlocation', '/principlefixations');
     });
@@ -866,25 +927,31 @@ const PrincipleFixations = Vue.component('PrincipleFixations', {
   }
  },
   created: function() {
-   studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/principlefixations');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
     }
     else {
-      groupsocket.emit('wantgroupprinciples', this.$activeSession);
-      groupsocket.on('showgroupprinciples', function(data) {
-        console.log(JSON.stringify(data));
-        this.principles = data;
-        Vue.prototype.$input = data;
-      }.bind(this));
-    } 
-    this.dilemma = this.$dilemma;
-    this.principles = this.$input;
- },
+      studentsocket.on('wantcurrentlocation', function () {
+        studentsocket.emit('currentlocation', '/principlefixations');
+      });
+
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+      else {
+        groupsocket.emit('wantgroupprinciples', this.$activeSession);
+        groupsocket.on('showgroupprinciples', function (data) {
+          console.log(JSON.stringify(data));
+          this.principles = data;
+          Vue.prototype.$input = data;
+        }.bind(this));
+      }
+      this.dilemma = this.$dilemma;
+      this.principles = this.$input;
+   }
+   },
   methods: {
     addPrinciple() { 
       //this.principles.push({principle: this.principle});
@@ -943,6 +1010,10 @@ const ValueHelp = Vue.component('ValueHelp', {
     }
   },
   created: function() {
+  if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
   
   studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/concretevalues');
@@ -990,28 +1061,34 @@ const ConcreteValues = Vue.component('ConcreteValues', {
  },
   created: function() {
   
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/concretevalues');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    }   
-   
-    else {
-      groupsocket.emit('wantgroupconcretevalues', this.$activeSession);
-        groupsocket.on('showgroupconcretevalues', function(data) {
-          console.log(JSON.stringify(data));
-          this.concreteValues = data;
-          Vue.prototype.$input = data;
-        }.bind(this));
     }
-    //set dilemma to global dilemma
-    this.dilemma = this.$dilemma;
-    //set global variable to this input instance
-    this.concreteValues = this.$input;
- },
+   else {
+     studentsocket.on('wantcurrentlocation', function () {
+       studentsocket.emit('currentlocation', '/concretevalues');
+     });
+
+     if (groupsocket == undefined) {
+       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+       router.push('/');
+     }
+
+     else {
+       groupsocket.emit('wantgroupconcretevalues', this.$activeSession);
+       groupsocket.on('showgroupconcretevalues', function (data) {
+         console.log(JSON.stringify(data));
+         this.concreteValues = data;
+         Vue.prototype.$input = data;
+       }.bind(this));
+     }
+     //set dilemma to global dilemma
+     this.dilemma = this.$dilemma;
+     //set global variable to this input instance
+     this.concreteValues = this.$input;
+   }
+   },
   methods: {
     addConcreteValue() { 
       //this.concreteValues.push({concreteValue: this.concreteValue});
@@ -1076,7 +1153,11 @@ const ActionOptionHelp = Vue.component('ActionOptionHelp', {
     }
   },  
   created: function() {
-  
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
+ 
     studentsocket.on('wantcurrentlocation', function() {
       studentsocket.emit('currentlocation', '/actions');
     });
@@ -1121,27 +1202,33 @@ const Actions = Vue.component('Actions', {
  },
   created: function() {
   
-    studentsocket.on('wantcurrentlocation', function() {
-      studentsocket.emit('currentlocation', '/actions');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+   if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
-    } 
-    else {
-      groupsocket.emit('wantgroupactionalternatives', this.$activeSession);
-        groupsocket.on('showgroupactionalternatives', function(data) {
-          console.log(JSON.stringify(data));
-          this.actionAlternatives = data;
-          Vue.prototype.$input = data;
-        }.bind(this));
-       
-    } 
-  
-    this.dilemma = this.$dilemma;
-    this.actionAlternatives = this.$input;
-  },
+    }
+   else {
+     studentsocket.on('wantcurrentlocation', function () {
+       studentsocket.emit('currentlocation', '/actions');
+     });
+
+     if (groupsocket == undefined) {
+       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+       router.push('/');
+     }
+     else {
+       groupsocket.emit('wantgroupactionalternatives', this.$activeSession);
+       groupsocket.on('showgroupactionalternatives', function (data) {
+         console.log(JSON.stringify(data));
+         this.actionAlternatives = data;
+         Vue.prototype.$input = data;
+       }.bind(this));
+
+     }
+
+     this.dilemma = this.$dilemma;
+     this.actionAlternatives = this.$input;
+    }
+    },
   methods: {
     addActionAlternative() { 
       //this.actionAlternatives.push({actionAlternative: this.actionAlternative});
@@ -1224,60 +1311,65 @@ const Summary = Vue.component('Summary', {
 
  created: function() {
  
-   
-  
-  studentsocket.on('wantcurrentlocation', function() {
+  if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
+      router.push('/');
+    }
+
+  else {
+    studentsocket.on('wantcurrentlocation', function () {
       studentsocket.emit('currentlocation', '/summary');
     });
 
     if (groupsocket == undefined) {
       window.alert("You are disconnected from your group, please log in again with the same username to join your group");
       router.push('/');
-    }  
-   else {
-     //notify that we want the input from the questions
-    groupsocket.emit('wantissummarysubmitted', this.$activeSession);
-    groupsocket.on('issummarysubmitted', function(data) {
-      console.log('issummarysubmitted');
-      console.log(' data session' + (data.session));
-      console.log(' active session' + (this.$activeSession));
-      if (data.session == this.$activeSession) {
-        console.log(data.submitted);
-        this.submitted = data.submitted;
-      }
-    }.bind(this));
+    }
+    else {
+      //notify that we want the input from the questions
+      groupsocket.emit('wantissummarysubmitted', this.$activeSession);
+      groupsocket.on('issummarysubmitted', function (data) {
+        console.log('issummarysubmitted');
+        console.log(' data session' + (data.session));
+        console.log(' active session' + (this.$activeSession));
+        if (data.session == this.$activeSession) {
+          console.log(data.submitted);
+          this.submitted = data.submitted;
+        }
+      }.bind(this));
 
-     groupsocket.emit('wantsummary', {'session' :this.$activeSession});
-     groupsocket.on('summarydata', function(data) { 
-       this.actionAlternatives = data.actionAlternatives;
-       this.concreteValues = data.concreteValues;
-       this.principles = data.principles;
-       this.reflexthoughts = data.reflexThoughts;
-     }.bind(this)); 
-     //so that changes on input will be seen by allgroup members
-     groupsocket.on('showgroupreflexthoughts', function(data) {
-       this.reflexthoughts = data; 
-     }.bind(this));
+      groupsocket.emit('wantsummary', { 'session': this.$activeSession });
+      groupsocket.on('summarydata', function (data) {
+        this.actionAlternatives = data.actionAlternatives;
+        this.concreteValues = data.concreteValues;
+        this.principles = data.principles;
+        this.reflexthoughts = data.reflexThoughts;
+      }.bind(this));
+      //so that changes on input will be seen by allgroup members
+      groupsocket.on('showgroupreflexthoughts', function (data) {
+        this.reflexthoughts = data;
+      }.bind(this));
 
-     groupsocket.on('showgroupprinciples', function(data) {
-       this.principles = data;
-     }.bind(this));
+      groupsocket.on('showgroupprinciples', function (data) {
+        this.principles = data;
+      }.bind(this));
 
-     groupsocket.on('showgroupconcretevalues', function(data) {
-       this.concreteValues = data;
-     }.bind(this));
+      groupsocket.on('showgroupconcretevalues', function (data) {
+        this.concreteValues = data;
+      }.bind(this));
 
-     groupsocket.on('showgroupactionalternatives', function(data) {
-       this.actionAlternatives = data;
-     }.bind(this));
+      groupsocket.on('showgroupactionalternatives', function (data) {
+        this.actionAlternatives = data;
+      }.bind(this));
 
-     groupsocket.on('analysissubmitted', function(message) {
-       this.submitted = true;
-     }.bind(this));
+      groupsocket.on('analysissubmitted', function (message) {
+        this.submitted = true;
+      }.bind(this));
 
 
-     this.dilemma = this.$dilemma;
-   } 
+      this.dilemma = this.$dilemma;
+    }
+  }
  },
   methods: {
   
@@ -1441,58 +1533,63 @@ const StudentVote = Vue.component('StudentVote', {
     }
   },
   created: function () {
-
-    studentsocket.on('wantcurrentlocation', function () {
-      studentsocket.emit('currentlocation', '/studentvote');
-    });
-
-    if (groupsocket == undefined) {
-      window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+    if (this.$activeSession == undefined) {
+      window.alert("You are disconnected from your session");
       router.push('/');
     }
     else {
-      studentsocket.emit('initialThoughtsStudent', this.$activeSession);
-      studentsocket.on('displayInitialThoughts', function (info) {
-        if (info.session == this.$activeSession) {
-          this.thoughts = info.thoughts;
-          //initialize component with as many poll objs as there are thoughts
-          for (var n = 0; n < info.thoughts.length; n++) {
-            this.listoptions.push(
-              {
-                options: {
-                  customId: n + 1,
-                  showTotalVotes: true,
-                  question: 'Do you think this thought is heteronomy or autonomy?',
-                  answers: [
-                    { value: 1, text: 'Heteronomy', votes: 0 },
-                    { value: 2, text: 'Autonomy', votes: 0 }
-                  ],
+      studentsocket.on('wantcurrentlocation', function () {
+        studentsocket.emit('currentlocation', '/studentvote');
+      });
+
+      if (groupsocket == undefined) {
+        window.alert("You are disconnected from your group, please log in again with the same username to join your group");
+        router.push('/');
+      }
+      else {
+        studentsocket.emit('initialThoughtsStudent', this.$activeSession);
+        studentsocket.on('displayInitialThoughts', function (info) {
+          if (info.session == this.$activeSession) {
+            this.thoughts = info.thoughts;
+            //initialize component with as many poll objs as there are thoughts
+            for (var n = 0; n < info.thoughts.length; n++) {
+              this.listoptions.push(
+                {
+                  options: {
+                    customId: n + 1,
+                    showTotalVotes: true,
+                    question: 'Do you think this thought is heteronomy or autonomy?',
+                    answers: [
+                      { value: 1, text: 'Heteronomy', votes: 0 },
+                      { value: 2, text: 'Autonomy', votes: 0 }
+                    ],
+                  }
                 }
-              }
-            );
+              );
+            }
           }
-        }
-      }.bind(this));
+        }.bind(this));
 
-      studentsocket.emit('studentwantvotes', this.$activeSession);
-      studentsocket.on('studentshowvotes', function (info) {
+        studentsocket.emit('studentwantvotes', this.$activeSession);
+        studentsocket.on('studentshowvotes', function (info) {
           console.log("student want wotes: " + JSON.stringify(info.votes));
-          console.log("student want wotes: " + info.session + " and "+ this.$activeSession);
-          
-        if (info.session == this.$activeSession) {
-          console.log(JSON.stringify(info.votes));
-          for (var i in info.votes) {
-            this.addVoteObj(info.votes[i]);
-          }
-        }
-      }.bind(this));
+          console.log("student want wotes: " + info.session + " and " + this.$activeSession);
 
-      //listen for student votes and updating the poll votes accordingly
-      studentsocket.on('vote', function(obj) {
-        if (obj.session == this.$activeSession) {
+          if (info.session == this.$activeSession) {
+            console.log(JSON.stringify(info.votes));
+            for (var i in info.votes) {
+              this.addVoteObj(info.votes[i]);
+            }
+          }
+        }.bind(this));
+
+        //listen for student votes and updating the poll votes accordingly
+        studentsocket.on('vote', function (obj) {
+          if (obj.session == this.$activeSession) {
             this.addVoteObj(obj);
-        }
-      }.bind(this));
+          }
+        }.bind(this));
+      }
     }
   } ,
   methods: {
@@ -1577,6 +1674,7 @@ const router = new VueRouter({
     },
     {
       path:'/',
+      name: 'login',
       component:Login
     },
     {
@@ -1699,8 +1797,24 @@ const app = new Vue({
       name: 'StudentWorkshop',
     }
    },
-  created: function() {
-   
+   mounted() {
+      },
+   created: function() {
+  
+    if (this.$activeSession == undefined && this.$router.currentRoute.path != "/") {
+      console.log(this.$router.currentRoute);
+      window.alert("The session was reset or disconnected");
+      router.push("/");
+    }
+
+ 
+    studentsocket.on('studentresetsessions', function(session) {
+      console.log("setuuggkf: " + session);
+      if (this.$activeSession == session) {
+        console.log("studentreset session");
+        Vue.prototype.$activeSession = undefined;
+      }
+    }.bind(this));
     studentsocket.on('activeSessionsNames', function(sessions){
       //list of all active sessions
       Vue.prototype.$sessions = sessions;
@@ -1718,7 +1832,13 @@ const app = new Vue({
  
     studentsocket.on('redirectcomponent', function(info) {
       if (info.session == this.$activeSession)  {
-        router.push({name: info.comp});
+        if (info.comp == 'login') {
+          this.$router.replace({ name: "login" });
+          console.log("login");
+        }
+        else {
+          router.push({name: info.comp});
+        }
       }
     }.bind(this));
   }
