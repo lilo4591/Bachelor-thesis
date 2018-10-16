@@ -96,6 +96,8 @@ Data.prototype.addStudent = function (username, socketid, session) {
 //deletes a student which has disconnected
 Data.prototype.removeStudent = function (socketid) {
   //new
+  var studentfound = false;
+  var sessionfound;
   //delete the id from group but keep the name of the student
   for (let key in this.activeSessions) {
     //    console.log("groups: "  + key);
@@ -105,6 +107,21 @@ Data.prototype.removeStudent = function (socketid) {
         if (this.activeSessions[key].groups[i].students[n].id == socketid) {
           this.activeSessions[key].groups[i].students[n].id = null;
           console.log("student deleted was: " + this.activeSessions[key].groups[i].students[n].studentname);
+          studentfound = true;
+          sessionfound = key;
+        }
+      }
+    }
+  }
+  //if the student haz no group, delete the name of the student from server
+  if (studentfound == false) {
+    for (let sessionfound in this.activeSessions) {
+      for (var i in this.activeSessions[sessionfound].students) {
+        if (this.activeSessions[sessionfound].students[i].id == socketid) {
+          console.log("student(with no group) deleted was " + this.activeSessions[sessionfound].students[i].studentname);
+          this.activeSessions[sessionfound].students.splice(i, 1);
+          console.log("students remaining in this session" + JSON.stringify(this.activeSessions[sessionfound].students));
+
         }
       }
     }

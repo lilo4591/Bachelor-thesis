@@ -235,13 +235,14 @@ const StartWorkshop = Vue.component('StartWorkshop', {
   `,
   created: function() {
     console.log(JSON.stringify(this.students));
+    console.log("route params: " + this.$route.params.sessionID);
     if (this.$route.params.sessionID != undefined) {
       Vue.prototype.$session = Number(this.$route.params.sessionID);
       this.session = this.$session;
       //TODO cannot read property 1234 of undefined
-      if (this.$students[this.$session] == undefined) {
-          this.$students[this.$session] = [];
-      }
+      //if (this.$students[this.$session] == undefined) {
+      //    this.$students[this.$session] = [];
+     // }
       console.log(this.session);
     }
     console.log('now at session: ' + this.$session);
@@ -300,7 +301,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
-      if (this.students.length !== 0) {
+      if (this.students.length !== 0 && n > 0) {
         socket.emit('generateGroups', {groupSize: n, session: this.session});
         console.log("start generate: " + n); 
       }
