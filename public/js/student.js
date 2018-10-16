@@ -1807,18 +1807,23 @@ const app = new Vue({
       router.push("/");
     }
 
- 
+    if (this.$sessions == undefined) {
+      console.log("ask for sessions");
+      studentsocket.emit("wantsession");
+
+    }
     studentsocket.on('studentresetsessions', function(session) {
       console.log("setuuggkf: " + session);
       if (this.$activeSession == session) {
         console.log("studentreset session");
         Vue.prototype.$activeSession = undefined;
+        Vue.prototype.$groupName = null;
       }
     }.bind(this));
     studentsocket.on('activeSessionsNames', function(sessions){
       //list of all active sessions
       Vue.prototype.$sessions = sessions;
-      console.log(this.$sessions);
+      console.log(JSON.stringify(this.$sessions));
     }.bind(this));
 
     //specific to redirect after reconnection

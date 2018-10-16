@@ -598,7 +598,7 @@ var teacherconnection = teacherio.on('connection', function (socket) {
     var i;
     var len;
     for (i = 0, len = data.activeSessions[info.session].groupNames.length; i < len; i++) {
-//      console.log("loop i: " + i);
+      console.log("loop i: " + i + " and at session: "  + info.session);
 //      console.log("groupnames i: " + JSON.stringify(data.activeSessions[info.session].groupNames));
       console.log("LENGTH" + (data.activeSessions[info.session].groupNames.length));
       io.of(data.activeSessions[info.session].groupNames[i]).on('connection', groupsmessages(i, info.session));
@@ -674,6 +674,7 @@ function generateGroups(groupSize, session) {
 function resetGroups(groupnames, session) {
   //disconnect the students from the groups groups
   for (var i in groupnames) {
+    console.log("in reset group variavle: " + i);
     const namespace = io.of(groupnames[i]);
     const connectedstudents = Object.keys(namespace.connected);
     connectedstudents.forEach(socketId => {
@@ -695,11 +696,13 @@ function resetSessions(){
     var session = data.activeSessions[data.activeSessionsNames[s]];
     var groupnames = session.groupNames;
     studentconnection.emit('redirectcomponent', {'session' : data.activeSessionsNames[s], 'comp' : 'login'});
+    console.log("in resetsessions: " + data.activeSessionsNames[s]);
     studentconnection.emit('studentresetsessions', data.activeSessionsNames[s]);
     //    studentconnection.to(allstudents[index].id).emit('redirectcomponent', {'session': session, 'component': 'start'});
-    for (var g in groupnames) {
-      resetGroups(groupnames[g], data.activeSessionsNames[s]);
-    }
+    //for (var g in groupnames) {
+      //console.log("in foorloop in reset sessions step: " + groupnames[g]);
+      resetGroups(groupnames, data.activeSessionsNames[s]);
+    //}
   }
   console.log("sessions now: " + JSON.stringify(data.activeSessions));
   data.activeSessions = {};
@@ -710,8 +713,10 @@ function groupsmessages(index, session) {
   return function (socket) {
     //listening for studens disconnecting from gropus
     socket.on('disconnect', function () {
-      console.log("Student with socketID: " + socket.id + " disconnected from group: " + data.activeSessions[session].groupNames[index]);
-    });
+      if (data.activeSessions[session] != undefined) {
+        console.log("Student with socketID: " + socket.id + " disconnected from group: " + data.activeSessions[session].groupNames[index]);
+      }
+      });
 
     
     console.log("A student joined a group " + data.activeSessions[session].groupNames[index]);
