@@ -129,7 +129,7 @@ data: function() {
           <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
           <router-link to="/resetsessions">Clear all sessions</router-link>
        </nav>
-        <p>Start an existing workshop or start new</p>
+        <p>Start an existing workshop or start a new</p>
           <div>
            <router-link :to="{name:'startworkshop', params: {'sessionID': sessionId}}" v-on:click="setSession(sessionId)" v-for="(sessionId, index) in sessions" :key='index'>
            <button class="sessionbutton"> 

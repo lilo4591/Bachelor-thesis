@@ -1810,8 +1810,8 @@ const app = new Vue({
     if (this.$sessions == undefined) {
       console.log("ask for sessions");
       studentsocket.emit("wantsession");
-
     }
+
     studentsocket.on('studentresetsessions', function(session) {
       console.log("setuuggkf: " + session);
       if (this.$activeSession == session) {
