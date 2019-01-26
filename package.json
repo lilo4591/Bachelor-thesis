@@ -9,6 +9,10 @@
   },
   "author": "Linn Lofquist",
   "license": "ISC",
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.x"
+  },
   "dependencies": {
     "esri-leaflet-geocoder": "^2.2.8",
     "express": "^4.16.3",
