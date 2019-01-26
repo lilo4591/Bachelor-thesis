@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public/')));
 app.use('/vue', express.static(path.join(__dirname, '/node_modules/vue/dist/')));
 
 // Serve teacherpage.html directly as root page
-app.get('/teacher', function (req, res) {
+app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'views/teacherpage.html'));
 });
 
