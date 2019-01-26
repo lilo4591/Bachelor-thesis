@@ -1,6 +1,9 @@
 # Ethical Competence workshop system
 The Ethical competence workshop system is a website designed to be used during workshops to train and increase ethical competence.
 
+## 0. Try the application
+If you want to try the application, go to [Teacher view](https://ethical-competence-app.herokuapp.com/teacher) and log in with username: teacher2018 and password: notsecurepassword and [Student view](https://ethical-competence-app.herokuapp.com/student) 
+
 ## 1. Getting Started
 Clone the repository.
 
