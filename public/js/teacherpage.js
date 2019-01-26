@@ -3,8 +3,8 @@ var socket = io('/teacher');
 //global variable to keep track analysis input each group as an obj
 Vue.prototype.$analys = [];
 //TODO: read dilemma from file or db to be able to change it.
-Vue.prototype.$staticdilemma = 
-"A student are conducting her master thesis at the university. " +
+Vue.prototype.$staticdilemma =
+  "A student are conducting her master thesis at the university. " +
   "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
   "To test this algorithm the student implements a system that uses the algorithm to hack into different companies's systems. " +
   "The algorithm manages to find a few vulnerabilities and this is added to the report. " +
@@ -12,7 +12,7 @@ Vue.prototype.$staticdilemma =
   "One of the companies's security team notices that they have been attacked and can track the attack back to the student and are planning to press charges. " +
   "But the student however did not do any damage to the companies's system and claims that she did them a favor, because now they can make their systems more secure."
 
-  Vue.use(VuePoll);
+Vue.use(VuePoll);
 
 
 const Help = Vue.component('Help', {
@@ -38,20 +38,20 @@ const Help = Vue.component('Help', {
       Go Back
     </router-link>
   </div>`
-  });
+});
 
 const LogIn = Vue.component('login', {
-  data: function() {
+  data: function () {
     return {
       username: "",
       password: "",
     }
   },
- methods : {
+  methods: {
     logIn() {
       this.$parent.logIn(this.username, this.password);
     }
-   },
+  },
   template: `<div>
       <nav>
         <router-link to="/help">Help</router-link>
@@ -69,20 +69,20 @@ const LogIn = Vue.component('login', {
 
 
 const TeacherStartPage = Vue.component('TeacherStartPage', {
-  data: function() {
+  data: function () {
     return {
       session: null,
     };
   },
   methods: {
-  logOut() {
+    logOut() {
       this.$parent.logOut();
     },
-  popUp() {
-    window.alert("This is not yet implemented.");
-  }
+    popUp() {
+      window.alert("This is not yet implemented.");
+    }
   },
-  template:`
+  template: `
         <div id="app">
         <p>{{this.name}}</p>
         <nav>
@@ -98,7 +98,7 @@ const TeacherStartPage = Vue.component('TeacherStartPage', {
 });
 
 const Sessions = Vue.component('Sessions', {
-data: function() {
+  data: function () {
     return {
       session: null,
       sessions: this.$sessions,
@@ -106,24 +106,24 @@ data: function() {
     };
   },
 
-  created: function()  {
-   socket.emit('wantallsessions');
-  
-  },
- methods: {
-  
-   generateSession(min, max) {
-    Vue.prototype.$session = Math.floor(Math.random() * (max - min) )+ min;
-    this.session = this.$session;
-    console.log(this.session);
-    socket.emit('teachergeneratesession', this.session);
+  created: function () {
     socket.emit('wantallsessions');
-   },
-   logOut() {
+
+  },
+  methods: {
+
+    generateSession(min, max) {
+      Vue.prototype.$session = Math.floor(Math.random() * (max - min)) + min;
+      this.session = this.$session;
+      console.log(this.session);
+      socket.emit('teachergeneratesession', this.session);
+      socket.emit('wantallsessions');
+    },
+    logOut() {
       this.$parent.logOut();
     }
-   },
-  template:`
+  },
+  template: `
         <div id="app">
        <nav>
           <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
@@ -146,19 +146,19 @@ data: function() {
 });
 
 const ResetSessions = Vue.component('ResetSessions', {
-data: function() {
-  return {
-    deleted: false
-  }
-},
+  data: function () {
+    return {
+      deleted: false
+    }
+  },
   methods: {
-  resetsessions(){
-    this.deleted = true;
-    Vue.prototype.$sessions = [];
-    socket.emit('resetsessions');
-  }
-},
-template: `
+    resetsessions() {
+      this.deleted = true;
+      Vue.prototype.$sessions = [];
+      socket.emit('resetsessions');
+    }
+  },
+  template: `
 <div>
   <p v-if="deleted==false">Are you sure you want to resent all sessions?
   This will delete all sessions, groups and their work.</p>
@@ -180,7 +180,7 @@ template: `
 });
 
 const StartWorkshop = Vue.component('StartWorkshop', {
-  data: function() {
+  data: function () {
     return {
       name: 'Startworkshop',
       student: '',
@@ -190,7 +190,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
       groupObject: null,
     };
   },
-   template: `
+  template: `
  
     <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
@@ -198,7 +198,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     <nav>
           <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
        </nav>
-       <h2>Log in to <b>localhost:3000/student</b> with sessiontoken {{ session }} </h2>
+       <h2>Log in to <b>https://ethical-competence-app.herokuapp.com/student</b> with sessiontoken {{ session }} </h2>
       <ul>
         <div v-for="(data,index) in students" :key='index'>
           <li>{{students[index]}} has connected</li>
@@ -230,22 +230,12 @@ const StartWorkshop = Vue.component('StartWorkshop', {
           Go Back
         </router-link>
     </div>
-  
-  
   `,
-  created: function() {
-    console.log(JSON.stringify(this.students));
-    console.log("route params: " + this.$route.params.sessionID);
+  created: function () {
     if (this.$route.params.sessionID != undefined) {
       Vue.prototype.$session = Number(this.$route.params.sessionID);
       this.session = this.$session;
-      //TODO cannot read property 1234 of undefined
-      //if (this.$students[this.$session] == undefined) {
-      //    this.$students[this.$session] = [];
-     // }
-      console.log(this.session);
     }
-    console.log('now at session: ' + this.$session);
     if (this.$session != undefined) {
       socket.emit('wantstudents', this.$session);
       socket.on('sendstudents', function (info) {
@@ -256,61 +246,42 @@ const StartWorkshop = Vue.component('StartWorkshop', {
           }
         }
       }.bind(this));
-    socket.emit('wantgroups', this.$session);
-    socket.on('sendgroups', function(info){
-      console.log('want group session: ' + info.session);
-      console.log('typeof info.session: ' + typeof(info.session));
-      console.log('this session: ' + this.$session);
-      if (info.session == this.$session) {
-        console.log("in if");
-        this.groupObject = info.groups
-       /* for (var i in info.groups) {
-          for (var m in info.groups[i].students) {
-            var student = info.groups[i].students[m].studentname;
-            this.addStudent(student);
-          }
-        }*/
-      console.log("all students already connected: " + this.students);
-      }
-
-    }.bind(this));
-  }
-     socket.on('groupInfo', function(data) {
-        console.log("groupinfo");
-        if (data.session == this.$session) {
-          console.log(JSON.stringify(data.groupObject));
-          this.groupObject = data.groupObject;
+      socket.emit('wantgroups', this.$session);
+      socket.on('sendgroups', function (info) {
+        if (info.session == this.$session) {
+          this.groupObject = info.groups
         }
       }.bind(this));
-   
-    socket.on("StudentLoggedIn", function(info) {
-      console.log('student logged in ' + this.$session);
-      if (info.session == this.$session) {  
-          
-          this.students.push(info.username);
+    }
+    socket.on('groupInfo', function (data) {
+      if (data.session == this.$session) {
+        this.groupObject = data.groupObject;
       }
-      }.bind(this));    
-    
-    },
+    }.bind(this));
+    socket.on("StudentLoggedIn", function (info) {
+      if (info.session == this.$session) {
+        this.students.push(info.username);
+      }
+    }.bind(this));
+  },
 
- methods: {    
-  logOut() {
+  methods: {
+    logOut() {
       this.$parent.logOut();
     },
-     addStudent(studentUsername) { 
+    addStudent(studentUsername) {
       this.students.push(studentUsername);
     },
     generateGroups(n) {
       if (this.students.length !== 0 && n > 0) {
-        socket.emit('generateGroups', {groupSize: n, session: this.session});
-        console.log("start generate: " + n); 
+        socket.emit('generateGroups', { groupSize: n, session: this.session });
       }
     },
   }
 });
 
 const workshopExercises = Vue.component('WorkshopExercises', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       name: 'workshopExercises',
@@ -319,7 +290,7 @@ const workshopExercises = Vue.component('WorkshopExercises', {
       ]
     };
   },
-   template: `
+  template: `
     <div>
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <br>
@@ -362,27 +333,27 @@ const workshopExercises = Vue.component('WorkshopExercises', {
     </div>
   
   ` ,
-  methods: { 
-   logOut() {
+  methods: {
+    logOut() {
       this.$parent.logOut();
     },
-     navigateStudentsTo(exercisecomp) {
-      socket.emit("navigateStudentsToComp", {'comp' : exercisecomp, 'session' : this.$session});
+    navigateStudentsTo(exercisecomp) {
+      socket.emit("navigateStudentsToComp", { 'comp': exercisecomp, 'session': this.$session });
     }
   }
 });
 
 const Settings = Vue.component('Settings', {
- 
-  data: function() {
+
+  data: function () {
     return {
       responseShow: false,
       response: "All exercise input deleted.",
-       session: this.$session,
+      session: this.$session,
     }
   },
   methods: {
-  clearAllInput() {
+    clearAllInput() {
       socket.emit('clearallinput', this.$session);
       this.responseShow = true;
     }
@@ -403,37 +374,35 @@ const Settings = Vue.component('Settings', {
     </router-link>
   </div>
 `
-  
+
 });
 
 const Provocative1 = Vue.component('provocative1', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       thought: '',
       thoughts: []
     }
   },
-  created: function() {
-    socket.on('collectsituations', function(info) {
-      console.log('collectsituations');
+  created: function () {
+    socket.on('collectsituations', function (info) {
       if (info.situations != null && info.session == this.$session) {
         this.thoughts = info.situations;
-        console.log(info.situations);
       }
-  }.bind(this));
+    }.bind(this));
   },
   methods: {
-    addThought() { 
-      this.thoughts.push({situation: this.thought});
+    addThought() {
+      this.thoughts.push({ situation: this.thought });
       this.thought = '';
     },
     removeThought(id) {
-      this.thoughts.splice(id,1);
+      this.thoughts.splice(id, 1);
     },
     collectAllSituations() {
       socket.emit("wantsituations", this.$session);
-      socket.emit("navigateStudentsToComp", {'comp' : "situationsfullclass", 'session': this.$session});
+      socket.emit("navigateStudentsToComp", { 'comp': "situationsfullclass", 'session': this.$session });
     }
   },
   template: `
@@ -470,32 +439,31 @@ const Provocative1 = Vue.component('provocative1', {
 
 
 const Provocative2love = Vue.component('provocative2love', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       thought: '',
       thoughts: [],
     }
   },
-  created: function() {
-    socket.on('collectrisks', function(info) {
+  created: function () {
+    socket.on('collectrisks', function (info) {
       if (info.risks != null && info.session == this.$session) {
         this.thoughts = info.risks;
-        console.log(info.risks);
       }
-  }.bind(this));
+    }.bind(this));
   },
   methods: {
-    addThought() { 
-      this.thoughts.push({risk: this.thought});
+    addThought() {
+      this.thoughts.push({ risk: this.thought });
       this.thought = '';
     },
     removeThought(id) {
-      this.thoughts.splice(id,1);
+      this.thoughts.splice(id, 1);
     },
     collectAllRisks() {
       socket.emit("wantrisks", this.$session);
-      socket.emit("navigateStudentsToComp", {'comp' : "lovefullclass", 'session': this.$session});
+      socket.emit("navigateStudentsToComp", { 'comp': "lovefullclass", 'session': this.$session });
     }
   },
   //TODO generate loverisks arguments from txtfile or db
@@ -533,7 +501,7 @@ const Provocative2love = Vue.component('provocative2love', {
 
 
 const Provocative3War = Vue.component('provocative3war', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       groupObject: null,
@@ -541,21 +509,20 @@ const Provocative3War = Vue.component('provocative3war', {
       thoughts: [],
     }
   },
-  created: function() {
-    socket.on('collectposs', function(info) {
+  created: function () {
+    socket.on('collectposs', function (info) {
       if (info.session == this.$session) {
         this.thoughts = info.poss;
       }
-  }.bind(this));
+    }.bind(this));
   },
   methods: {
-   removeThought(id) {
-    this.thoughts.splice(id,1);
+    removeThought(id) {
+      this.thoughts.splice(id, 1);
     },
-   collectAll() {
-    console.log('wantposs session: ' + this.$session);
-    socket.emit("wantposs", this.$session);
-    socket.emit("navigateStudentsToComp", {'comp' : "warfullclass", 'session' : this.$session});
+    collectAll() {
+      socket.emit("wantposs", this.$session);
+      socket.emit("navigateStudentsToComp", { 'comp': "warfullclass", 'session': this.$session });
     }
   },
   //TODO generate arguments from txtfile or db
@@ -592,16 +559,16 @@ const Provocative3War = Vue.component('provocative3war', {
 });
 
 const ProvocativeConclusion = Vue.component('provocativeConclusion', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
     };
   },
 
 
-template:
+  template:
 
-`
+    `
 <div id="app">
   <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
   <div id="textright">Step <b>4</b> of <b>4</b></div><br>
@@ -625,7 +592,7 @@ template:
 
 //Teacher showing dilemma and displaying student thoughts
 const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       staticdilemma: this.$staticdilemma,
@@ -633,23 +600,23 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
       thoughts: []
     }
   },
-  created: function() {
-    socket.on('displayThoughts', function(info) {
-     if (info.session == this.$session) {
-      this.thoughts = info.thoughts;
-    }
-      
-    }.bind(this));  
-  } ,
+  created: function () {
+    socket.on('displayThoughts', function (info) {
+      if (info.session == this.$session) {
+        this.thoughts = info.thoughts;
+      }
+
+    }.bind(this));
+  },
   methods: {
-    addThought() { 
-      this.thoughts.push({thought: this.thought});
+    addThought() {
+      this.thoughts.push({ thought: this.thought });
       this.thought = '';
     },
     removeThought(id) {
-      this.thoughts.splice(id,1);
+      this.thoughts.splice(id, 1);
     }
-   
+
   },
   //TODO: add dilemma here
   template: `
@@ -685,7 +652,7 @@ const autonomyHeteronomy1 = Vue.component('autonomyHeteronomy1', {
 
 //Instructions on formulation own dilemma and thought reflexes
 const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       name: "autonomyHeteronomy2",
@@ -694,10 +661,10 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   },
   methods: {
     updateDisplayReflex(bool) {
-      this.displayreflex = bool;      
+      this.displayreflex = bool;
     }
-  }, 
- template: `
+  },
+  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>2</b> of <b>7</b></div><br>
@@ -727,17 +694,17 @@ const autonomyHeteronomy2 = Vue.component('autonomyHeteronomy2', {
   </div>
   `
 });
-  
+
 //Dogmatiska låsningar
 //TODO translate dogmatiska låsningar
 const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       name: "autonomyHeteronomy3"
     }
-  }, 
- template: `
+  },
+  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>3</b> of <b>7</b></div><br>
@@ -762,13 +729,13 @@ const autonomyHeteronomy3 = Vue.component('autonomyHeteronomy3', {
 //Konkreta värden
 //TODO: Evaluate concretee values and explain it further
 const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       name: "autonomyHeteronomy4"
     }
-  }, 
- template: `
+  },
+  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>4</b> of <b>7</b></div><br>
@@ -794,13 +761,13 @@ const autonomyHeteronomy4 = Vue.component('autonomyHeteronomy4', {
 //Handlingalternativ och värden(vad kan göras?)
 //TODO: Evaluate actionoptions and explain it further
 const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       name: "autonomyHeteronomy5"
     }
-  }, 
- template: `
+  },
+  template: `
   <div id="app"> 
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>5</b> of <b>7</b></div><br>
@@ -823,15 +790,15 @@ const autonomyHeteronomy5 = Vue.component('autonomyHeteronomy5', {
 });
 
 var analysis = Vue.component('analysis', {
-  data: function() {
+  data: function () {
     return {
       groupsanalys: this.$analys,
       session: this.$session
     }
-  
+
   },
 
-  template:`
+  template: `
   <div id="app">
     <div id="textleft"> Sessiontoken: <b>{{session}}</b></div>
     <div id="textright">Step <b>6</b> of <b>7</b></div><br>
@@ -872,7 +839,7 @@ var analysis = Vue.component('analysis', {
 });
 
 const showAnalysis = Vue.component('showAnalysis', {
-  data:function() {
+  data: function () {
     return {
       session: this.$session,
       dilemma: "",
@@ -888,9 +855,9 @@ const showAnalysis = Vue.component('showAnalysis', {
     this.group = this.$route.params.groupanalys.group;
     this.actionAlternatives = this.$route.params.groupanalys.actionAlternatives;
     this.concreteValues = this.$route.params.groupanalys.concreteValues;
-    this.principles = this.$route.params.groupanalys.principles; 
+    this.principles = this.$route.params.groupanalys.principles;
     this.reflexthoughts = this.$route.params.groupanalys.reflexThoughts;
-    
+
   },
 
   template: `
@@ -947,12 +914,12 @@ const showAnalysis = Vue.component('showAnalysis', {
       Go back
     </router-link>
   </div>
-` 
+`
 
 });
 
 const Vote = Vue.component('Vote', {
-  data: function() {
+  data: function () {
     return {
       session: this.$session,
       thought: '',
@@ -961,29 +928,28 @@ const Vote = Vue.component('Vote', {
       i: 0,
       showVotes: false,
       showNextButton: true,
-      listoptions: [ {options: {
-                      customId: 0,
-                      showTotalVotes: true,
-                      showResults: true,
-                      question: 'Do you think this thought is heteronomy or autonomy?',
-                        answers: [
-                                    { value: 1, text: 'Heteronomy', votes: 0 },
-                                    { value: 2, text: 'Autonomy', votes: 0 }
-                                  ],
-                                }
-      } ]
+      listoptions: [{
+        options: {
+          customId: 0,
+          showTotalVotes: true,
+          showResults: true,
+          question: 'Do you think this thought is heteronomy or autonomy?',
+          answers: [
+            { value: 1, text: 'Heteronomy', votes: 0 },
+            { value: 2, text: 'Autonomy', votes: 0 }
+          ],
+        }
+      }]
 
     }
   },
-  created: function() {
-   socket.emit('initialThoughts', this.$session);
+  created: function () {
+    socket.emit('initialThoughts', this.$session);
     socket.on('displayInitialThoughts', function (info) {
-      console.log('display init thoughts '+ info.session);
       if (info.session == this.$session) {
         this.thoughts = info.thoughts;
         //initialize component with as many poll objs as there are thoughts
         for (var n = 0; n < info.thoughts.length; n++) {
-          console.log("loop step: " + n);
           this.listoptions.push(
             {
               options: {
@@ -1001,62 +967,56 @@ const Vote = Vue.component('Vote', {
         }
       }
     }.bind(this));
-  
+
     socket.emit('wantvotes', this.$session);
-    socket.on('showvotes', function(info) {
+    socket.on('showvotes', function (info) {
       if (info.session == this.$session) {
         for (var i in info.votes) {
           this.addVoteObj(info.votes[i]);
-        } 
-    }
+        }
+      }
     }.bind(this));
-    
-  //listen for student votes and updating the poll votes accordingly
-  socket.on('vote', function(obj) {
-    if (obj.session == this.$session) {
-     this.addVoteObj(obj); 
-    }
-  }.bind(this));
+
+    //listen for student votes and updating the poll votes accordingly
+    socket.on('vote', function (obj) {
+      if (obj.session == this.$session) {
+        this.addVoteObj(obj);
+      }
+    }.bind(this));
   },
   methods: {
-  addVoteObj(obj) {
-    console.log('vote recieved');
-        if (obj.answer === "Heteronomy") {
-          console.log(obj.answer);
-          this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
-          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[0].votes);
-        }
-        else if (obj.answer === "Autonomy") {
-          console.log(obj.answer);
-          this.listoptions[obj.thoughtindex].options.answers[1].votes += 1; 
-          console.log("after update: " + this.listoptions[obj.thoughtindex].options.answers[1].votes);
-          console.log(JSON.stringify(obj));
-        }   
-      },
+    addVoteObj(obj) {
+      if (obj.answer === "Heteronomy") {
+        this.listoptions[obj.thoughtindex].options.answers[0].votes += 1;
+      }
+      else if (obj.answer === "Autonomy") {
+        this.listoptions[obj.thoughtindex].options.answers[1].votes += 1;
+      }
+    },
     updateShowIndex() {
       if (this.i >= this.thoughts.length - 1) {
         this.showNextButton = false;
       }
       else {
         this.i += 1;
-        this.showVotes=false;
+        this.showVotes = false;
       }
     },
-    showResult(){
-      this.showVotes=true;
+    showResult() {
+      this.showVotes = true;
     },
-    goBackOneQuestion(){
+    goBackOneQuestion() {
       if (this.i != 0) {
         this.i -= 1;
       }
     },
-    addVote(obj){
+    addVote(obj) {
       console.log('You voted ' + obj.value + '!');
       console.log(JSON.stringify(obj));
-      
+
     },
     navigateStudentsToStart() {
-      socket.emit('navigateStudentsToComp', {'comp' : "start", 'session' : this.$session });
+      socket.emit('navigateStudentsToComp', { 'comp': "start", 'session': this.$session });
     }
   },
   template: `
@@ -1095,17 +1055,17 @@ const Vote = Vue.component('Vote', {
          Continue
          </router-link>
   </div>`
-  });
+});
 
 const router = new VueRouter({
-  routes:[
+  routes: [
     {
-      path:'/help',
-      component:Help
+      path: '/help',
+      component: Help
     },
     {
-      path:'/',
-      component:LogIn,
+      path: '/',
+      component: LogIn,
       name: 'login'
     },
     {
@@ -1117,85 +1077,85 @@ const router = new VueRouter({
       component: ResetSessions
     },
     {
-      path:'/startworkshop',
+      path: '/startworkshop',
       name: 'startworkshop',
-      component:StartWorkshop
+      component: StartWorkshop
     },
     {
-      path:'/workshopexercises',
-      component:workshopExercises
+      path: '/workshopexercises',
+      component: workshopExercises
     },
     {
-      path:'/provocative1',
-      component:Provocative1
+      path: '/provocative1',
+      component: Provocative1
     },
     {
-      path:'/provocative2love',
-      component:Provocative2love
+      path: '/provocative2love',
+      component: Provocative2love
     },
     {
-      path:'/provocative3war',
-      component:Provocative3War
+      path: '/provocative3war',
+      component: Provocative3War
     },
     {
       //conslusion on the provocative exercise
-      path:'/provocativeconclusion',
-      component:ProvocativeConclusion
+      path: '/provocativeconclusion',
+      component: ProvocativeConclusion
     },
     {
-      path:'/autonomyheteronomy1',
-      component:autonomyHeteronomy1
+      path: '/autonomyheteronomy1',
+      component: autonomyHeteronomy1
     },
     {
       //Reflex thoughts
-      path:'/autonomyheteronomy2',
-      component:autonomyHeteronomy2
+      path: '/autonomyheteronomy2',
+      component: autonomyHeteronomy2
     },
     {
       //Dogmatiska låsningar
-      path:'/autonomyheteronomy3',
-      component:autonomyHeteronomy3
+      path: '/autonomyheteronomy3',
+      component: autonomyHeteronomy3
     },
     {
       //Konkreta värden (vem berörs och vad är deras värderingar)
-      path:'/autonomyheteronomy4',
-      component:autonomyHeteronomy4
+      path: '/autonomyheteronomy4',
+      component: autonomyHeteronomy4
     },
     {
       //Handlingalternativ och värden(vad kan göras?)
-      path:'/autonomyheteronomy5',
-      component:autonomyHeteronomy5
+      path: '/autonomyheteronomy5',
+      component: autonomyHeteronomy5
     },
     {
       //rediricting page with summaryanalyisis links
-      path:'/analysis',
+      path: '/analysis',
       component: analysis,
       name: 'analysis'
     },
     {
       //rediricting page with summaryanalyisis links
-      path:'/showanalysis',
+      path: '/showanalysis',
       component: showAnalysis,
       name: 'showanalysis'
     },
     {
       //voting on the inital dilemma input, autonomy or heteronomy?
-      path:'/vote',
-      component:Vote
+      path: '/vote',
+      component: Vote
     },
     {
       //delete input from server
-      path:'/settings',
-      component:Settings
+      path: '/settings',
+      component: Settings
     },
     {
       //decide which session to start with
-      path:'/sessions',
-      component:Sessions
+      path: '/sessions',
+      component: Sessions
     }
-  
- 
- 
+
+
+
   ]
 });
 
@@ -1204,7 +1164,7 @@ const app = new Vue({
   name: 'Workshop',
   router,
   socket,
- data() {
+  data() {
     return {
       authenticated: false,
       mockaccount: {
@@ -1215,49 +1175,44 @@ const app = new Vue({
       session: null,
       thoughts: []
     }
-   },
-   mounted() {
-     if(!this.authenticated) {
-        this.$router.replace({ name: "login" });
-       }
-   },
-   methods: {
-     logOut() {
-        this.authenticated = false;
-        this.$router.replace({ name: "login" });
-     },
+  },
+  mounted() {
+    if (!this.authenticated) {
+      this.$router.replace({ name: "login" });
+    }
+  },
+  methods: {
+    logOut() {
+      this.authenticated = false;
+      this.$router.replace({ name: "login" });
+    },
     logIn(username, password) {
       if (this.username != "" && this.password != "") {
         if (username == this.mockaccount.username && password == this.mockaccount.password) {
-          this.authenticated = true; 
-          console.log("printtest " + this.authenticated);
+          this.authenticated = true;
           router.push('/teacherstartpage');
+        }
+        else {
+          window.alert("Username or password was incorrect");
+        }
       }
       else {
-        window.alert("Username or password was incorrect");
+        window.alert("please fill in the fields");
       }
     }
-    else {
-      window.alert("please fill in the fields");
-    }
-   }
-   },
-  created: function() {
-   socket.emit('wantallsessions');
-    socket.on('allsessions', function(sessions) {
+  },
+  created: function () {
+    socket.emit('wantallsessions');
+    socket.on('allsessions', function (sessions) {
       Vue.prototype.$sessions = sessions;
-      console.log('vue sessionscomp: ' + this.$sessions);
     });
     socket.on('showanalysis', function (data) {
       if (data.session == this.$session) {
         var contains = false;
         var index;
-        //console.log("new analys " + data.group);
         for (var i in this.$analys) {
           //if this groups analysis already existis
-          //console.log("existing analys in index " + i + this.$analys[i].group);
           if (data.group === this.$analys[i].group) {
-            //console.log('match');
             contains = true;
             index = i;
           }
