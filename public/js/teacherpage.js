@@ -198,7 +198,7 @@ const StartWorkshop = Vue.component('StartWorkshop', {
     <nav>
           <router-link to="/login" v-if="this.$parent.authenticated" v-on:click.native="logOut()" replace>Logout</router-link>
        </nav>
-       <h2>Log in to <b>https://ethical-competence-app.herokuapp.com/student</b> with sessiontoken {{ session }} </h2>
+       <h2>Log in to <b>ethical-competence-app.herokuapp.com/student</b> with sessiontoken {{ session }} </h2>
       <ul>
         <div v-for="(data,index) in students" :key='index'>
           <li>{{students[index]}} has connected</li>
