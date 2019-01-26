@@ -394,7 +394,7 @@ const Settings = Vue.component('Settings', {
    <button id="right" class="smallbutton" v-on:click="clearAllInput()">
       Clear all input
     </button>
-   <p id="textleft" v-if="responseShow">{{response}}</p>
+   <p v-if="responseShow">{{response}}</p>
     <router-link tag="button" class="navbutton" to="/workshopexercises">
       <i id="left" class="material-icons">
         arrow_back
