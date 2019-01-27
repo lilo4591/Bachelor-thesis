@@ -4,7 +4,7 @@ var socket = io('/teacher');
 Vue.prototype.$analys = [];
 //TODO: read dilemma from file or db to be able to change it.
 Vue.prototype.$staticdilemma =
-  "A student are conducting her master thesis at the university. " +
+  "A student is conducting her master thesis at the university. " +
   "The thesis is about developing an algorithm used to find vulnerabilities in computer systems. " +
   "To test this algorithm the student implements a system that uses the algorithm to hack into different companies's systems. " +
   "The algorithm manages to find a few vulnerabilities and this is added to the report. " +
